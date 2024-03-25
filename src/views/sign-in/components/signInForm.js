@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   Button,
   Flex,
@@ -22,6 +22,7 @@ import { ButtonPrimary } from "components/button-primary";
 
 export const SignInForm = () => {
   const { signIn } = useContext(AuthContext);
+  const history = useNavigate();
 
   const {
     handleSubmit,
@@ -41,7 +42,7 @@ export const SignInForm = () => {
 
   const handleSignIn = async (data) => {
     setIsSignInLoading(true);
-    await signIn(data);
+    await signIn(data, history);
     setIsSignInLoading(false);
   };
 

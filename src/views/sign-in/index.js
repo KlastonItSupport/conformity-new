@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Box,
-  HStack,
-  VStack,
-  useBreakpointValue,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import { SignInForm } from "./components/signInForm";
 import { RightSideMessage } from "./components/rightSideMessage";
 

@@ -1,15 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "assets/css/App.css";
-import { Route, Switch, Redirect } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ThemeEditorProvider } from "@hypertheme-editor/chakra-ui";
 import { AuthProvider } from "providers/auth";
 import theme from "./theme/theme";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BrowserRouter } from "react-router-dom/cjs/react-router-dom.min";
 import SignInPage from "views/sign-in";
+import { UsersPage } from "views/users";
+
+const routes = createBrowserRouter([
+  {
+    path: "/",
+    element: <SignInPage />,
+  },
+  {
+    path: "signin",
+    element: <SignInPage />,
+  },
+  {
+    path: "users",
+    element: <UsersPage />,
+  },
+]);
 
 ReactDOM.render(
   <AuthProvider>
@@ -17,12 +32,7 @@ ReactDOM.render(
       <ToastContainer />
       <React.StrictMode>
         <ThemeEditorProvider>
-          <BrowserRouter>
-            <Switch>
-              <Route path={`/signin`} component={SignInPage} />
-              <Redirect from="/" to="/admin" />
-            </Switch>
-          </BrowserRouter>
+          <RouterProvider router={routes} />
         </ThemeEditorProvider>
       </React.StrictMode>
     </ChakraProvider>

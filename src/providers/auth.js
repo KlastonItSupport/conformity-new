@@ -1,5 +1,6 @@
 import { api } from "api/api";
 import { createContext } from "react";
+
 import { toast } from "react-toastify";
 
 const AuthContext = createContext();
@@ -8,7 +9,7 @@ const AuthProvider = ({ children }) => {
   const accessTokenKey = "@Conformity:accessToken";
   const userKey = "@Conformity:user";
 
-  const signIn = async (data) => {
+  const signIn = async (data, history) => {
     try {
       const response = await api.post("/users/signIn", data);
 
@@ -24,13 +25,29 @@ const AuthProvider = ({ children }) => {
       localStorage.setItem(userKey, JSON.stringify(user));
 
       toast.success("Login feito com sucesso");
+      history("/users");
     } catch (_) {
       toast.error("Ocorreu um erro");
     }
   };
 
+  const dealingWithAuth = (shouldRedirect, redirectRoute, history) => {
+    const hasAccessToken = localStorage.getItem(accessTokenKey);
+    const hasUser = localStorage.getItem(userKey);
+
+    if (hasAccessToken && hasUser) {
+      if (shouldRedirect) {
+        history(redirectRoute);
+      }
+      return;
+    }
+    history("/signin");
+  };
+
   return (
-    <AuthContext.Provider value={{ signIn }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ signIn, dealingWithAuth }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 
