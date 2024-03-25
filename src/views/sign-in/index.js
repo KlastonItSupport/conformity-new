@@ -1,10 +1,17 @@
 import React from "react";
-import { Box, HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
+import {
+  Box,
+  HStack,
+  VStack,
+  useBreakpointValue,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { SignInForm } from "./components/signInForm";
 import { RightSideMessage } from "./components/rightSideMessage";
 
 function SignInPage() {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
+
   return (
     <Box w={"100vw"} h={"100vh"} bg={"primary.50"}>
       {isDesktop ? (

@@ -1,16 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "assets/css/App.css";
-import { HashRouter, Route, Switch, Redirect } from "react-router-dom";
-import AuthLayout from "layouts/auth";
-import AdminLayout from "layouts/admin";
-import RtlLayout from "layouts/rtl";
+import { Route, Switch, Redirect } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ThemeEditorProvider } from "@hypertheme-editor/chakra-ui";
 import { AuthProvider } from "providers/auth";
 import theme from "./theme/theme";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BrowserRouter } from "react-router-dom/cjs/react-router-dom.min";
+import SignInPage from "views/sign-in";
 
 ReactDOM.render(
   <AuthProvider>
@@ -18,14 +17,12 @@ ReactDOM.render(
       <ToastContainer />
       <React.StrictMode>
         <ThemeEditorProvider>
-          <HashRouter>
+          <BrowserRouter>
             <Switch>
-              <Route path={`/auth`} component={AuthLayout} />
-              <Route path={`/admin`} component={AdminLayout} />
-              <Route path={`/rtl`} component={RtlLayout} />
+              <Route path={`/signin`} component={SignInPage} />
               <Redirect from="/" to="/admin" />
             </Switch>
-          </HashRouter>
+          </BrowserRouter>
         </ThemeEditorProvider>
       </React.StrictMode>
     </ChakraProvider>

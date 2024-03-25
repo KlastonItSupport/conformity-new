@@ -2,7 +2,8 @@ import { mode } from "@chakra-ui/theme-tools";
 export const globalStyles = {
   colors: {
     primary: {
-      50: "#0086ff0a",
+      50: "#F5FAFF",
+      75: "#EBF5FF",
       100: "#0086FF",
       200: "#0075df",
     },
