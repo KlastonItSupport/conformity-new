@@ -8,26 +8,25 @@ const AuthProvider = ({ children }) => {
   const accessTokenKey = "@Conformity:accessToken";
   const userKey = "@Conformity:user";
 
-  const signIn = (data) => {
-    api
-      .post("/users/signIn", data)
-      .then((response) => {
-        const { accessToken } = response.data;
-        const user = {
-          id: response.data.id,
-          name: response.data.name,
-          email: data.email,
-          accessRule: response.data.accessRule,
-        };
+  const signIn = async (data) => {
+    try {
+      const response = await api.post("/users/signIn", data);
 
-        localStorage.setItem(accessTokenKey, accessToken);
-        localStorage.setItem(userKey, JSON.stringify(user));
+      const { accessToken } = response.data;
+      const user = {
+        id: response.data.id,
+        name: response.data.name,
+        email: data.email,
+        accessRule: response.data.accessRule,
+      };
 
-        toast.success("Login feito com sucesso");
-      })
-      .catch((_) => {
-        toast.error("Aconteceu um erro.");
-      });
+      localStorage.setItem(accessTokenKey, accessToken);
+      localStorage.setItem(userKey, JSON.stringify(user));
+
+      toast.success("Login feito com sucesso");
+    } catch (_) {
+      toast.error("Ocorreu um erro");
+    }
   };
 
   return (

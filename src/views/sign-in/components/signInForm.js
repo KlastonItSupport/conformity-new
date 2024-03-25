@@ -18,6 +18,7 @@ import { signInSchema } from "schemas/auth/sign-in.schema";
 import FormInput from "components/form-input/form-input";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
+import { ButtonPrimary } from "components/button-primary";
 
 export const SignInForm = () => {
   const { signIn } = useContext(AuthContext);
@@ -35,6 +36,15 @@ export const SignInForm = () => {
 
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
+
+  const [isSignInLoading, setIsSignInLoading] = React.useState(false);
+
+  const handleSignIn = async (data) => {
+    setIsSignInLoading(true);
+    await signIn(data);
+    setIsSignInLoading(false);
+  };
+
   return (
     <Flex
       flexDirection="column"
@@ -70,7 +80,7 @@ export const SignInForm = () => {
         <Flex align="center" mb="25px">
           <HSeparator />
         </Flex>
-        <form onSubmit={handleSubmit(signIn)}>
+        <form onSubmit={handleSubmit((data) => handleSignIn(data))}>
           <FormInput
             variant="auth"
             fontSize="sm"
@@ -142,7 +152,7 @@ export const SignInForm = () => {
               </Text>
             </NavLink>
           </Flex>
-          <Button
+          <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"
             w="100%"
@@ -155,9 +165,9 @@ export const SignInForm = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             type="submit"
-          >
-            Entrar
-          </Button>
+            label="Entrar"
+            isLoading={isSignInLoading}
+          />
         </form>
       </Flex>
     </Flex>
