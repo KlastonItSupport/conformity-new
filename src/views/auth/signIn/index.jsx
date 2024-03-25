@@ -3,9 +3,8 @@ import { Box, HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import { SignInForm } from "./components/signInForm";
 import { RightSideMessage } from "./components/rightSideMessage";
 
-function SignIn() {
+function SignInPage() {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
-
   return (
     <Box w={"100vw"} h={"100vh"} bg={"primary.50"}>
       {isDesktop ? (
@@ -23,4 +22,4 @@ function SignIn() {
   );
 }
 
-export default SignIn;
+export default SignInPage;

@@ -1,26 +1,35 @@
-import React from "react";
+import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  Box,
   Button,
   Flex,
-  FormControl,
   FormLabel,
   Heading,
-  Icon,
-  Input,
-  InputGroup,
-  InputRightElement,
   Select,
   Text,
   VStack,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { HSeparator } from "components/separator/Separator";
-import { MdOutlineRemoveRedEye } from "react-icons/md";
+import { AuthContext } from "providers/auth";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signInSchema } from "schemas/auth/sign-in.schema";
+import FormInput from "components/form-input/form-input";
 import { RiEyeCloseLine } from "react-icons/ri";
+import { MdOutlineRemoveRedEye } from "react-icons/md";
 
 export const SignInForm = () => {
+  const { signIn } = useContext(AuthContext);
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(signInSchema),
+  });
+
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.600";
 
@@ -61,60 +70,39 @@ export const SignInForm = () => {
         <Flex align="center" mb="25px">
           <HSeparator />
         </Flex>
-        <FormControl>
-          <FormLabel
-            display="flex"
-            ms="4px"
-            fontSize="sm"
-            fontWeight="500"
-            color={textColor}
-            mb="8px"
-          >
-            Email *
-          </FormLabel>
-          <Input
-            isRequired={true}
+        <form onSubmit={handleSubmit(signIn)}>
+          <FormInput
             variant="auth"
             fontSize="sm"
             ms={{ base: "0px", md: "0px" }}
             type="email"
             placeholder="emailexample@hotmail.com"
-            mb="24px"
+            margin="0 0 10px 0 "
             fontWeight="500"
             size="lg"
             borderRadius="6px"
             bgColor={"primary.50"}
+            {...register("email")}
+            error={errors.email?.message}
+            label="Email *"
           />
-          <FormLabel
-            ms="4px"
+
+          <FormInput
             fontSize="sm"
-            fontWeight="500"
-            color={textColor}
-            display="flex"
-          >
-            Senha *
-          </FormLabel>
-          <InputGroup size="md">
-            <Input
-              isRequired={true}
-              fontSize="sm"
-              placeholder="Min. 8 caracteres"
-              mb="24px"
-              size="lg"
-              type={show ? "text" : "password"}
-              variant="auth"
-              borderRadius="6px"
-              bgColor={"primary.50"}
-            />
-            <InputRightElement display="flex" alignItems="center" mt="4px">
-              <Icon
-                color={textColorSecondary}
-                _hover={{ cursor: "pointer" }}
-                as={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-                onClick={handleClick}
-              />
-            </InputRightElement>
-          </InputGroup>
+            placeholder="Min. 8 caracteres"
+            margin="0 0 10px 0 "
+            size="lg"
+            type={show ? "text" : "password"}
+            variant="auth"
+            borderRadius="6px"
+            icon={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+            bgColor={"primary.50"}
+            {...register("password")}
+            error={errors.password?.message}
+            label="Senha *"
+            onClickIcon={handleClick}
+          />
+
           <FormLabel
             ms="4px"
             fontSize="sm"
@@ -125,7 +113,6 @@ export const SignInForm = () => {
             Idioma
           </FormLabel>
           <Select
-            isRequired={true}
             variant="auth"
             fontSize="sm"
             ms={{ base: "0px", md: "0px" }}
@@ -136,6 +123,8 @@ export const SignInForm = () => {
             size="lg"
             borderRadius="6px"
             bgColor={"primary.50"}
+            // {...register("language")}
+            // error={errors.language?.message}
           >
             <option value="option1">Portugues</option>
             <option value="option1">Inglês</option>
@@ -165,10 +154,11 @@ export const SignInForm = () => {
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
+            type="submit"
           >
             Entrar
           </Button>
-        </FormControl>
+        </form>
       </Flex>
     </Flex>
   );

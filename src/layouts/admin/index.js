@@ -1,19 +1,11 @@
 // Chakra imports
-import {
-  Portal,
-  Box,
-  useDisclosure,
-  Text,
-  Button,
-  Link,
-} from "@chakra-ui/react";
+import { Portal, Box, useDisclosure } from "@chakra-ui/react";
 import Footer from "components/footer/FooterAdmin.js";
 // Layout components
 import Navbar from "components/navbar/NavbarAdmin.js";
 import Sidebar from "components/sidebar/Sidebar.js";
 import { SidebarContext } from "contexts/SidebarContext";
 import React, { useState } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
 import routes from "routes.js";
 
 // Custom Chakra theme
@@ -95,27 +87,7 @@ export default function Dashboard(props) {
     }
     return activeNavbar;
   };
-  const getRoutes = (routes) => {
-    return routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
-      }
-      if (prop.collapse) {
-        return getRoutes(prop.items);
-      }
-      if (prop.category) {
-        return getRoutes(prop.items);
-      } else {
-        return null;
-      }
-    });
-  };
+
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
   document.documentElement.dir = "ltr";
@@ -164,9 +136,7 @@ export default function Dashboard(props) {
                 pe="20px"
                 minH="100vh"
                 pt="50px"
-              >
-                <Switch>{getRoutes(routes)}</Switch>
-              </Box>
+              ></Box>
             ) : null}
             <Box>
               <Footer />

@@ -10,7 +10,7 @@ import { switchStyles } from "./components/switch";
 import { linkStyles } from "./components/link";
 import { breakpoints } from "./foundations/breakpoints";
 import { globalStyles } from "./styles";
-export default extendTheme(
+const theme = extendTheme(
   { breakpoints }, // Breakpoints
   globalStyles,
   badgeStyles, // badge styles
@@ -23,3 +23,5 @@ export default extendTheme(
   switchStyles, // switch styles
   CardComponent // card component
 );
+
+export default theme;
