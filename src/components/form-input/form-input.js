@@ -8,20 +8,23 @@ import {
 import React, { forwardRef } from "react";
 
 const FormInput = forwardRef(
-  ({ label, placeholder, error, margin, onClickIcon, icon, ...rest }, ref) => {
+  ({ label, error, margin, onClickIcon, width, icon, ...rest }, ref) => {
     return (
       <InputGroup
         size="md"
         display={"flex"}
         flexDirection={"column"}
         margin={margin}
+        width={width}
       >
-        <FormLabel ms="4px" fontSize="sm" fontWeight="500" display="flex">
-          {label}
-        </FormLabel>
+        {label && (
+          <FormLabel ms="4px" fontSize="sm" fontWeight="500" display="flex">
+            {label}
+          </FormLabel>
+        )}
+
         <Input
           fontSize="sm"
-          placeholder="Min. 8 caracteres"
           size="lg"
           variant="auth"
           borderRadius="6px"
