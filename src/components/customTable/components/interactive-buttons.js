@@ -51,7 +51,17 @@ export const InteractiveButtons = ({
   };
 
   const handleCSV = async () => {
-    const csvData = Papa.unparse(data);
+    const csvData = Papa.unparse(
+      data.map((user) => {
+        return {
+          empresa: user.company,
+          nome: user.name,
+          email: user.email,
+          status: user.status,
+          regraDeAcesso: user.accessRule,
+        };
+      })
+    );
     const downloadLink = document.createElement("a");
 
     downloadLink.href = URL.createObjectURL(

@@ -20,6 +20,7 @@ const NavigationLinks = ({ routeTree }) => {
           <Link
             color={route?.isCurrent ? "secondaryGray.600" : "primary.100"}
             href={route.path}
+            key={index + route.path}
           >
             <span>{isNotLast && "/ "}</span>
             {route.label}

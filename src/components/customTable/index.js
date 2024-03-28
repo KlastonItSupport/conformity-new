@@ -143,7 +143,7 @@ const TableCustom = ({
         isShowingThisColumn && (
           <Th
             onClick={() => handleSort(column.access)}
-            key={column.header + "th"}
+            key={column.header + "thx"}
             cursor={"pointer"}
             border={"1px solid #ddd"}
           >
@@ -161,7 +161,7 @@ const TableCustom = ({
       const isEvenNumber = index % 2 === 0 ? true : false;
       return (
         <Tr
-          key={item.name}
+          key={item.name + index}
           bgColor={isEvenNumber ? "#F5F5F5" : "white"}
           _hover={{ bgColor: "#ebebeb" }}
         >
@@ -177,20 +177,26 @@ const TableCustom = ({
               isChecked={selecteds[index + 1].checked}
             ></Checkbox>
           </Td>
-          {columns.map((column) => {
+          {columns.map((column, index) => {
+            //nn
             const isShowingThisColumn = visibleColumns.find(
               (visibleColumn) => column.header === visibleColumn
             );
             return (
               isShowingThisColumn && (
-                <Td border={"1px solid #ddd"}>{item[column.access]}</Td>
+                <Td border={"1px solid #ddd"} key={column + index}>
+                  {item[column.access]}
+                </Td>
               )
             );
           })}
           <Td border={"1px solid #ddd"}>
             <Box display={"flex"}>
               {actionButtons.map((button, index) => (
-                <Box onClick={() => actionButtonsOnClick[index](item.id)}>
+                <Box
+                  key={index + "x"}
+                  onClick={() => actionButtonsOnClick[index](item.id)}
+                >
                   {button}
                 </Box>
               ))}
@@ -267,7 +273,10 @@ const TableCustom = ({
               <Th border={"1px solid #ddd"}>
                 <Box display={"flex"}>
                   {actionButtons.map((button, index) => (
-                    <Box onClick={() => actionButtonsOnClickHeaders[index]()}>
+                    <Box
+                      key={index + "actionbuttons"}
+                      onClick={() => actionButtonsOnClickHeaders[index]()}
+                    >
                       {button}
                     </Box>
                   ))}

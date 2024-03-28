@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignInPage from "views/sign-in";
 import { UsersPage } from "views/users";
+import { UserProvider } from "providers/users";
 
 const routes = createBrowserRouter([
   {
@@ -28,14 +29,16 @@ const routes = createBrowserRouter([
 
 ReactDOM.render(
   <AuthProvider>
-    <ChakraProvider theme={theme}>
-      <ToastContainer />
-      <React.StrictMode>
-        <ThemeEditorProvider>
-          <RouterProvider router={routes} />
-        </ThemeEditorProvider>
-      </React.StrictMode>
-    </ChakraProvider>
+    <UserProvider>
+      <ChakraProvider theme={theme}>
+        <ToastContainer />
+        <React.StrictMode>
+          <ThemeEditorProvider>
+            <RouterProvider router={routes} />
+          </ThemeEditorProvider>
+        </React.StrictMode>
+      </ChakraProvider>
+    </UserProvider>
   </AuthProvider>,
   document.getElementById("root")
 );
