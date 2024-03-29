@@ -13,7 +13,7 @@ import {
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
 
-const EditModal = ({
+const ModalForm = ({
   isOpen,
   onClose,
   id,
@@ -21,6 +21,8 @@ const EditModal = ({
   formRef,
   title,
   description,
+  leftButtonLabel,
+  rightButtonLabel,
 }) => {
   const handleEdit = () => {
     formRef.current.dispatchEvent(
@@ -53,7 +55,7 @@ const EditModal = ({
               borderRadius="7px"
               _active={{ bgColor: "red.800" }}
               type="submit"
-              label="Cancelar"
+              label={leftButtonLabel}
               onClick={onClose}
               width="150px"
               marginRight="20px"
@@ -69,7 +71,7 @@ const EditModal = ({
               borderRadius="7px"
               _active={{ bgColor: "primary.200" }}
               type="submit"
-              label="Editar"
+              label={rightButtonLabel}
               onClick={handleEdit}
               width="150px"
             />
@@ -80,4 +82,4 @@ const EditModal = ({
   );
 };
 
-export default EditModal;
+export default ModalForm;

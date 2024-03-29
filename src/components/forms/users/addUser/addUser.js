@@ -1,11 +1,10 @@
-import { Select, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInput from "components/form-input/form-input";
 import { useForm } from "react-hook-form";
 import editUsersFormSchema from "./schema";
 import SelectInput from "components/select";
 
-export const EditUsersForm = ({ formRef }) => {
+export const AddUserForm = ({ formRef }) => {
   const {
     handleSubmit,
     register,
@@ -15,7 +14,7 @@ export const EditUsersForm = ({ formRef }) => {
   });
 
   const onSubmit = (data) => {
-    console.log("abassdasdsa", data); // Adicione o console.log aqui
+    console.log("abassdasdsa", data);
   };
   return (
     <form
@@ -56,6 +55,7 @@ export const EditUsersForm = ({ formRef }) => {
         error={errors.celphone?.message}
       />
       <SelectInput
+        label="Cargo"
         error={errors.role}
         options={[
           { label: "TI", value: "1" },
@@ -80,8 +80,8 @@ export const EditUsersForm = ({ formRef }) => {
         error={errors.email?.message}
       />
       <SelectInput
-        errors={errors.departament}
         label="Departamento"
+        errors={errors.departament}
         options={[
           { label: "Qualidade", value: "1" },
           { label: "Compras", value: "2" },
@@ -91,8 +91,8 @@ export const EditUsersForm = ({ formRef }) => {
       />
 
       <SelectInput
-        errors={errors.accessRule}
         label="Regra de acesso"
+        errors={errors.accessRule}
         {...register("accessRule")}
         options={[
           { label: "Super Admin", value: "option1" },
@@ -102,8 +102,8 @@ export const EditUsersForm = ({ formRef }) => {
       />
 
       <SelectInput
-        {...register("status")}
         label="Status"
+        {...register("status")}
         errors={errors.status}
         options={[
           {

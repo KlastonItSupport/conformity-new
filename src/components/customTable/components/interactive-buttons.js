@@ -30,13 +30,14 @@ export const InteractiveButtons = ({
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((user) => {
-        return {
-          empresa: user.company,
-          nome: user.name,
-          email: user.email,
-          status: user.status,
-          regraDeAcesso: user.accessRule,
-        };
+        const userParsed = {};
+        userParsed["Empresa"] = user.company;
+        userParsed["Nome"] = user.name;
+        userParsed["Email"] = user.email;
+        userParsed["Status"] = user.status;
+        userParsed["Regra de acesso"] = user.accessRule;
+
+        return userParsed;
       })
     );
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -53,13 +54,14 @@ export const InteractiveButtons = ({
   const handleCSV = async () => {
     const csvData = Papa.unparse(
       data.map((user) => {
-        return {
-          empresa: user.company,
-          nome: user.name,
-          email: user.email,
-          status: user.status,
-          regraDeAcesso: user.accessRule,
-        };
+        const userParsed = {};
+        userParsed["Empresa"] = user.company;
+        userParsed["Nome"] = user.name;
+        userParsed["Email"] = user.email;
+        userParsed["Status"] = user.status;
+        userParsed["Regra de acesso"] = user.accessRule;
+
+        return userParsed;
       })
     );
     const downloadLink = document.createElement("a");
@@ -149,7 +151,7 @@ export const InteractiveButtons = ({
                 }
               >
                 <Text>{column.header} </Text>
-                {isShowingThisColumn && <Check color="green" size={32} />}
+                {isShowingThisColumn && <Check color="green" size={20} />}
               </MenuItem>
             );
           })}

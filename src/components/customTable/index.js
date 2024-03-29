@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Checkbox,
@@ -18,14 +18,7 @@ import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { InteractiveButtons } from "./components/interactive-buttons";
 import FormInput from "components/form-input/form-input";
 
-const TableCustom = ({
-  columns,
-  data,
-  title,
-  actionButtons,
-  actionButtonsOnClick,
-  actionButtonsOnClickHeaders,
-}) => {
+const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
   const [sort, setSort] = useState({
     column: "",
     direction: "asc",
@@ -44,6 +37,38 @@ const TableCustom = ({
       };
     }),
   ]);
+
+  const resetSelecteds = () => {
+    setSelecteds([
+      {
+        id: "checkall",
+        checked: false,
+      },
+      ...data.map((user) => {
+        return {
+          id: user.id,
+          checked: false,
+        };
+      }),
+    ]);
+  };
+
+  useEffect(() => {
+    resetSelecteds();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+  useEffect(() => {
+    const checkedItems = selecteds.filter((selected) =>
+      selected.checked ? selected : undefined
+    );
+    if (checkedItems.length >= 1) {
+      onCheckItems(true);
+      return;
+    }
+
+    onCheckItems(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selecteds]);
 
   const [visibleColumns, setVisibleColumns] = useState(
     columns.map((column) => column.header)
@@ -96,6 +121,8 @@ const TableCustom = ({
       }
       return data;
     });
+
+    resetSelecteds();
   };
 
   const handleCheckBoxes = (isChecked, user, checkAll = false) => {
@@ -165,7 +192,7 @@ const TableCustom = ({
           bgColor={isEvenNumber ? "#F5F5F5" : "white"}
           _hover={{ bgColor: "#ebebeb" }}
         >
-          <Td border={"1px solid #ddd"}>
+          <Td border={"1px solid #ddd"} height={"15px"}>
             <Checkbox
               size="lg"
               _checked={{
@@ -184,7 +211,11 @@ const TableCustom = ({
             );
             return (
               isShowingThisColumn && (
-                <Td border={"1px solid #ddd"} key={column + index}>
+                <Td
+                  height={"15px"}
+                  border={"1px solid #ddd"}
+                  key={column + index}
+                >
                   {item[column.access]}
                 </Td>
               )
@@ -192,12 +223,13 @@ const TableCustom = ({
           })}
           <Td border={"1px solid #ddd"}>
             <Box display={"flex"}>
-              {actionButtons.map((button, index) => (
+              {icons.map((icon, index) => (
                 <Box
+                  cursor={"pointer"}
                   key={index + "x"}
-                  onClick={() => actionButtonsOnClick[index](item.id)}
+                  onClick={() => icon.onClickRow(item)}
                 >
-                  {button}
+                  {icon.icon}
                 </Box>
               ))}
             </Box>
@@ -226,6 +258,11 @@ const TableCustom = ({
         />
       </HStack>
     );
+  };
+
+  const shouldShowHeaderIcon = (icon) => {
+    if (!icon.shouldShow) return false;
+    return icon.isDisabled;
   };
   return (
     <Box w={isMobile ? "99vw" : "95vw"} margin={"0 auto"} bgColor={"white"}>
@@ -265,6 +302,7 @@ const TableCustom = ({
                       background: "primary.100",
                     },
                   }}
+                  isChecked={selecteds[0].checked}
                   onChange={(e) => handleCheckBoxes(e.target.checked, {}, true)}
                 />
               </Th>
@@ -272,12 +310,24 @@ const TableCustom = ({
 
               <Th border={"1px solid #ddd"}>
                 <Box display={"flex"}>
-                  {actionButtons.map((button, index) => (
+                  {icons.map((icon, index) => (
                     <Box
                       key={index + "actionbuttons"}
-                      onClick={() => actionButtonsOnClickHeaders[index]()}
+                      onClick={() =>
+                        shouldShowHeaderIcon(icon)
+                          ? icon.onClickHeader(selecteds)
+                          : () => {}
+                      }
+                      cursor={
+                        shouldShowHeaderIcon(icon) ? "pointer" : "not-allowed"
+                      }
+                      color={
+                        shouldShowHeaderIcon(icon)
+                          ? "black"
+                          : "secondaryGray.500"
+                      }
                     >
-                      {button}
+                      {icon.icon}
                     </Box>
                   ))}
                 </Box>

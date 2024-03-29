@@ -5,6 +5,11 @@ const SelectInput = forwardRef(
   ({ label, errors, register, options, ...rest }, ref) => {
     return (
       <>
+        {label && (
+          <Text fontSize="sm" fontWeight="500" pb="10px" pl={"5px"}>
+            {label}
+          </Text>
+        )}
         <Select
           ref={ref}
           variant="auth"

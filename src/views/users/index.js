@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   Box,
   Flex,
@@ -8,18 +8,18 @@ import {
 } from "@chakra-ui/react";
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import CheckTable from "../../components/customTable";
+import CustomTable from "../../components/customTable";
 import { columns, usersMock } from "./components/usersarray";
 import { Pagination } from "../../components/pagination/pagination";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
 import DeleteModal from "components/modals/deleteModal";
 import { ButtonPrimary } from "components/button-primary";
-import EditModal from "components/modals/editModal";
 import { EditUsersForm } from "components/forms/users/editUsers/editUsers";
 import { EditUsersPasswordForm } from "components/forms/users/editUsers/editPassword";
 import NavigationLinks from "components/navigationLinks";
 import { UserContext } from "providers/users";
+import ModalForm from "components/modals/modalForm";
+import { AddUserForm } from "components/forms/users/addUser/addUser";
 
 export const UsersPage = () => {
   const { dealingWithAuth } = useContext(AuthContext);
@@ -34,7 +34,6 @@ export const UsersPage = () => {
     selectedItems,
   } = useContext(UserContext);
 
-  const history = useNavigate();
   const formRef = useRef(null);
 
   useEffect(() => {
@@ -76,22 +75,28 @@ export const UsersPage = () => {
   } = useDisclosure();
 
   const {
+    isOpen: isAddUserModalOpen,
+    onOpen: onAddUserModalOpen,
+    onClose: onAddUserModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isDeleteSelectedUsers,
     onOpen: onDeleteSelectedUsersOpen,
     onClose: onDeleteSelectedUsersClose,
   } = useDisclosure();
 
-  const handleEditModalOpen = (id) => {
-    changeEditId(id);
+  const handleEditModalOpen = (item) => {
+    changeEditId(item);
     onEditModalOpen();
   };
 
-  const handleDeleteModalOpen = (id) => {
-    changeDeleteId(id);
+  const handleDeleteModalOpen = (item) => {
+    changeDeleteId(item);
     onDeleteModalOpen();
   };
 
-  const handleOnDeleteSelectedUsersClose = () => {
+  const handleOnDeleteSelectedUsersOpen = (selecteds) => {
     onDeleteSelectedUsersOpen();
   };
 
@@ -99,25 +104,45 @@ export const UsersPage = () => {
     onEditPasswordModalOpen();
   };
 
-  const handleTrainingModalOpen = (id) => {
-    // onTrainingModalOpen();
-  };
+  const [tableIcons, setTableIcons] = useState([
+    {
+      icon: <NotePencil size={20} />,
+      onClickRow: handleEditModalOpen,
+      onClickHeader: () => [],
+      isDisabled: false,
+      shouldShow: false,
+    },
+    {
+      icon: <Trash size={20} />,
+      onClickRow: handleDeleteModalOpen,
+      onClickHeader: handleOnDeleteSelectedUsersOpen,
+      isDisabled: false,
+      shouldShow: true,
+    },
+    {
+      icon: <Key size={20} />,
+      onClickRow: handlePasswordChangeModalOpen,
+      onClickHeader: () => [],
+      isDisabled: false,
+      shouldShow: false,
+    },
+  ]);
+
+  const routeTreePaths = [
+    {
+      path: "/",
+      label: "Dashboard",
+    },
+    {
+      path: "/users",
+      label: "Usuários",
+      isCurrent: true,
+    },
+  ];
 
   return (
     <VStack spacing={0} w="100%" h="100%" py={"30px"}>
-      <NavigationLinks
-        routeTree={[
-          {
-            path: "/",
-            label: "Dashboard",
-          },
-          {
-            path: "/users",
-            label: "Usuários",
-            isCurrent: true,
-          },
-        ]}
-      />
+      <NavigationLinks routeTree={routeTreePaths} />
       <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
         <ButtonPrimary
           fontSize="sm"
@@ -133,27 +158,27 @@ export const UsersPage = () => {
           type="submit"
           label=" + Adicionar"
           width="150px"
+          onClick={onAddUserModalOpen}
         />
       </Box>
-      <CheckTable
+      <CustomTable
         data={users}
         columns={columns}
         title={"Usuários"}
         actionButtons={[
-          <NotePencil size={20} cursor={"pointer"} />,
-          <Trash size={20} cursor={"pointer"} />,
-          <Key size={20} cursor={"pointer"} />,
+          <NotePencil size={20} cursor={"pointer"} color="black" />,
+          <Trash size={20} cursor={"pointer"} color="black" />,
+          <Key size={20} cursor={"pointer"} color="black" />,
         ]}
-        actionButtonsOnClick={[
-          handleEditModalOpen,
-          handleDeleteModalOpen,
-          handlePasswordChangeModalOpen,
-        ]}
-        actionButtonsOnClickHeaders={[
-          () => {},
-          handleOnDeleteSelectedUsersClose,
-          () => {},
-        ]}
+        icons={tableIcons}
+        onCheckItems={(show) => {
+          setTableIcons(
+            tableIcons.map((icon) => {
+              icon.isDisabled = show;
+              return icon;
+            })
+          );
+        }}
       />
       <Flex
         justifyContent={"end"}
@@ -167,7 +192,7 @@ export const UsersPage = () => {
         />
       </Flex>
 
-      <EditModal
+      <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={editId}
@@ -175,9 +200,11 @@ export const UsersPage = () => {
         formRef={formRef}
         title={"Editar Usuário"}
         description={"Tem certeza de que deseja Editar este usuário?"}
+        leftButtonLabel={"Cancelar"}
+        rightButtonLabel={"Editar"}
       />
 
-      <EditModal
+      <ModalForm
         isOpen={isEditPasswordModalOpen}
         onClose={onEditPasswordModalClose}
         id={editId}
@@ -185,6 +212,20 @@ export const UsersPage = () => {
         formRef={formRef}
         title={"Editar Senha"}
         description={"Tem certeza que deseja alterar a senha?"}
+        leftButtonLabel={"Cancelar"}
+        rightButtonLabel={"Editar"}
+      />
+
+      <ModalForm
+        isOpen={isAddUserModalOpen}
+        onClose={onAddUserModalClose}
+        id={editId}
+        form={<AddUserForm formRef={formRef} />}
+        formRef={formRef}
+        title={"Adicionar usuário"}
+        description={""}
+        leftButtonLabel={"Cancelar"}
+        rightButtonLabel={"Editar"}
       />
       <DeleteModal
         title={"Excluir Usuário"}
