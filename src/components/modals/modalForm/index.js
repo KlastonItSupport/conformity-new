@@ -13,7 +13,7 @@ import {
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
 
-const ModalForm = ({
+export const ModalForm = ({
   isOpen,
   onClose,
   id,
@@ -23,6 +23,7 @@ const ModalForm = ({
   description,
   leftButtonLabel,
   rightButtonLabel,
+  modalSize = "xl",
 }) => {
   const handleEdit = () => {
     formRef.current.dispatchEvent(
@@ -31,7 +32,7 @@ const ModalForm = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size={modalSize}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
@@ -81,5 +82,3 @@ const ModalForm = ({
     </Modal>
   );
 };
-
-export default ModalForm;

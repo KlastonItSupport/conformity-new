@@ -9,30 +9,20 @@ import {
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import CustomTable from "../../components/customTable";
-import { columns, usersMock } from "./components/usersarray";
+import { companiesMock, columns } from "./companieArray";
 import { Pagination } from "../../components/pagination/pagination";
-import { Key, NotePencil, Trash } from "@phosphor-icons/react";
-import DeleteModal from "components/modals/deleteModal";
+import { ArrowsLeftRight, NotePencil } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import { EditUsersForm } from "components/forms/users/editUsers/editUsers";
-import { EditUsersPasswordForm } from "components/forms/users/editUsers/editPassword";
 import NavigationLinks from "components/navigationLinks";
 import { UserContext } from "providers/users";
 import { ModalForm } from "components/modals/modalForm";
-import { AddUserForm } from "components/forms/users/addUser/addUser";
+import { CompanyForm } from "components/forms/companies/addCompany/addCompany";
 
-export const UsersPage = () => {
+export const CompaniesPage = () => {
   const { dealingWithAuth } = useContext(AuthContext);
   const itemsPerPage = 10;
-  const {
-    deleteId,
-    changeDeleteId,
-    editId,
-    changeEditId,
-    users,
-    changeUsers,
-    selectedItems,
-  } = useContext(UserContext);
+  const { editId, changeEditId, changeUsers } = useContext(UserContext);
 
   const formRef = useRef(null);
 
@@ -45,7 +35,7 @@ export const UsersPage = () => {
   const updateData = (page) => {
     const firstPostIndex = (page - 1) * itemsPerPage;
     const lastItemIndex = firstPostIndex + itemsPerPage;
-    const slicedData = usersMock.slice(firstPostIndex, lastItemIndex);
+    const slicedData = companiesMock.slice(firstPostIndex, lastItemIndex);
 
     changeUsers([...slicedData]);
   };
@@ -55,12 +45,12 @@ export const UsersPage = () => {
     lg: false,
     sm: true,
   });
-
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
+  const isDesktop = useBreakpointValue({
+    base: false,
+    md: false,
+    lg: true,
+    sm: false,
+  });
 
   const {
     isOpen: isEditModalOpen,
@@ -69,21 +59,9 @@ export const UsersPage = () => {
   } = useDisclosure();
 
   const {
-    isOpen: isEditPasswordModalOpen,
-    onOpen: onEditPasswordModalOpen,
-    onClose: onEditPasswordModalClose,
-  } = useDisclosure();
-
-  const {
     isOpen: isAddUserModalOpen,
     onOpen: onAddUserModalOpen,
     onClose: onAddUserModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isDeleteSelectedUsers,
-    onOpen: onDeleteSelectedUsersOpen,
-    onClose: onDeleteSelectedUsersClose,
   } = useDisclosure();
 
   const handleEditModalOpen = (item) => {
@@ -91,38 +69,18 @@ export const UsersPage = () => {
     onEditModalOpen();
   };
 
-  const handleDeleteModalOpen = (item) => {
-    changeDeleteId(item);
-    onDeleteModalOpen();
-  };
-
-  const handleOnDeleteSelectedUsersOpen = (selecteds) => {
-    onDeleteSelectedUsersOpen();
-  };
-
-  const handlePasswordChangeModalOpen = (id) => {
-    onEditPasswordModalOpen();
-  };
-
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <NotePencil size={20} />,
-      onClickRow: handleEditModalOpen,
+      onClickRow: (item) => handleEditModalOpen(item),
       onClickHeader: () => [],
       isDisabled: false,
       shouldShow: false,
     },
     {
-      icon: <Trash size={20} />,
-      onClickRow: handleDeleteModalOpen,
-      onClickHeader: handleOnDeleteSelectedUsersOpen,
-      isDisabled: false,
-      shouldShow: true,
-    },
-    {
-      icon: <Key size={20} />,
-      onClickRow: handlePasswordChangeModalOpen,
-      onClickHeader: () => [],
+      icon: <ArrowsLeftRight size={20} />,
+      onClickRow: () => {},
+      onClickHeader: () => {},
       isDisabled: false,
       shouldShow: false,
     },
@@ -134,8 +92,8 @@ export const UsersPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/users",
-      label: "Usuários",
+      path: "/companies",
+      label: "Empresas",
       isCurrent: true,
     },
   ];
@@ -162,14 +120,9 @@ export const UsersPage = () => {
         />
       </Box>
       <CustomTable
-        data={users}
+        data={companiesMock}
         columns={columns}
-        title={"Usuários"}
-        actionButtons={[
-          <NotePencil size={20} cursor={"pointer"} color="black" />,
-          <Trash size={20} cursor={"pointer"} color="black" />,
-          <Key size={20} cursor={"pointer"} color="black" />,
-        ]}
+        title={"Empresas"}
         icons={tableIcons}
         onCheckItems={(show) => {
           setTableIcons(
@@ -186,7 +139,7 @@ export const UsersPage = () => {
         bgColor={"white"}
       >
         <Pagination
-          data={usersMock}
+          data={companiesMock}
           onClickPagination={updateData}
           itemsPerPage={itemsPerPage}
         />
@@ -202,46 +155,32 @@ export const UsersPage = () => {
         description={"Tem certeza de que deseja Editar este usuário?"}
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
-        modalSize="xl"
-      />
-
-      <ModalForm
-        isOpen={isEditPasswordModalOpen}
-        onClose={onEditPasswordModalClose}
-        id={editId}
-        form={<EditUsersPasswordForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Editar Senha"}
-        description={"Tem certeza que deseja alterar a senha?"}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-        modalSize="xl"
       />
 
       <ModalForm
         isOpen={isAddUserModalOpen}
         onClose={onAddUserModalClose}
         id={editId}
-        form={<AddUserForm formRef={formRef} />}
+        form={<CompanyForm formRef={formRef} />}
         formRef={formRef}
-        title={"Adicionar usuário"}
+        title={"Adicionar Empresa"}
+        description={""}
+        leftButtonLabel={"Cancelar"}
+        rightButtonLabel={"Criar"}
+        modalSize={isDesktop ? "4xl" : "xl"}
+      />
+
+      <ModalForm
+        isOpen={isEditModalOpen}
+        onClose={onEditModalClose}
+        id={editId}
+        form={<CompanyForm formRef={formRef} />}
+        formRef={formRef}
+        title={"Editar empresa"}
         description={""}
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
-      />
-      <DeleteModal
-        title={"Excluir Usuário"}
-        subtitle={"Tem certeza de que deseja excluir este usuário?"}
-        isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
-        id={deleteId}
-      />
-      <DeleteModal
-        title={"Excluir Usuários"}
-        subtitle={"Tem certeza de que deseja excluir estes usuários?"}
-        isOpen={isDeleteSelectedUsers}
-        onClose={onDeleteSelectedUsersClose}
-        id={selectedItems}
+        modalSize={isDesktop ? "4xl" : "xl"}
       />
     </VStack>
   );

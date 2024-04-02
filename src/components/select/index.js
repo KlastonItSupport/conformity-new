@@ -2,11 +2,16 @@ import { Select, Text } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 
 const SelectInput = forwardRef(
-  ({ label, errors, register, options, ...rest }, ref) => {
+  ({ paddingLabel, label, errors, register, options, ...rest }, ref) => {
     return (
       <>
         {label && (
-          <Text fontSize="sm" fontWeight="500" pb="10px" pl={"5px"}>
+          <Text
+            fontSize="sm"
+            fontWeight="500"
+            pb={paddingLabel ? paddingLabel : "10px"}
+            pl={"5px"}
+          >
             {label}
           </Text>
         )}

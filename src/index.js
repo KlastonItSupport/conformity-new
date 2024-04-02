@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import SignInPage from "views/sign-in";
 import { UsersPage } from "views/users";
 import { UserProvider } from "providers/users";
+import { CompaniesPage } from "views/companies";
 
 const routes = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const routes = createBrowserRouter([
   {
     path: "users",
     element: <UsersPage />,
+  },
+  {
+    path: "companies",
+    element: <CompaniesPage />,
   },
 ]);
 

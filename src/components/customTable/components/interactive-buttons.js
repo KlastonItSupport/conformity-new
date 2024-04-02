@@ -18,6 +18,7 @@ export const InteractiveButtons = ({
   columns,
   data,
   setVisibleColumns,
+  downloadTitle,
 }) => {
   const isMobile = useBreakpointValue({
     base: false,
@@ -26,19 +27,24 @@ export const InteractiveButtons = ({
     sm: true,
   });
 
+  const dataKeys = Object.keys(data[0]).filter(
+    (key) => key !== "id" && key !== "passwordHash"
+  );
+
+  const dataWithoutSensitiveInfo = (item) => {
+    // delete dataKeys.id;
+    const itemFormatted = {};
+    columns.map(
+      (column, index) => (itemFormatted[column.header] = item[dataKeys[index]])
+    );
+
+    return itemFormatted;
+  };
+
   const handleExcel = () => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(
-      data.map((user) => {
-        const userParsed = {};
-        userParsed["Empresa"] = user.company;
-        userParsed["Nome"] = user.name;
-        userParsed["Email"] = user.email;
-        userParsed["Status"] = user.status;
-        userParsed["Regra de acesso"] = user.accessRule;
-
-        return userParsed;
-      })
+      data.map((item) => dataWithoutSensitiveInfo(item))
     );
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const workbookBlob = new Blob([XLSX.write(workbook, { type: "array" })], {
@@ -47,29 +53,20 @@ export const InteractiveButtons = ({
 
     const downloadLink = document.createElement("a");
     downloadLink.href = window.URL.createObjectURL(workbookBlob);
-    downloadLink.download = "usuarios-excel";
+    downloadLink.download = `${downloadTitle}-excel`;
     downloadLink.click();
   };
 
   const handleCSV = async () => {
     const csvData = Papa.unparse(
-      data.map((user) => {
-        const userParsed = {};
-        userParsed["Empresa"] = user.company;
-        userParsed["Nome"] = user.name;
-        userParsed["Email"] = user.email;
-        userParsed["Status"] = user.status;
-        userParsed["Regra de acesso"] = user.accessRule;
-
-        return userParsed;
-      })
+      data.map((item) => dataWithoutSensitiveInfo(item))
     );
     const downloadLink = document.createElement("a");
 
     downloadLink.href = URL.createObjectURL(
       new Blob([csvData], { type: "text/csv" })
     );
-    downloadLink.download = "usuarios-csv.csv";
+    downloadLink.download = `${downloadTitle}-csv.csv`;
     downloadLink.click();
   };
 
