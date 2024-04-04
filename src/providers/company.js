@@ -8,7 +8,7 @@ const CompanyContext = createContext();
 
 const CompanyProvider = ({ children }) => {
   const { getToken } = useContext(AuthContext);
-  const itemsPerPage = 2;
+  const itemsPerPage = 10;
   const [deleteId, setDeleteId] = useState();
   const [editId, setEditId] = useState(0);
   const [companies, setCompanies] = useState([]);
