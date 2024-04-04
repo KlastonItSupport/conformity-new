@@ -16,7 +16,6 @@ import React from "react";
 export const ModalForm = ({
   isOpen,
   onClose,
-  id,
   form,
   formRef,
   title,
@@ -25,7 +24,7 @@ export const ModalForm = ({
   rightButtonLabel,
   modalSize = "xl",
 }) => {
-  const handleEdit = () => {
+  const onSubmit = () => {
     formRef.current.dispatchEvent(
       new Event("submit", { cancelable: true, bubbles: true })
     );
@@ -71,9 +70,8 @@ export const ModalForm = ({
               boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
               borderRadius="7px"
               _active={{ bgColor: "primary.200" }}
-              type="submit"
               label={rightButtonLabel}
-              onClick={handleEdit}
+              onClick={onSubmit}
               width="150px"
             />
           </HStack>

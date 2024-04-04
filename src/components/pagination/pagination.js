@@ -1,16 +1,15 @@
 import { Button, HStack } from "@chakra-ui/react";
 import { useState } from "react";
 
-export const Pagination = ({ data, onClickPagination, itemsPerPage }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // const lastItemIndex = currentPage * itemsPerPage;
-  // const firstPostIndex = lastItemIndex - itemsPerPage;
-  // const currentItems = data.slice(firstPostIndex, lastItemIndex);
-
+export const Pagination = ({
+  data,
+  onClickPagination,
+  itemsPerPage,
+  currentPage,
+}) => {
   const pages = [];
 
-  for (let i = 1; i <= Math.ceil(data.length / itemsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(data?.length / itemsPerPage); i++) {
     pages.push(i);
   }
 
@@ -18,7 +17,6 @@ export const Pagination = ({ data, onClickPagination, itemsPerPage }) => {
   const initalPage = pages[0];
 
   const onPageClick = (page) => {
-    setCurrentPage(page);
     onClickPagination(page);
   };
 

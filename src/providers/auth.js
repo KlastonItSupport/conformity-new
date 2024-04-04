@@ -44,8 +44,15 @@ const AuthProvider = ({ children }) => {
     history("/signin");
   };
 
+  const getToken = () => {
+    const token = localStorage.getItem(accessTokenKey);
+    if (token) {
+      return token;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ signIn, dealingWithAuth }}>
+    <AuthContext.Provider value={{ signIn, dealingWithAuth, getToken }}>
       {children}
     </AuthContext.Provider>
   );

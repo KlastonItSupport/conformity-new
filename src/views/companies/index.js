@@ -6,39 +6,43 @@ import {
   useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
-import { AuthContext } from "providers/auth";
+// import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import CustomTable from "../../components/customTable";
-import { companiesMock, columns } from "./companieArray";
+import { columns } from "./companieArray";
 import { Pagination } from "../../components/pagination/pagination";
 import { ArrowsLeftRight, NotePencil } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
-import { EditUsersForm } from "components/forms/users/editUsers/editUsers";
 import NavigationLinks from "components/navigationLinks";
-import { UserContext } from "providers/users";
 import { ModalForm } from "components/modals/modalForm";
-import { CompanyForm } from "components/forms/companies/addCompany/addCompany";
+import { CompanyForm } from "components/forms/companies/company/company";
+import { CompanyContext } from "providers/company";
 
 export const CompaniesPage = () => {
-  const { dealingWithAuth } = useContext(AuthContext);
-  const itemsPerPage = 10;
-  const { editId, changeEditId, changeUsers } = useContext(UserContext);
+  // const { dealingWithAuth } = useContext(AuthContext);
+  const {
+    editId,
+    changeEditId,
+    companies,
+    updatePagination,
+    itemsPerPage,
+    companiesCopy,
+    currentPage,
+    getCompanies,
+  } = useContext(CompanyContext);
 
   const formRef = useRef(null);
 
   useEffect(() => {
     // dealingWithAuth(true, "/users", history);
-    updateData(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateData = (page) => {
-    const firstPostIndex = (page - 1) * itemsPerPage;
-    const lastItemIndex = firstPostIndex + itemsPerPage;
-    const slicedData = companiesMock.slice(firstPostIndex, lastItemIndex);
+  useEffect(() => {
+    getCompanies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    changeUsers([...slicedData]);
-  };
   const isMobile = useBreakpointValue({
     base: false,
     md: false,
@@ -119,8 +123,9 @@ export const CompaniesPage = () => {
           onClick={onAddUserModalOpen}
         />
       </Box>
+
       <CustomTable
-        data={companiesMock}
+        data={companies}
         columns={columns}
         title={"Empresas"}
         icons={tableIcons}
@@ -133,19 +138,20 @@ export const CompaniesPage = () => {
           );
         }}
       />
+
       <Flex
         justifyContent={"end"}
         w={isMobile ? "99vw" : "95vw"}
         bgColor={"white"}
       >
         <Pagination
-          data={companiesMock}
-          onClickPagination={updateData}
+          data={companiesCopy}
+          onClickPagination={updatePagination}
           itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
         />
       </Flex>
-
-      <ModalForm
+      {/* <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={editId}
@@ -155,13 +161,14 @@ export const CompaniesPage = () => {
         description={"Tem certeza de que deseja Editar este usuário?"}
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
-      />
-
+      /> */}
       <ModalForm
         isOpen={isAddUserModalOpen}
         onClose={onAddUserModalClose}
         id={editId}
-        form={<CompanyForm formRef={formRef} />}
+        form={
+          <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
+        }
         formRef={formRef}
         title={"Adicionar Empresa"}
         description={""}
@@ -169,8 +176,7 @@ export const CompaniesPage = () => {
         rightButtonLabel={"Criar"}
         modalSize={isDesktop ? "4xl" : "xl"}
       />
-
-      <ModalForm
+      {/* <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={editId}
@@ -181,7 +187,7 @@ export const CompaniesPage = () => {
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
         modalSize={isDesktop ? "4xl" : "xl"}
-      />
+      /> */}
     </VStack>
   );
 };

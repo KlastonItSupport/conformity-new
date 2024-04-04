@@ -12,6 +12,7 @@ import SignInPage from "views/sign-in";
 import { UsersPage } from "views/users";
 import { UserProvider } from "providers/users";
 import { CompaniesPage } from "views/companies";
+import { CompanyProvider } from "providers/company";
 
 const routes = createBrowserRouter([
   {
@@ -34,16 +35,18 @@ const routes = createBrowserRouter([
 
 ReactDOM.render(
   <AuthProvider>
-    <UserProvider>
-      <ChakraProvider theme={theme}>
-        <ToastContainer />
-        <React.StrictMode>
-          <ThemeEditorProvider>
-            <RouterProvider router={routes} />
-          </ThemeEditorProvider>
-        </React.StrictMode>
-      </ChakraProvider>
-    </UserProvider>
+    <CompanyProvider>
+      <UserProvider>
+        <ChakraProvider theme={theme}>
+          <ToastContainer />
+          <React.StrictMode>
+            <ThemeEditorProvider>
+              <RouterProvider router={routes} />
+            </ThemeEditorProvider>
+          </React.StrictMode>
+        </ChakraProvider>
+      </UserProvider>
+    </CompanyProvider>
   </AuthProvider>,
   document.getElementById("root")
 );

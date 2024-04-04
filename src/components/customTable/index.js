@@ -57,6 +57,7 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
     resetSelecteds();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+
   useEffect(() => {
     const checkedItems = selecteds.filter((selected) =>
       selected.checked ? selected : undefined
@@ -80,6 +81,7 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
     lg: false,
     sm: true,
   });
+
   const checkSortDirection = (columnName) => {
     if (columnName === sort.column && sort.direction === "desc") {
       return <CaretUp style={{ marginLeft: "10px" }} size={20} />;
@@ -87,11 +89,12 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
     return <CaretDown style={{ marginLeft: "10px" }} size={20} />;
   };
 
-  const handleSort = (column) => {
+  const handleSort = (column, index) => {
     if (sort.previousClicked && sort.previousClicked !== column) {
       sort.direction = "asc";
     }
     const newDirection = sort.direction === "asc" ? "desc" : "asc";
+
     setSort({
       column,
       direction: newDirection,
@@ -99,27 +102,18 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
     });
 
     data.sort((a, b) => {
-      if (column === "company") {
-        return (
-          a.company.localeCompare(b.company) * (newDirection === "asc" ? 1 : -1)
+      if (columns[index].sortFunc) {
+        return columns[index].sortFunc(
+          a,
+          b,
+          columns[index].access,
+          newDirection
         );
-      } else if (column === "name") {
-        return a.name.localeCompare(b.name) * (newDirection === "asc" ? 1 : -1);
-      } else if (column === "email") {
+      } else {
         return (
-          a.email.localeCompare(b.email) * (newDirection === "asc" ? 1 : -1)
-        );
-      } else if (column === "status") {
-        return (
-          a.status.localeCompare(b.status) * (newDirection === "asc" ? 1 : -1)
-        );
-      } else if (column === "accessRule") {
-        return (
-          a.accessRule.localeCompare(b.accessRule) *
-          (newDirection === "asc" ? 1 : -1)
+          a[column].localeCompare(b[column]) * (newDirection === "asc" ? 1 : -1)
         );
       }
-      return data;
     });
 
     resetSelecteds();
@@ -162,14 +156,14 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
   };
 
   const renderTableHeader = () => {
-    return columns.map((column) => {
+    return columns.map((column, index) => {
       const isShowingThisColumn = visibleColumns.find(
         (visibleColumn) => column.header === visibleColumn
       );
       return (
         isShowingThisColumn && (
           <Th
-            onClick={() => handleSort(column.access)}
+            onClick={() => handleSort(column.access, index)}
             key={column.header + "thx"}
             cursor={"pointer"}
             border={"1px solid #ddd"}
@@ -184,59 +178,61 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
   };
 
   const renderTableRows = () => {
-    return data.map((item, index) => {
-      const isEvenNumber = index % 2 === 0 ? true : false;
-      return (
-        <Tr
-          key={item.name + index}
-          bgColor={isEvenNumber ? "#F5F5F5" : "white"}
-          _hover={{ bgColor: "#ebebeb" }}
-        >
-          <Td border={"1px solid #ddd"} height={"15px"}>
-            <Checkbox
-              size="lg"
-              _checked={{
-                "& .chakra-checkbox__control": {
-                  background: "primary.100",
-                },
-              }}
-              onChange={(e) => handleCheckBoxes(e.target.checked, item)}
-              isChecked={selecteds[index + 1].checked}
-            ></Checkbox>
-          </Td>
-          {columns.map((column, index) => {
-            //nn
-            const isShowingThisColumn = visibleColumns.find(
-              (visibleColumn) => column.header === visibleColumn
-            );
-            return (
-              isShowingThisColumn && (
-                <Td
-                  height={"15px"}
-                  border={"1px solid #ddd"}
-                  key={column + index}
-                >
-                  {item[column.access]}
-                </Td>
-              )
-            );
-          })}
-          <Td border={"1px solid #ddd"}>
-            <Box display={"flex"}>
-              {icons.map((icon, index) => (
-                <Box
-                  cursor={"pointer"}
-                  key={index + "x"}
-                  onClick={() => icon.onClickRow(item)}
-                >
-                  {icon.icon}
-                </Box>
-              ))}
-            </Box>
-          </Td>
-        </Tr>
-      );
-    });
+    return (
+      data.length > 0 &&
+      data.map((item, index) => {
+        const isEvenNumber = index % 2 === 0 ? true : false;
+        return (
+          <Tr
+            key={item.name + index}
+            bgColor={isEvenNumber ? "#F5F5F5" : "white"}
+            _hover={{ bgColor: "#ebebeb" }}
+          >
+            <Td border={"1px solid #ddd"} height={"15px"}>
+              <Checkbox
+                size="lg"
+                _checked={{
+                  "& .chakra-checkbox__control": {
+                    background: "primary.100",
+                  },
+                }}
+                onChange={(e) => handleCheckBoxes(e.target.checked, item)}
+                isChecked={selecteds[index + 1]?.checked ?? false}
+              ></Checkbox>
+            </Td>
+            {columns.map((column, index) => {
+              const isShowingThisColumn = visibleColumns.find(
+                (visibleColumn) => column.header === visibleColumn
+              );
+              return (
+                isShowingThisColumn && (
+                  <Td
+                    height={"15px"}
+                    border={"1px solid #ddd"}
+                    key={column + index}
+                  >
+                    {item[column.access]}
+                  </Td>
+                )
+              );
+            })}
+            <Td border={"1px solid #ddd"}>
+              <Box display={"flex"}>
+                {icons.map((icon, index) => (
+                  <Box
+                    cursor={"pointer"}
+                    key={index + "x"}
+                    onClick={() => icon.onClickRow(item)}
+                  >
+                    {icon.icon}
+                  </Box>
+                ))}
+              </Box>
+            </Td>
+          </Tr>
+        );
+      })
+    );
   };
 
   const searchInput = () => {
@@ -282,12 +278,15 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
           </Text>
           {searchInput()}
         </Flex>
-        <InteractiveButtons
-          columns={columns}
-          data={data}
-          setVisibleColumns={setVisibleColumns}
-          visibleColumns={visibleColumns}
-        />
+        {data.length > 0 && (
+          <InteractiveButtons
+            columns={columns}
+            data={data}
+            setVisibleColumns={setVisibleColumns}
+            visibleColumns={visibleColumns}
+            downloadTitle={title}
+          />
+        )}
       </VStack>
       <Box width={"95vw"} overflow={"auto"}>
         <Table overflow={"auto"}>
