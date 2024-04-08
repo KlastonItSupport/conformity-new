@@ -12,7 +12,6 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import React from "react";
-import { sleep } from "helpers/sleep";
 
 export function ItemMenu({ icon, itemsList, label }) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
@@ -26,10 +25,7 @@ export function ItemMenu({ icon, itemsList, label }) {
         borderRadius={5}
         fontWeight="normal"
         onMouseEnter={onOpen}
-        onMouseLeave={async () => {
-          await sleep(700);
-          onClose();
-        }}
+        onMouseLeave={onClose}
       >
         <HStack>
           {label ? (
