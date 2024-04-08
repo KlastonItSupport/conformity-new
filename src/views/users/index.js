@@ -20,6 +20,7 @@ import NavigationLinks from "components/navigationLinks";
 import { UserContext } from "providers/users";
 import { ModalForm } from "components/modals/modalForm";
 import { AddUserForm } from "components/forms/users/addUser/addUser";
+import { NavBar } from "components/navbar";
 
 export const UsersPage = () => {
   const { dealingWithAuth } = useContext(AuthContext);
@@ -141,108 +142,111 @@ export const UsersPage = () => {
   ];
 
   return (
-    <VStack spacing={0} w="100%" h="100%" py={"30px"}>
-      <NavigationLinks routeTree={routeTreePaths} />
-      <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
-        <ButtonPrimary
-          fontSize="sm"
-          fontWeight="bold"
-          h="50"
-          mb="24px"
-          bgColor={"primary.100"}
-          _hover={{ bgColor: "primary.200" }}
-          textColor={"white"}
-          boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-          borderRadius="7px"
-          _active={{ bgColor: "primary.200" }}
-          type="submit"
-          label=" + Adicionar"
-          width="150px"
-          onClick={onAddUserModalOpen}
+    <>
+      <NavBar />
+      <VStack marginTop={"40px"} spacing={0} w="100%" h="100%">
+        <NavigationLinks routeTree={routeTreePaths} />
+        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
+          <ButtonPrimary
+            fontSize="sm"
+            fontWeight="bold"
+            h="50"
+            mb="24px"
+            bgColor={"primary.100"}
+            _hover={{ bgColor: "primary.200" }}
+            textColor={"white"}
+            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+            borderRadius="7px"
+            _active={{ bgColor: "primary.200" }}
+            type="submit"
+            label=" + Adicionar"
+            width="150px"
+            onClick={onAddUserModalOpen}
+          />
+        </Box>
+        <CustomTable
+          data={users}
+          columns={columns}
+          title={"Usuários"}
+          actionButtons={[
+            <NotePencil size={20} cursor={"pointer"} color="black" />,
+            <Trash size={20} cursor={"pointer"} color="black" />,
+            <Key size={20} cursor={"pointer"} color="black" />,
+          ]}
+          icons={tableIcons}
+          onCheckItems={(show) => {
+            setTableIcons(
+              tableIcons.map((icon) => {
+                icon.isDisabled = show;
+                return icon;
+              })
+            );
+          }}
         />
-      </Box>
-      <CustomTable
-        data={users}
-        columns={columns}
-        title={"Usuários"}
-        actionButtons={[
-          <NotePencil size={20} cursor={"pointer"} color="black" />,
-          <Trash size={20} cursor={"pointer"} color="black" />,
-          <Key size={20} cursor={"pointer"} color="black" />,
-        ]}
-        icons={tableIcons}
-        onCheckItems={(show) => {
-          setTableIcons(
-            tableIcons.map((icon) => {
-              icon.isDisabled = show;
-              return icon;
-            })
-          );
-        }}
-      />
-      <Flex
-        justifyContent={"end"}
-        w={isMobile ? "99vw" : "95vw"}
-        bgColor={"white"}
-      >
-        <Pagination
-          data={usersMock}
-          onClickPagination={updateData}
-          itemsPerPage={itemsPerPage}
+        <Flex
+          justifyContent={"end"}
+          w={isMobile ? "99vw" : "95vw"}
+          bgColor={"white"}
+        >
+          <Pagination
+            data={usersMock}
+            onClickPagination={updateData}
+            itemsPerPage={itemsPerPage}
+          />
+        </Flex>
+
+        <ModalForm
+          isOpen={isEditModalOpen}
+          onClose={onEditModalClose}
+          id={editId}
+          form={<EditUsersForm formRef={formRef} />}
+          formRef={formRef}
+          title={"Editar Usuário"}
+          description={"Tem certeza de que deseja Editar este usuário?"}
+          leftButtonLabel={"Cancelar"}
+          rightButtonLabel={"Editar"}
+          modalSize="xl"
         />
-      </Flex>
 
-      <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
-        id={editId}
-        form={<EditUsersForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Editar Usuário"}
-        description={"Tem certeza de que deseja Editar este usuário?"}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-        modalSize="xl"
-      />
+        <ModalForm
+          isOpen={isEditPasswordModalOpen}
+          onClose={onEditPasswordModalClose}
+          id={editId}
+          form={<EditUsersPasswordForm formRef={formRef} />}
+          formRef={formRef}
+          title={"Editar Senha"}
+          description={"Tem certeza que deseja alterar a senha?"}
+          leftButtonLabel={"Cancelar"}
+          rightButtonLabel={"Editar"}
+          modalSize="xl"
+        />
 
-      <ModalForm
-        isOpen={isEditPasswordModalOpen}
-        onClose={onEditPasswordModalClose}
-        id={editId}
-        form={<EditUsersPasswordForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Editar Senha"}
-        description={"Tem certeza que deseja alterar a senha?"}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-        modalSize="xl"
-      />
-
-      <ModalForm
-        isOpen={isAddUserModalOpen}
-        onClose={onAddUserModalClose}
-        id={editId}
-        form={<AddUserForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Adicionar usuário"}
-        description={""}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-      />
-      <DeleteModal
-        title={"Excluir Usuário"}
-        subtitle={"Tem certeza de que deseja excluir este usuário?"}
-        isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
-        id={deleteId}
-      />
-      <DeleteModal
-        title={"Excluir Usuários"}
-        subtitle={"Tem certeza de que deseja excluir estes usuários?"}
-        isOpen={isDeleteSelectedUsers}
-        onClose={onDeleteSelectedUsersClose}
-        id={selectedItems}
-      />
-    </VStack>
+        <ModalForm
+          isOpen={isAddUserModalOpen}
+          onClose={onAddUserModalClose}
+          id={editId}
+          form={<AddUserForm formRef={formRef} />}
+          formRef={formRef}
+          title={"Adicionar usuário"}
+          description={""}
+          leftButtonLabel={"Cancelar"}
+          rightButtonLabel={"Editar"}
+        />
+        <DeleteModal
+          title={"Excluir Usuário"}
+          subtitle={"Tem certeza de que deseja excluir este usuário?"}
+          isOpen={isDeleteModalOpen}
+          onClose={onDeleteModalClose}
+          id={deleteId}
+        />
+        <DeleteModal
+          title={"Excluir Usuários"}
+          subtitle={"Tem certeza de que deseja excluir estes usuários?"}
+          isOpen={isDeleteSelectedUsers}
+          onClose={onDeleteSelectedUsersClose}
+          id={selectedItems}
+        />
+      </VStack>
+    </>
   );
 };

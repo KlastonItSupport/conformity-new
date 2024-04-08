@@ -17,6 +17,7 @@ import NavigationLinks from "components/navigationLinks";
 import { ModalForm } from "components/modals/modalForm";
 import { CompanyForm } from "components/forms/companies/company/company";
 import { CompanyContext } from "providers/company";
+import { NavBar } from "components/navbar";
 
 export const CompaniesPage = () => {
   // const { dealingWithAuth } = useContext(AuthContext);
@@ -103,55 +104,57 @@ export const CompaniesPage = () => {
   ];
 
   return (
-    <VStack spacing={0} w="100%" h="100%" py={"30px"}>
-      <NavigationLinks routeTree={routeTreePaths} />
-      <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
-        <ButtonPrimary
-          fontSize="sm"
-          fontWeight="bold"
-          h="50"
-          mb="24px"
-          bgColor={"primary.100"}
-          _hover={{ bgColor: "primary.200" }}
-          textColor={"white"}
-          boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-          borderRadius="7px"
-          _active={{ bgColor: "primary.200" }}
-          type="submit"
-          label=" + Adicionar"
-          width="150px"
-          onClick={onAddUserModalOpen}
-        />
-      </Box>
+    <>
+      <NavBar />
+      <VStack marginTop={"40px"} spacing={0} w="100%" h="100%">
+        <NavigationLinks routeTree={routeTreePaths} />
+        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
+          <ButtonPrimary
+            fontSize="sm"
+            fontWeight="bold"
+            h="50"
+            mb="24px"
+            bgColor={"primary.100"}
+            _hover={{ bgColor: "primary.200" }}
+            textColor={"white"}
+            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+            borderRadius="7px"
+            _active={{ bgColor: "primary.200" }}
+            type="submit"
+            label=" + Adicionar"
+            width="150px"
+            onClick={onAddUserModalOpen}
+          />
+        </Box>
 
-      <CustomTable
-        data={companies}
-        columns={columns}
-        title={"Empresas"}
-        icons={tableIcons}
-        onCheckItems={(show) => {
-          setTableIcons(
-            tableIcons.map((icon) => {
-              icon.isDisabled = show;
-              return icon;
-            })
-          );
-        }}
-      />
-
-      <Flex
-        justifyContent={"end"}
-        w={isMobile ? "99vw" : "95vw"}
-        bgColor={"white"}
-      >
-        <Pagination
-          data={companiesCopy}
-          onClickPagination={updatePagination}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
+        <CustomTable
+          data={companies}
+          columns={columns}
+          title={"Empresas"}
+          icons={tableIcons}
+          onCheckItems={(show) => {
+            setTableIcons(
+              tableIcons.map((icon) => {
+                icon.isDisabled = show;
+                return icon;
+              })
+            );
+          }}
         />
-      </Flex>
-      {/* <ModalForm
+
+        <Flex
+          justifyContent={"end"}
+          w={isMobile ? "99vw" : "95vw"}
+          bgColor={"white"}
+        >
+          <Pagination
+            data={companiesCopy}
+            onClickPagination={updatePagination}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+          />
+        </Flex>
+        {/* <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={editId}
@@ -162,21 +165,21 @@ export const CompaniesPage = () => {
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
       /> */}
-      <ModalForm
-        isOpen={isAddUserModalOpen}
-        onClose={onAddUserModalClose}
-        id={editId}
-        form={
-          <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
-        }
-        formRef={formRef}
-        title={"Adicionar Empresa"}
-        description={""}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Criar"}
-        modalSize={isDesktop ? "4xl" : "xl"}
-      />
-      {/* <ModalForm
+        <ModalForm
+          isOpen={isAddUserModalOpen}
+          onClose={onAddUserModalClose}
+          id={editId}
+          form={
+            <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
+          }
+          formRef={formRef}
+          title={"Adicionar Empresa"}
+          description={""}
+          leftButtonLabel={"Cancelar"}
+          rightButtonLabel={"Criar"}
+          modalSize={isDesktop ? "4xl" : "xl"}
+        />
+        {/* <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={editId}
@@ -188,6 +191,7 @@ export const CompaniesPage = () => {
         rightButtonLabel={"Editar"}
         modalSize={isDesktop ? "4xl" : "xl"}
       /> */}
-    </VStack>
+      </VStack>
+    </>
   );
 };
