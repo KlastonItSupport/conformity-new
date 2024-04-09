@@ -18,7 +18,14 @@ import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { InteractiveButtons } from "./components/interactive-buttons";
 import FormInput from "components/form-input/form-input";
 
-const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
+const TableCustom = ({
+  columns,
+  data,
+  title,
+  onCheckItems,
+  icons,
+  formatOnDownLoad,
+}) => {
   const [sort, setSort] = useState({
     column: "",
     direction: "asc",
@@ -102,6 +109,13 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
     });
 
     data.sort((a, b) => {
+      if (typeof a[column] === "boolean" && typeof b[column] === "boolean") {
+        return (
+          (a[column] === b[column] ? 0 : a[column] ? 1 : -1) *
+          (newDirection === "asc" ? 1 : -1)
+        );
+      }
+
       if (columns[index].sortFunc) {
         return columns[index].sortFunc(
           a,
@@ -211,7 +225,9 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
                     border={"1px solid #ddd"}
                     key={column + index}
                   >
-                    {item[column.access]}
+                    {column.formatData
+                      ? column.formatData(item[column.access])
+                      : item[column.access]}
                   </Td>
                 )
               );
@@ -285,6 +301,7 @@ const TableCustom = ({ columns, data, title, onCheckItems, icons }) => {
             setVisibleColumns={setVisibleColumns}
             visibleColumns={visibleColumns}
             downloadTitle={title}
+            formatOnDownLoad={formatOnDownLoad}
           />
         )}
       </VStack>

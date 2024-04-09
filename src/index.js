@@ -13,6 +13,8 @@ import { UsersPage } from "views/users";
 import { UserProvider } from "providers/users";
 import { CompaniesPage } from "views/companies";
 import { CompanyProvider } from "providers/company";
+import { GroupsPage } from "views/groups";
+import { GroupProvider } from "providers/group";
 
 const routes = createBrowserRouter([
   {
@@ -31,20 +33,26 @@ const routes = createBrowserRouter([
     path: "companies",
     element: <CompaniesPage />,
   },
+  {
+    path: "groups",
+    element: <GroupsPage />,
+  },
 ]);
 
 ReactDOM.render(
   <AuthProvider>
     <CompanyProvider>
       <UserProvider>
-        <ChakraProvider theme={theme}>
-          <ToastContainer />
-          <React.StrictMode>
-            <ThemeEditorProvider>
-              <RouterProvider router={routes} />
-            </ThemeEditorProvider>
-          </React.StrictMode>
-        </ChakraProvider>
+        <GroupProvider>
+          <ChakraProvider theme={theme}>
+            <ToastContainer />
+            <React.StrictMode>
+              <ThemeEditorProvider>
+                <RouterProvider router={routes} />
+              </ThemeEditorProvider>
+            </React.StrictMode>
+          </ChakraProvider>
+        </GroupProvider>
       </UserProvider>
     </CompanyProvider>
   </AuthProvider>,

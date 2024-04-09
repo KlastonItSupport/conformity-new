@@ -106,7 +106,7 @@ export const CompaniesPage = () => {
   return (
     <>
       <NavBar />
-      <VStack marginTop={"40px"} spacing={0} w="100%" h="100%">
+      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
         <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
           <ButtonPrimary

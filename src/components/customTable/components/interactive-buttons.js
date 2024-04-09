@@ -19,6 +19,7 @@ export const InteractiveButtons = ({
   data,
   setVisibleColumns,
   downloadTitle,
+  formatOnDownLoad,
 }) => {
   const isMobile = useBreakpointValue({
     base: false,
@@ -32,7 +33,6 @@ export const InteractiveButtons = ({
   );
 
   const dataWithoutSensitiveInfo = (item) => {
-    // delete dataKeys.id;
     const itemFormatted = {};
     columns.map(
       (column, index) => (itemFormatted[column.header] = item[dataKeys[index]])
@@ -44,7 +44,9 @@ export const InteractiveButtons = ({
   const handleExcel = () => {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(
-      data.map((item) => dataWithoutSensitiveInfo(item))
+      formatOnDownLoad
+        ? formatOnDownLoad(data)
+        : data.map((item) => dataWithoutSensitiveInfo(item))
     );
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
     const workbookBlob = new Blob([XLSX.write(workbook, { type: "array" })], {
@@ -59,7 +61,9 @@ export const InteractiveButtons = ({
 
   const handleCSV = async () => {
     const csvData = Papa.unparse(
-      data.map((item) => dataWithoutSensitiveInfo(item))
+      formatOnDownLoad
+        ? formatOnDownLoad(data)
+        : data.map((item) => dataWithoutSensitiveInfo(item))
     );
     const downloadLink = document.createElement("a");
 

@@ -117,6 +117,10 @@ export const NavBar = () => {
           src: "/users",
           label: "Usuários",
         },
+        {
+          src: "/groups",
+          label: "Grupos Permissões",
+        },
       ]}
       key={"admin-admin"}
     />,
@@ -132,6 +136,7 @@ export const NavBar = () => {
         px={"20px"}
         position={"fixed"}
         top={0}
+        zIndex={3}
       >
         <HStack w={"40%"}>
           <Img src={whiteLogo} w={"128px"} />
