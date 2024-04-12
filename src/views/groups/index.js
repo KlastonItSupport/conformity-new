@@ -32,6 +32,7 @@ export const GroupsPage = () => {
     selecteds,
     handleChangeSelectedsIds,
     setGroups,
+    createGroupIsLoading,
   } = useContext(GroupContext);
 
   const isMobile = useBreakpointValue({
@@ -80,7 +81,7 @@ export const GroupsPage = () => {
   };
   const onConfirmDeleteSelecteds = async () => {
     const deletePromises = selecteds.map((selected) =>
-      deleteGroup(selected.id)
+      selected.id !== "checkall" ? deleteGroup(selected.id) : () => {}
     );
 
     await Promise.all(deletePromises);
@@ -201,6 +202,7 @@ export const GroupsPage = () => {
         description={""}
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Criar"}
+        isLoading={createGroupIsLoading}
       />
       <ModalForm
         isOpen={isEditModalOpen}

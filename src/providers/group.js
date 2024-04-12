@@ -11,6 +11,8 @@ const GroupProvider = ({ children }) => {
   const [deleteId, setDeleteId] = useState();
   const [selecteds, setSelecteds] = useState();
   const [groups, setGroups] = useState([]);
+  const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
+  const [deleteGroupIsLoading, setDeleteGroupIsLoading] = useState(false);
   const itemsPerPage = 1;
 
   const changeGroup = (groups) => setGroups([...groups]);
@@ -30,6 +32,8 @@ const GroupProvider = ({ children }) => {
 
   const createGroup = async (data) => {
     try {
+      setCreateGroupIsLoading(true);
+
       const companyId = getUserInfo().companyId;
       const response = await api.post(
         "/permissions/create-group",
@@ -46,6 +50,7 @@ const GroupProvider = ({ children }) => {
     } catch (_) {
       toast.error("Ocorreu um erro");
     }
+    setCreateGroupIsLoading(false);
   };
 
   const deleteGroup = async (id) => {
@@ -70,8 +75,6 @@ const GroupProvider = ({ children }) => {
   const handleChangeDeleteId = (id) => setDeleteId(id);
   const handleChangeSelectedsIds = (id) => setSelecteds(id);
 
-  useEffect(() => {}, [groups]);
-
   return (
     <GroupContext.Provider
       value={{
@@ -86,6 +89,9 @@ const GroupProvider = ({ children }) => {
         handleChangeDeleteId,
         handleChangeSelectedsIds,
         setGroups,
+        createGroupIsLoading,
+        setCreateGroupIsLoading,
+        deleteGroupIsLoading,
       }}
     >
       {children}

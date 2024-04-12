@@ -23,6 +23,7 @@ export const ModalForm = ({
   leftButtonLabel,
   rightButtonLabel,
   modalSize = "xl",
+  isLoading = false,
 }) => {
   const onSubmit = () => {
     formRef.current.dispatchEvent(
@@ -73,6 +74,7 @@ export const ModalForm = ({
               label={rightButtonLabel}
               onClick={onSubmit}
               width="150px"
+              isLoading={isLoading}
             />
           </HStack>
         </ModalFooter>
