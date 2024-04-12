@@ -2,7 +2,7 @@
 const formatBoolean = (data) => (data ? "Sim" : "Não");
 
 const formatReadDeleteEditColumns = (data) => {
-  return `Consultar: ${formatBoolean(data.canRead)} | Deletar: ${formatBoolean(data.canDelete)}  | Editar: ${formatBoolean(data.canEdit)} `;
+  return `Criar: ${formatBoolean(data.canAdd)}| Consultar: ${formatBoolean(data.canRead)} | Deletar: ${formatBoolean(data.canDelete)}  | Editar: ${formatBoolean(data.canEdit)} `;
 };
 
 export const formatOnDownLoad = (data) => {
@@ -11,12 +11,15 @@ export const formatOnDownLoad = (data) => {
   data.map((element) => {
     parsedDownload.push({
       ["Nome"]: element.name,
+      ["Documentos - Pode Criar "]: formatBoolean(element.documents.canAdd),
       ["Documentos - Pode Ler "]: formatBoolean(element.documents.canRead),
       ["Documentos - Pode Editar "]: formatBoolean(element.documents.canEdit),
       ["Documentos - Pode Apagar "]: formatBoolean(element.documents.canDelete),
+      ["Tarefas - Pode Criar "]: formatBoolean(element.tasks.canAdd),
       ["Tarefas - Pode Ler "]: formatBoolean(element.tasks.canRead),
       ["Tarefas - Pode Editar "]: formatBoolean(element.tasks.canEdit),
       ["Tarefas - Pode Apagar "]: formatBoolean(element.tasks.canDelete),
+      ["Equipamentos - Pode Criar "]: formatBoolean(element.equipments.canAdd),
       ["Equipamentos - Pode Ler "]: formatBoolean(element.equipments.canRead),
       ["Equipamentos - Pode Editar "]: formatBoolean(
         element.equipments.canEdit
@@ -24,19 +27,23 @@ export const formatOnDownLoad = (data) => {
       ["Equipamentos - Pode Apagar "]: formatBoolean(
         element.equipments.canDelete
       ),
+      ["Indicadores - Pode Criar "]: formatBoolean(element.indicators.canAdd),
       ["Indicadores - Pode Ler "]: formatBoolean(element.indicators.canRead),
       ["Indicadores - Pode Editar "]: formatBoolean(element.indicators.canEdit),
       ["Indicadores - Pode Apagar "]: formatBoolean(
         element.indicators.canDelete
       ),
+      ["CRM - Pode Criar "]: formatBoolean(element.crm.canAdd),
       ["CRM - Pode Ler "]: formatBoolean(element.crm.canRead),
       ["CRM - Pode Editar "]: formatBoolean(element.crm.canEdit),
       ["CRM - Pode Apagar "]: formatBoolean(element.crm.canDelete),
+      ["Treinamentos - Pode Criar "]: formatBoolean(element.training.canAdd),
       ["Treinamentos - Pode Ler "]: formatBoolean(element.training.canRead),
       ["Treinamentos - Pode Editar "]: formatBoolean(element.training.canEdit),
       ["Treinamentos - Pode Apagar "]: formatBoolean(
         element.training.canDelete
       ),
+      ["Empresas - Pode Criar "]: formatBoolean(element.companies.canAdd),
       ["Empresas - Pode Ler "]: formatBoolean(element.companies.canRead),
       ["Empresas - Pode Editar "]: formatBoolean(element.companies.canEdit),
       ["Empresas - Pode Apagar "]: formatBoolean(element.companies.canDelete),
@@ -97,24 +104,32 @@ export const groupsMock = [
     id: 1,
     name: "RH",
     documents: {
+      cannAdd: false,
       canRead: false,
       canDelete: false,
       canEdit: false,
     },
-    tasks: {
-      canRead: true,
-      canDelete: false,
-      canEdit: true,
-    },
+    tasks: { cannAdd: false, canRead: true, canDelete: false, canEdit: true },
     equipments: {
+      cannAdd: false,
       canRead: true,
       canDelete: false,
       canEdit: false,
     },
-    indicators: { canRead: true, canDelete: true, canEdit: true },
-    crm: { canRead: true, canDelete: false, canEdit: false },
-    training: { canRead: true, canDelete: true, canEdit: true },
-    companies: { canRead: true, canDelete: false, canEdit: false },
+    indicators: {
+      cannAdd: false,
+      canRead: true,
+      canDelete: true,
+      canEdit: true,
+    },
+    crm: { cannAdd: false, canRead: true, canDelete: false, canEdit: false },
+    training: { cannAdd: false, canRead: true, canDelete: true, canEdit: true },
+    companies: {
+      cannAdd: false,
+      canRead: true,
+      canDelete: false,
+      canEdit: false,
+    },
   },
   {
     id: 2,

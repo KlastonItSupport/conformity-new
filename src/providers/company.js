@@ -14,6 +14,7 @@ const CompanyProvider = ({ children }) => {
   const [companies, setCompanies] = useState([]);
   const [currentPage, setCurrentPage] = useState([]);
   const [companiesCopy, setCompaniesCopy] = useState([]);
+  const [users, setUsers] = useState([]);
   const editFormRef = useRef(null);
 
   const changeDeleteId = (id) => {
@@ -71,6 +72,14 @@ const CompanyProvider = ({ children }) => {
     }
   };
 
+  const getCompanyUsers = async () => {
+    const response = await api.get("/companies/get-users", {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+
+    setUsers(response.data);
+  };
+
   useEffect(() => {
     updatePagination(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,6 +101,8 @@ const CompanyProvider = ({ children }) => {
         companies,
         companiesCopy,
         currentPage,
+        getCompanyUsers,
+        users,
       }}
     >
       {children}

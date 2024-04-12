@@ -1,12 +1,20 @@
 import { Checkbox, HStack, Text, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInput from "components/form-input/form-input";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import React, { useContext, useEffect, useState } from "react";
+import { useController, useForm } from "react-hook-form";
 import { groupSchema } from "./schema";
+import { CompanyContext } from "providers/company";
+import { SelectDropDown } from "components/select-drop-down";
+import { GroupContext } from "providers/group";
+import { checkBoxStart } from "./helper";
 
 export const GroupForm = ({ formRef, onCloseModal }) => {
+  const { getCompanyUsers, users } = useContext(CompanyContext);
+  const { createGroup } = useContext(GroupContext);
+
   const {
+    control,
     handleSubmit,
     register,
     formState: { errors },
@@ -14,31 +22,21 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
     resolver: yupResolver(groupSchema),
   });
 
-  const [checkboxList, setCheckBoxList] = useState({
-    documents: {
-      canRead: false,
-      canDelete: false,
-      canEdit: false,
-    },
-    tasks: {
-      canRead: false,
-      canDelete: false,
-      canEdit: false,
-    },
-    equipments: {
-      canRead: false,
-      canDelete: false,
-      canEdit: false,
-    },
-    indicators: { canRead: false, canDelete: false, canEdit: false },
-    crm: { canRead: false, canDelete: false, canEdit: false },
-    training: { canRead: false, canDelete: false, canEdit: false },
-    companies: { canRead: false, canDelete: false, canEdit: false },
+  useController({
+    name: "users",
+    control,
   });
 
+  const [checkboxList, setCheckBoxList] = useState(checkBoxStart);
+
   const onSubmit = (data) => {
-    console.log(data);
-    console.log("checkboxes", checkboxList);
+    const users = data.users.map((user) => user.value);
+
+    createGroup({
+      ...data,
+      users: users,
+      permissions: { ...checkboxList },
+    });
   };
 
   const buildCheckBoxes = (title, access) => {
@@ -53,7 +51,21 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
                 ...checkboxList,
                 [access]: {
                   ...checkboxList[access],
-                  canRead: e.currentTarget.checked,
+                  canAdd: e.currentTarget.checked ? 1 : 0,
+                },
+              });
+            }}
+          >
+            Adicionar
+          </Checkbox>
+          <Checkbox
+            pr={"25px"}
+            onChange={(e) => {
+              setCheckBoxList({
+                ...checkboxList,
+                [access]: {
+                  ...checkboxList[access],
+                  canRead: e.currentTarget.checked ? 1 : 0,
                 },
               });
             }}
@@ -67,7 +79,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
                 ...checkboxList,
                 [access]: {
                   ...checkboxList[access],
-                  canEdit: e.currentTarget.checked,
+                  canEdit: e.currentTarget.checked ? 1 : 0,
                 },
               });
             }}
@@ -80,7 +92,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
                 ...checkboxList,
                 [access]: {
                   ...checkboxList[access],
-                  canDelete: e.currentTarget.checked,
+                  canDelete: e.currentTarget.checked ? 1 : 0,
                 },
               });
             }}
@@ -91,6 +103,17 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
       </VStack>
     );
   };
+
+  const options = users.map((user) => ({
+    value: user.id,
+    label: user.name,
+  }));
+
+  useEffect(() => {
+    getCompanyUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <VStack w={"100%"} alignItems={"start"}>
       <form
@@ -114,6 +137,16 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
           {...register("name")}
           error={errors.name?.message}
         />
+
+        <SelectDropDown
+          options={options}
+          label={"Selecione os usuários"}
+          error={errors.users}
+          control={control}
+          name={"users"}
+          placeholder="Clique ou digite para adicionar o usuário"
+        />
+
         {buildCheckBoxes("Documentos", "documents")}
         {buildCheckBoxes("Tasks", "tasks")}
         {buildCheckBoxes("Equipamentos", "equipments")}

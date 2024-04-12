@@ -331,7 +331,9 @@ const TableCustom = ({
                       key={index + "actionbuttons"}
                       onClick={() =>
                         shouldShowHeaderIcon(icon)
-                          ? icon.onClickHeader(selecteds)
+                          ? icon.onClickHeader(
+                              selecteds.filter((selected) => selected.checked)
+                            )
                           : () => {}
                       }
                       cursor={

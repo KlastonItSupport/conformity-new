@@ -8,9 +8,9 @@ import {
 import { ButtonPrimary } from "components/button-primary";
 import { NavBar } from "components/navbar";
 import NavigationLinks from "components/navigationLinks";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import CustomTable from "../../components/customTable";
-import { columns, formatOnDownLoad, groupsMock } from "./columns";
+import { columns, formatOnDownLoad, groupsMock } from "./table-helper";
 import { Trash, NotePencil } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
 import DeleteModal from "components/modals/deleteModal";
@@ -21,7 +21,18 @@ import { Pagination } from "components/pagination/pagination";
 export const GroupsPage = () => {
   const formRef = useRef(null);
 
-  const { groups, itemsPerPage, changeGroup } = useContext(GroupContext);
+  const {
+    groups,
+    itemsPerPage,
+    changeGroup,
+    getGroups,
+    deleteGroup,
+    handleChangeDeleteId,
+    deleteId,
+    selecteds,
+    handleChangeSelectedsIds,
+    setGroups,
+  } = useContext(GroupContext);
 
   const isMobile = useBreakpointValue({
     base: false,
@@ -54,6 +65,35 @@ export const GroupsPage = () => {
     onClose: onEditModalClose,
   } = useDisclosure();
 
+  const onDeleteModalConfirm = () => {
+    deleteGroup(deleteId);
+    onDeleteModalClose();
+  };
+  const onDeleteOpenModal = (id) => {
+    handleChangeDeleteId(id);
+    onDeleteModalOpen();
+  };
+
+  const onDeleteSelectedOpenModal = (selecteds) => {
+    handleChangeSelectedsIds(selecteds);
+    onDeleteSelectedGroupsOpen();
+  };
+  const onConfirmDeleteSelecteds = async () => {
+    const deletePromises = selecteds.map((selected) =>
+      deleteGroup(selected.id)
+    );
+
+    await Promise.all(deletePromises);
+
+    setGroups(
+      groups.filter(
+        (group) => !selecteds.some((selected) => selected.id === group.id)
+      )
+    );
+
+    onDeleteSelectedGroupsClose();
+  };
+
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <NotePencil size={20} />,
@@ -64,8 +104,8 @@ export const GroupsPage = () => {
     },
     {
       icon: <Trash size={20} />,
-      onClickRow: onDeleteModalOpen,
-      onClickHeader: onDeleteSelectedGroupsOpen,
+      onClickRow: (item) => onDeleteOpenModal(item.id),
+      onClickHeader: (selecteds) => onDeleteSelectedOpenModal(selecteds),
       isDisabled: false,
       shouldShow: true,
     },
@@ -89,6 +129,15 @@ export const GroupsPage = () => {
 
     changeGroup([...slicedData]);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      getGroups();
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -170,14 +219,14 @@ export const GroupsPage = () => {
         subtitle={"Tem certeza de que deseja excluir este Grupo?"}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
-        id={""}
+        onConfirm={onDeleteModalConfirm}
       />
       <DeleteModal
         title={"Excluir Grupo"}
         subtitle={"Tem certeza de que deseja excluir estes Grupos?"}
         isOpen={isDeleteSelectedGroups}
         onClose={onDeleteSelectedGroupsClose}
-        id={""}
+        onConfirm={onConfirmDeleteSelecteds}
       />
       ;
     </>

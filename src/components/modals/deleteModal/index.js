@@ -11,12 +11,7 @@ import {
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
 
-const DeleteModal = ({ isOpen, onClose, id, title, subtitle }) => {
-  const handleDelete = () => {
-    console.log("IDDDDD", id);
-    onClose(); // Fechar o modal após a exclusão
-  };
-
+const DeleteModal = ({ isOpen, onClose, onConfirm, id, title, subtitle }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -37,7 +32,7 @@ const DeleteModal = ({ isOpen, onClose, id, title, subtitle }) => {
             _active={{ bgColor: "red.800" }}
             type="submit"
             label="Excluir"
-            onClick={onClose}
+            onClick={onConfirm}
             width="150px"
             margin={"0 auto"}
           />

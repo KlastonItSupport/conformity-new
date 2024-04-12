@@ -19,6 +19,7 @@ const AuthProvider = ({ children }) => {
         name: response.data.name,
         email: data.email,
         accessRule: response.data.accessRule,
+        companyId: response.data.companyId,
       };
 
       localStorage.setItem(accessTokenKey, accessToken);
@@ -51,8 +52,17 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const getUserInfo = () => {
+    const user = JSON.parse(localStorage.getItem(userKey));
+    if (user) {
+      return user;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ signIn, dealingWithAuth, getToken }}>
+    <AuthContext.Provider
+      value={{ signIn, dealingWithAuth, getToken, getUserInfo }}
+    >
       {children}
     </AuthContext.Provider>
   );
