@@ -7,7 +7,7 @@ import { groupSchema } from "./schema";
 import { CompanyContext } from "providers/company";
 import { SelectDropDown } from "components/select-drop-down";
 import { GroupContext } from "providers/group";
-import { checkBoxStart } from "./helper";
+import { getCheckBoxes } from "./helper";
 
 export const GroupForm = ({ formRef, onCloseModal }) => {
   const { getCompanyUsers, users } = useContext(CompanyContext);
@@ -27,7 +27,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
     control,
   });
 
-  const [checkboxList, setCheckBoxList] = useState(checkBoxStart);
+  const [checkboxList, setCheckBoxList] = useState(getCheckBoxes(false));
 
   const onSubmit = (data) => {
     const users = data.users.map((user) => user.value);
@@ -46,6 +46,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
         <HStack justifyContent={"space-evenly"}>
           <Checkbox
             pr={"25px"}
+            isChecked={checkboxList[access].canAdd === 1 ? true : false}
             onChange={(e) => {
               setCheckBoxList({
                 ...checkboxList,
@@ -60,6 +61,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
           </Checkbox>
           <Checkbox
             pr={"25px"}
+            isChecked={checkboxList[access].canRead === 1 ? true : false}
             onChange={(e) => {
               setCheckBoxList({
                 ...checkboxList,
@@ -74,6 +76,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
           </Checkbox>
           <Checkbox
             pr={"25px"}
+            isChecked={checkboxList[access].canEdit === 1 ? true : false}
             onChange={(e) => {
               setCheckBoxList({
                 ...checkboxList,
@@ -87,6 +90,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
             Editar
           </Checkbox>
           <Checkbox
+            isChecked={checkboxList[access].canDelete === 1 ? true : false}
             onChange={(e) => {
               setCheckBoxList({
                 ...checkboxList,
@@ -108,6 +112,22 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
     value: user.id,
     label: user.name,
   }));
+
+  const giveAllPermissions = () => {
+    return (
+      <VStack justifyContent={"start"} paddingY={"15px"} alignItems={"start"}>
+        <Text fontWeight={"bold"}> Dar Todas as permissoes</Text>
+        <Checkbox
+          pr={"25px"}
+          onChange={(e) => {
+            setCheckBoxList(getCheckBoxes(e.currentTarget.checked));
+          }}
+        >
+          Selecione para dar todas as permissoes
+        </Checkbox>
+      </VStack>
+    );
+  };
 
   useEffect(() => {
     getCompanyUsers();
@@ -146,7 +166,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
           name={"users"}
           placeholder="Clique ou digite para adicionar o usuário"
         />
-
+        {giveAllPermissions()}
         {buildCheckBoxes("Documentos", "documents")}
         {buildCheckBoxes("Tasks", "tasks")}
         {buildCheckBoxes("Equipamentos", "equipments")}
