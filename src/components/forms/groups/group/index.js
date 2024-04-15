@@ -1,4 +1,11 @@
-import { Checkbox, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Center,
+  Checkbox,
+  HStack,
+  Spinner,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInput from "components/form-input/form-input";
 import React, { useContext, useEffect, useState } from "react";
@@ -16,7 +23,23 @@ export const GroupForm = ({
   onCloseModal,
 }) => {
   const { getCompanyUsers, users } = useContext(CompanyContext);
-  const { createGroup, editGroup } = useContext(GroupContext);
+  const { createGroup, editGroup, getUsersGroup } = useContext(GroupContext);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [groupUsers, setGroupUsers] = useState([]);
+  const [checkboxList, setCheckBoxList] = useState(
+    type === "create"
+      ? getCheckBoxes(false)
+      : {
+          documents: formValues.documents,
+          tasks: formValues.tasks,
+          equipments: formValues.equipments,
+          indicators: formValues.indicators,
+          crm: formValues.crm,
+          training: formValues.training,
+          companies: formValues.companies,
+        }
+  );
 
   const {
     control,
@@ -31,20 +54,6 @@ export const GroupForm = ({
     name: "users",
     control,
   });
-
-  const [checkboxList, setCheckBoxList] = useState(
-    type === "create"
-      ? getCheckBoxes(false)
-      : {
-          documents: formValues.documents,
-          tasks: formValues.tasks,
-          equipments: formValues.equipments,
-          indicators: formValues.indicators,
-          crm: formValues.crm,
-          training: formValues.training,
-          companies: formValues.companies,
-        }
-  );
 
   const onSubmit = async (data) => {
     const users = data.users.map((user) => user.value);
@@ -156,7 +165,22 @@ export const GroupForm = ({
   };
 
   useEffect(() => {
-    getCompanyUsers();
+    const fetchData = async () => {
+      setIsLoading(true);
+      await getCompanyUsers();
+
+      if (type !== "create") {
+        const users = await getUsersGroup(formValues.id);
+        setGroupUsers(
+          users.map((user) => ({
+            value: user.id,
+            label: user.name,
+          }))
+        );
+        setIsLoading(false);
+      }
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -185,14 +209,21 @@ export const GroupForm = ({
           defaultValue={type !== "create" ? formValues.name : undefined}
         />
 
-        <SelectDropDown
-          options={options}
-          label={"Selecione os usuários"}
-          error={errors.users}
-          control={control}
-          name={"users"}
-          placeholder="Clique ou digite para adicionar o usuário"
-        />
+        {isLoading ? (
+          <Center>
+            <Spinner />
+          </Center>
+        ) : (
+          <SelectDropDown
+            options={options}
+            label={"Selecione os usuários"}
+            defaultValue={groupUsers}
+            error={errors.users}
+            control={control}
+            name={"users"}
+            placeholder="Clique ou digite para adicionar o usuário"
+          />
+        )}
         {giveAllPermissions()}
         {buildCheckBoxes("Documentos", "documents")}
         {buildCheckBoxes("Tasks", "tasks")}

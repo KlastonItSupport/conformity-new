@@ -1,5 +1,5 @@
 import { api } from "api/api";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
@@ -14,6 +14,8 @@ const GroupProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
   const [deleteGroupIsLoading, setDeleteGroupIsLoading] = useState(false);
+  const [selected, setSelected] = useState([]);
+
   const itemsPerPage = 1;
 
   const changeGroup = (groups) => setGroups([...groups]);
@@ -75,7 +77,6 @@ const GroupProvider = ({ children }) => {
 
   const editGroup = async (data) => {
     try {
-      console.log("edit group", data);
       setCreateGroupIsLoading(true);
 
       const response = await api.patch(`/permissions/group/${data.id}`, data, {
@@ -91,6 +92,17 @@ const GroupProvider = ({ children }) => {
       toast.error("Ocorreu um erro");
     }
     setCreateGroupIsLoading(false);
+  };
+
+  const getUsersGroup = async (groupId) => {
+    try {
+      const response = await api.get(`/permissions/group/users/${groupId}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      return response.data;
+    } catch (_) {
+      toast.error("Ocorreu um erro ao resgatar os usuários deste grupo");
+    }
   };
 
   const handleChangeDeleteId = (id) => setDeleteId(id);
@@ -116,6 +128,9 @@ const GroupProvider = ({ children }) => {
         editSelected,
         setEditSelected,
         editGroup,
+        selected,
+        setSelected,
+        getUsersGroup,
       }}
     >
       {children}
