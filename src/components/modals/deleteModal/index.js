@@ -1,5 +1,4 @@
 import {
-  Button,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,7 +10,15 @@ import {
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
 
-const DeleteModal = ({ isOpen, onClose, onConfirm, id, title, subtitle }) => {
+const DeleteModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  id,
+  title,
+  subtitle,
+  isLoading = false,
+}) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -35,6 +42,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, id, title, subtitle }) => {
             onClick={onConfirm}
             width="150px"
             margin={"0 auto"}
+            isLoading={isLoading}
           />
         </ModalFooter>
       </ModalContent>

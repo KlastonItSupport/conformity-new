@@ -33,6 +33,8 @@ export const GroupsPage = () => {
     handleChangeSelectedsIds,
     setGroups,
     createGroupIsLoading,
+    editSelected,
+    setEditSelected,
   } = useContext(GroupContext);
 
   const isMobile = useBreakpointValue({
@@ -98,7 +100,7 @@ export const GroupsPage = () => {
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <NotePencil size={20} />,
-      onClickRow: onEditModalOpen,
+      onClickRow: (item) => onEditModalOpenHandle(item),
       onClickHeader: () => [],
       isDisabled: false,
       shouldShow: false,
@@ -111,6 +113,11 @@ export const GroupsPage = () => {
       shouldShow: true,
     },
   ]);
+
+  const onEditModalOpenHandle = (item) => {
+    onEditModalOpen();
+    setEditSelected(item);
+  };
   const routeTreePaths = [
     {
       path: "/",
@@ -208,7 +215,14 @@ export const GroupsPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         id={"editId"}
-        form={<GroupForm formRef={formRef} />}
+        form={
+          <GroupForm
+            formRef={formRef}
+            formValues={editSelected}
+            type="edit"
+            onCloseModal={onEditModalClose}
+          />
+        }
         formRef={formRef}
         title={"Editar Grupo"}
         description={"Tem certeza de que deseja Editar este Grupo?"}

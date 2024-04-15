@@ -9,6 +9,7 @@ const GroupContext = createContext();
 const GroupProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
   const [deleteId, setDeleteId] = useState();
+  const [editSelected, setEditSelected] = useState();
   const [selecteds, setSelecteds] = useState();
   const [groups, setGroups] = useState([]);
   const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
@@ -72,6 +73,26 @@ const GroupProvider = ({ children }) => {
     }
   };
 
+  const editGroup = async (data) => {
+    try {
+      console.log("edit group", data);
+      setCreateGroupIsLoading(true);
+
+      const response = await api.patch(`/permissions/group/${data.id}`, data, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      toast.success("Grupo Editado com sucesso");
+
+      setGroups([
+        { ...response.data, ...response.data.permissions },
+        ...groups.filter((group) => group.id !== response.data.id),
+      ]);
+    } catch (_) {
+      toast.error("Ocorreu um erro");
+    }
+    setCreateGroupIsLoading(false);
+  };
+
   const handleChangeDeleteId = (id) => setDeleteId(id);
   const handleChangeSelectedsIds = (id) => setSelecteds(id);
 
@@ -92,6 +113,9 @@ const GroupProvider = ({ children }) => {
         createGroupIsLoading,
         setCreateGroupIsLoading,
         deleteGroupIsLoading,
+        editSelected,
+        setEditSelected,
+        editGroup,
       }}
     >
       {children}

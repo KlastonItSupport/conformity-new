@@ -9,9 +9,14 @@ import { SelectDropDown } from "components/select-drop-down";
 import { GroupContext } from "providers/group";
 import { getCheckBoxes } from "./helper";
 
-export const GroupForm = ({ formRef, onCloseModal }) => {
+export const GroupForm = ({
+  formRef,
+  type = "create",
+  formValues,
+  onCloseModal,
+}) => {
   const { getCompanyUsers, users } = useContext(CompanyContext);
-  const { createGroup } = useContext(GroupContext);
+  const { createGroup, editGroup } = useContext(GroupContext);
 
   const {
     control,
@@ -27,16 +32,37 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
     control,
   });
 
-  const [checkboxList, setCheckBoxList] = useState(getCheckBoxes(false));
+  const [checkboxList, setCheckBoxList] = useState(
+    type === "create"
+      ? getCheckBoxes(false)
+      : {
+          documents: formValues.documents,
+          tasks: formValues.tasks,
+          equipments: formValues.equipments,
+          indicators: formValues.indicators,
+          crm: formValues.crm,
+          training: formValues.training,
+          companies: formValues.companies,
+        }
+  );
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const users = data.users.map((user) => user.value);
-
-    createGroup({
+    const payload = {
       ...data,
       users: users,
       permissions: { ...checkboxList },
-    });
+    };
+
+    if (type === "create") {
+      await createGroup(payload);
+      onCloseModal();
+      return;
+    }
+
+    payload.id = formValues.id;
+    await editGroup(payload);
+    onCloseModal();
   };
 
   const buildCheckBoxes = (title, access) => {
@@ -156,6 +182,7 @@ export const GroupForm = ({ formRef, onCloseModal }) => {
           width="100%"
           {...register("name")}
           error={errors.name?.message}
+          defaultValue={type !== "create" ? formValues.name : undefined}
         />
 
         <SelectDropDown
