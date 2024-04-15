@@ -35,6 +35,7 @@ export const GroupsPage = () => {
     createGroupIsLoading,
     editSelected,
     setEditSelected,
+    selectedIsLoading,
   } = useContext(GroupContext);
 
   const isMobile = useBreakpointValue({
@@ -229,6 +230,7 @@ export const GroupsPage = () => {
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Editar"}
         modalSize="xl"
+        isLoading={selectedIsLoading}
       />
       <DeleteModal
         title={"Excluir Grupo"}

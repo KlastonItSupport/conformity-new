@@ -119,7 +119,7 @@ export const NavBar = () => {
         },
         {
           src: "/groups",
-          label: "Grupos Permissões",
+          label: "Grupos e Permissões",
         },
       ]}
       key={"admin-admin"}

@@ -14,6 +14,7 @@ const GroupProvider = ({ children }) => {
   const [groups, setGroups] = useState([]);
   const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
   const [deleteGroupIsLoading, setDeleteGroupIsLoading] = useState(false);
+  const [selectedIsLoading, setSelectedIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
 
   const itemsPerPage = 1;
@@ -77,7 +78,7 @@ const GroupProvider = ({ children }) => {
 
   const editGroup = async (data) => {
     try {
-      setCreateGroupIsLoading(true);
+      setSelectedIsLoading(true);
 
       const response = await api.patch(`/permissions/group/${data.id}`, data, {
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -91,7 +92,7 @@ const GroupProvider = ({ children }) => {
     } catch (_) {
       toast.error("Ocorreu um erro");
     }
-    setCreateGroupIsLoading(false);
+    setSelectedIsLoading(false);
   };
 
   const getUsersGroup = async (groupId) => {
@@ -131,6 +132,8 @@ const GroupProvider = ({ children }) => {
         selected,
         setSelected,
         getUsersGroup,
+        selectedIsLoading,
+        setSelectedIsLoading,
       }}
     >
       {children}
