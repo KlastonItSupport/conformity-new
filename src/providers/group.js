@@ -12,6 +12,7 @@ const GroupProvider = ({ children }) => {
   const [editSelected, setEditSelected] = useState();
   const [selecteds, setSelecteds] = useState();
   const [groups, setGroups] = useState([]);
+
   const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
   const [deleteGroupIsLoading, setDeleteGroupIsLoading] = useState(false);
   const [selectedIsLoading, setSelectedIsLoading] = useState(false);
@@ -129,6 +130,7 @@ const GroupProvider = ({ children }) => {
         createGroupIsLoading,
         setCreateGroupIsLoading,
         deleteGroupIsLoading,
+        setDeleteGroupIsLoading,
         editSelected,
         setEditSelected,
         editGroup,

@@ -76,10 +76,16 @@ const UserProvider = ({ children }) => {
       if (response.status === 201) {
         toast.success("Usuário criado com sucesso");
         setUsers([response.data, ...users]);
+        setCreateUserIsLoading(false);
+
+        return response.data;
       }
     } catch (e) {
       if ((e.status = 409)) {
         toast.error("Ja existe um usuário com este email");
+        setCreateUserIsLoading(false);
+
+        return false;
       }
     }
     setCreateUserIsLoading(false);

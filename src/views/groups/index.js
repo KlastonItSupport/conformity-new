@@ -13,7 +13,7 @@ import CustomTable from "../../components/customTable";
 import { columns, formatOnDownLoad, groupsMock } from "./table-helper";
 import { Trash, NotePencil } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
-import DeleteModal from "components/modals/deleteModal";
+import DeleteModal from "components/modals/delete-modal";
 import { GroupForm } from "components/forms/groups/group";
 import { GroupContext } from "providers/group";
 import { Pagination } from "components/pagination/pagination";
@@ -36,6 +36,8 @@ export const GroupsPage = () => {
     editSelected,
     setEditSelected,
     selectedIsLoading,
+    deleteGroupIsLoading,
+    setDeleteGroupIsLoading,
   } = useContext(GroupContext);
 
   const isMobile = useBreakpointValue({
@@ -69,8 +71,10 @@ export const GroupsPage = () => {
     onClose: onEditModalClose,
   } = useDisclosure();
 
-  const onDeleteModalConfirm = () => {
-    deleteGroup(deleteId);
+  const onDeleteModalConfirm = async () => {
+    setDeleteGroupIsLoading(true);
+    await deleteGroup(deleteId);
+    setDeleteGroupIsLoading(false);
     onDeleteModalClose();
   };
   const onDeleteOpenModal = (id) => {
@@ -238,6 +242,7 @@ export const GroupsPage = () => {
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={onDeleteModalConfirm}
+        isLoading={deleteGroupIsLoading}
       />
       <DeleteModal
         title={"Excluir Grupo"}

@@ -12,7 +12,7 @@ import CustomTable from "../../components/customTable";
 import { columns, usersMock } from "./components/table-helper";
 import { Pagination } from "../../components/pagination/pagination";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
-import DeleteModal from "components/modals/deleteModal";
+import DeleteModal from "components/modals/delete-modal";
 import { ButtonPrimary } from "components/button-primary";
 import { EditUsersForm } from "components/forms/users/editUsers/edit-users";
 import { EditUsersPasswordForm } from "components/forms/users/editUsers/edit-password";

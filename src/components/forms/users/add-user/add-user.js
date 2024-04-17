@@ -20,7 +20,7 @@ import { GroupForm } from "components/forms/groups/group";
 
 export const AddUserForm = ({ formRef, onCloseModal }) => {
   const { createUser } = useContext(UserContext);
-  const { getGroups } = useContext(GroupContext);
+  const { getGroups, createGroupIsLoading } = useContext(GroupContext);
   const [groupOptions, setGroupOptions] = useState([]);
   const [groupIsLoading, setGroupIsLoading] = useState(false);
   const groupFormRef = useRef(null);
@@ -39,8 +39,11 @@ export const AddUserForm = ({ formRef, onCloseModal }) => {
   } = useDisclosure();
 
   const onSubmit = async (data) => {
-    await createUser(data);
-    onCloseModal();
+    const cretedSuccessfully = await createUser(data);
+
+    if (cretedSuccessfully) {
+      onCloseModal();
+    }
   };
 
   const fetchGroupData = async () => {
@@ -238,7 +241,7 @@ export const AddUserForm = ({ formRef, onCloseModal }) => {
         description={""}
         leftButtonLabel={"Cancelar"}
         rightButtonLabel={"Criar"}
-        isLoading={false}
+        isLoading={createGroupIsLoading}
       />
     </>
   );
