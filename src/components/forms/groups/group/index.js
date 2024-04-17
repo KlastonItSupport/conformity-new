@@ -56,7 +56,10 @@ export const GroupForm = ({
   });
 
   const onSubmit = async (data) => {
-    const users = data.users.map((user) => user.value);
+    const users =
+      data.users && data.users.length > 0
+        ? data.users.map((user) => user.value)
+        : [];
     const payload = {
       ...data,
       users: users,
