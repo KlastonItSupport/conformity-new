@@ -1,11 +1,13 @@
-import { Select, Text } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInput from "components/form-input/form-input";
 import { useForm } from "react-hook-form";
 import editUsersFormSchema from "./schema";
 import SelectInput from "components/select";
+import { useContext } from "react";
+import { UserContext } from "providers/users";
 
-export const EditUsersForm = ({ formRef }) => {
+export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
+  const { editUser } = useContext(UserContext);
   const {
     handleSubmit,
     register,
@@ -14,9 +16,21 @@ export const EditUsersForm = ({ formRef }) => {
     resolver: yupResolver(editUsersFormSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log("abassdasdsa", data); // Adicione o console.log aqui
+  const onSubmit = async (data) => {
+    await editUser(data);
+    onCloseModal();
   };
+
+  const getAccessDefaultValue = () => {
+    if (formValues.accessRule === "super-admin") {
+      return { label: "Super Admin", value: "super-admin" };
+    }
+    if (formValues.accessRule === "super-user") {
+      return { label: "Super Usuário", value: "super-user" };
+    }
+    return { label: "Usuário", value: "user" };
+  };
+
   return (
     <form
       style={{ width: "100%" }}
@@ -36,8 +50,25 @@ export const EditUsersForm = ({ formRef }) => {
         bgColor={"primary.50"}
         label="Nome *"
         width="100%"
+        defaultValue={formValues.name}
         {...register("name")}
         error={errors.name?.message}
+      />
+      <FormInput
+        variant="auth"
+        fontSize="sm"
+        ms={{ base: "0px", md: "0px" }}
+        type="email"
+        placeholder="emailexample@hotmail.com"
+        margin="0 0 10px 0 "
+        fontWeight="500"
+        size="lg"
+        borderRadius="6px"
+        bgColor={"primary.50"}
+        label="Email *"
+        defaultValue={formValues.email}
+        {...register("email")}
+        error={errors.email?.message}
       />
       <FormInput
         variant="auth"
@@ -52,6 +83,7 @@ export const EditUsersForm = ({ formRef }) => {
         bgColor={"primary.50"}
         label="Telefone *"
         width="100%"
+        defaultValue={formValues.celphone}
         {...register("celphone")}
         error={errors.celphone?.message}
       />
@@ -63,21 +95,6 @@ export const EditUsersForm = ({ formRef }) => {
           { label: "RH", value: "3" },
         ]}
         {...register("role")}
-      />
-      <FormInput
-        variant="auth"
-        fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
-        type="email"
-        placeholder="emailexample@hotmail.com"
-        margin="0 0 10px 0 "
-        fontWeight="500"
-        size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
-        label="Email *"
-        {...register("email")}
-        error={errors.email?.message}
       />
       <SelectInput
         errors={errors.departament}
@@ -94,10 +111,11 @@ export const EditUsersForm = ({ formRef }) => {
         errors={errors.accessRule}
         label="Regra de acesso"
         {...register("accessRule")}
+        defaultValue={getAccessDefaultValue()}
         options={[
-          { label: "Super Admin", value: "option1" },
-          { label: "Super Usuário", value: "option2" },
-          { label: "Usuário", value: "3" },
+          { label: "Super Admin", value: "super-admin" },
+          { label: "Super Usuário", value: "super-user" },
+          { label: "Usuário", value: "user" },
         ]}
       />
 
@@ -105,14 +123,18 @@ export const EditUsersForm = ({ formRef }) => {
         {...register("status")}
         label="Status"
         errors={errors.status}
+        defaultValue={{
+          label: formValues.status === "active" ? "Ativo" : "Inativo",
+          value: formValues.status,
+        }}
         options={[
           {
             label: "Ativo",
-            value: "1",
+            value: "active",
           },
           {
             label: "Inativo",
-            value: "aaa",
+            value: "inactive",
           },
         ]}
       />

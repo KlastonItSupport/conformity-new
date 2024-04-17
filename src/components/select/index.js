@@ -2,7 +2,10 @@ import { Select, Text } from "@chakra-ui/react";
 import React, { forwardRef } from "react";
 
 const SelectInput = forwardRef(
-  ({ paddingLabel, label, errors, register, options, ...rest }, ref) => {
+  (
+    { paddingLabel, label, errors, register, options, defaultValue, ...rest },
+    ref
+  ) => {
     return (
       <>
         {label && (
@@ -28,11 +31,29 @@ const SelectInput = forwardRef(
           bgColor={"primary.50"}
           {...rest}
         >
-          {options.map((option, index) => (
-            <option key={index} value={option.value}>
-              {option.label}
+          {defaultValue && (
+            <option key={defaultValue.value} value={defaultValue.value}>
+              {defaultValue.label}
             </option>
-          ))}
+          )}
+          {options.map((option, index) => {
+            const optionJsx = (
+              <option key={index} value={option.value}>
+                {option.label}
+              </option>
+            );
+            if (!defaultValue) {
+              return optionJsx;
+            }
+            if (
+              defaultValue.value !== option.value &&
+              defaultValue.label !== option.label
+            ) {
+              return optionJsx;
+            }
+
+            return false;
+          })}
         </Select>
 
         {errors && (

@@ -9,17 +9,17 @@ import {
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import CustomTable from "../../components/customTable";
-import { columns, usersMock } from "./components/usersarray";
+import { columns, usersMock } from "./components/table-helper";
 import { Pagination } from "../../components/pagination/pagination";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
 import DeleteModal from "components/modals/deleteModal";
 import { ButtonPrimary } from "components/button-primary";
-import { EditUsersForm } from "components/forms/users/editUsers/editUsers";
-import { EditUsersPasswordForm } from "components/forms/users/editUsers/editPassword";
+import { EditUsersForm } from "components/forms/users/editUsers/edit-users";
+import { EditUsersPasswordForm } from "components/forms/users/editUsers/edit-password";
 import NavigationLinks from "components/navigationLinks";
 import { UserContext } from "providers/users";
 import { ModalForm } from "components/modals/modalForm";
-import { AddUserForm } from "components/forms/users/addUser/addUser";
+import { AddUserForm } from "components/forms/users/add-user/add-user";
 import { NavBar } from "components/navbar";
 
 export const UsersPage = () => {
@@ -29,17 +29,32 @@ export const UsersPage = () => {
     deleteId,
     changeDeleteId,
     editId,
-    changeEditId,
+    setEditId,
     users,
-    changeUsers,
+    setUsers,
+    getUsersFromThisCompany,
+    deleteUser,
+    deleteIsLoading,
     selectedItems,
+    setSelectedItems,
+    selectedIsLoading,
+    setSelectedIsLoading,
+    createUserIsLoading,
+    changePassword,
+    changePasswordIsLoading,
+    setEditPasswordId,
+    editIsLoading,
   } = useContext(UserContext);
 
   const formRef = useRef(null);
 
   useEffect(() => {
     // dealingWithAuth(true, "/users", history);
-    updateData(1);
+    // updateData(1);
+    const fetchData = async () => {
+      getUsersFromThisCompany();
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -48,7 +63,7 @@ export const UsersPage = () => {
     const lastItemIndex = firstPostIndex + itemsPerPage;
     const slicedData = usersMock.slice(firstPostIndex, lastItemIndex);
 
-    changeUsers([...slicedData]);
+    setUsers([...slicedData]);
   };
   const isMobile = useBreakpointValue({
     base: false,
@@ -88,21 +103,41 @@ export const UsersPage = () => {
   } = useDisclosure();
 
   const handleEditModalOpen = (item) => {
-    changeEditId(item);
+    setEditId(item);
     onEditModalOpen();
   };
 
-  const handleDeleteModalOpen = (item) => {
+  const handleDeleteModalOpen = async (item) => {
     changeDeleteId(item);
     onDeleteModalOpen();
   };
 
-  const handleOnDeleteSelectedUsersOpen = (selecteds) => {
+  const handlePasswordChangeModalOpen = (item) => {
+    setEditPasswordId(item);
+    onEditPasswordModalOpen();
+  };
+
+  const onDeleteSelectedOpenModal = (selecteds) => {
+    setSelectedItems(selecteds);
     onDeleteSelectedUsersOpen();
   };
 
-  const handlePasswordChangeModalOpen = (id) => {
-    onEditPasswordModalOpen();
+  const onConfirmDeleteSelecteds = async () => {
+    setSelectedIsLoading(true);
+    const deletePromises = selectedItems.map((selected) =>
+      selected.id !== "checkall" ? deleteUser(selected.id) : () => {}
+    );
+
+    await Promise.all(deletePromises);
+
+    setUsers(
+      users.filter(
+        (group) => !selectedItems.some((selected) => selected.id === group.id)
+      )
+    );
+
+    setSelectedIsLoading(false);
+    onDeleteSelectedUsersClose();
   };
 
   const [tableIcons, setTableIcons] = useState([
@@ -116,7 +151,7 @@ export const UsersPage = () => {
     {
       icon: <Trash size={20} />,
       onClickRow: handleDeleteModalOpen,
-      onClickHeader: handleOnDeleteSelectedUsersOpen,
+      onClickHeader: (selecteds) => onDeleteSelectedOpenModal(selecteds),
       isDisabled: false,
       shouldShow: true,
     },
@@ -189,7 +224,7 @@ export const UsersPage = () => {
           bgColor={"white"}
         >
           <Pagination
-            data={usersMock}
+            data={users}
             onClickPagination={updateData}
             itemsPerPage={itemsPerPage}
           />
@@ -198,46 +233,65 @@ export const UsersPage = () => {
         <ModalForm
           isOpen={isEditModalOpen}
           onClose={onEditModalClose}
-          id={editId}
-          form={<EditUsersForm formRef={formRef} />}
+          form={
+            <EditUsersForm
+              formRef={formRef}
+              onCloseModal={onEditModalClose}
+              formValues={editId}
+            />
+          }
           formRef={formRef}
           title={"Editar Usuário"}
           description={"Tem certeza de que deseja Editar este usuário?"}
           leftButtonLabel={"Cancelar"}
           rightButtonLabel={"Editar"}
           modalSize="xl"
+          isLoading={editIsLoading}
         />
 
         <ModalForm
           isOpen={isEditPasswordModalOpen}
           onClose={onEditPasswordModalClose}
-          id={editId}
-          form={<EditUsersPasswordForm formRef={formRef} />}
+          form={
+            <EditUsersPasswordForm
+              formRef={formRef}
+              onEdit={changePassword}
+              onCloseModal={onEditPasswordModalClose}
+            />
+          }
           formRef={formRef}
           title={"Editar Senha"}
           description={"Tem certeza que deseja alterar a senha?"}
           leftButtonLabel={"Cancelar"}
           rightButtonLabel={"Editar"}
           modalSize="xl"
+          isLoading={changePasswordIsLoading}
         />
 
         <ModalForm
           isOpen={isAddUserModalOpen}
           onClose={onAddUserModalClose}
-          id={editId}
-          form={<AddUserForm formRef={formRef} />}
+          form={
+            <AddUserForm formRef={formRef} onCloseModal={onAddUserModalClose} />
+          }
           formRef={formRef}
           title={"Adicionar usuário"}
           description={""}
           leftButtonLabel={"Cancelar"}
-          rightButtonLabel={"Editar"}
+          rightButtonLabel={"Criar"}
+          isLoading={createUserIsLoading}
         />
         <DeleteModal
           title={"Excluir Usuário"}
           subtitle={"Tem certeza de que deseja excluir este usuário?"}
           isOpen={isDeleteModalOpen}
           onClose={onDeleteModalClose}
+          onConfirm={async () => {
+            await deleteUser(deleteId.id);
+            onDeleteModalClose();
+          }}
           id={deleteId}
+          isLoading={deleteIsLoading}
         />
         <DeleteModal
           title={"Excluir Usuários"}
@@ -245,6 +299,8 @@ export const UsersPage = () => {
           isOpen={isDeleteSelectedUsers}
           onClose={onDeleteSelectedUsersClose}
           id={selectedItems}
+          onConfirm={onConfirmDeleteSelecteds}
+          isLoading={selectedIsLoading}
         />
       </VStack>
     </>

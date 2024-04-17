@@ -493,7 +493,7 @@ export const usersMock = [
 ];
 
 export const columns = [
-  { header: "Empresa", access: "company" },
+  { header: "Empresa", access: "companyName" },
   { header: "Nome", access: "name" },
   { header: "Email", access: "email" },
   { header: "Status", access: "status" },

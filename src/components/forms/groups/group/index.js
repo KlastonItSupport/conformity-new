@@ -177,8 +177,8 @@ export const GroupForm = ({
             label: user.name,
           }))
         );
-        setIsLoading(false);
       }
+      setIsLoading(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps

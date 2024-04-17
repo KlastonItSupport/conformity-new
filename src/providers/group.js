@@ -21,7 +21,7 @@ const GroupProvider = ({ children }) => {
 
   const changeGroup = (groups) => setGroups([...groups]);
 
-  const getGroups = async () => {
+  const getGroups = async (shouldSetGroups = true) => {
     const companyId = getUserInfo().companyId;
 
     const response = await api.get(
@@ -31,7 +31,10 @@ const GroupProvider = ({ children }) => {
       }
     );
 
-    setGroups(response.data);
+    if (shouldSetGroups) {
+      setGroups(response.data);
+    }
+    return response.data;
   };
 
   const createGroup = async (data) => {

@@ -1,19 +1,20 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormInput from "components/form-input/form-input";
 import { useForm } from "react-hook-form";
-import editUsersFormSchema from "./schema";
+import { editPasswordSchema } from "./schema";
 
-export const EditUsersPasswordForm = ({ formRef }) => {
+export const EditUsersPasswordForm = ({ formRef, onEdit, onCloseModal }) => {
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(editUsersFormSchema),
+    resolver: yupResolver(editPasswordSchema),
   });
 
-  const onSubmit = (data) => {
-    console.log("abassdasdsa", data);
+  const onSubmit = async (data) => {
+    await onEdit(data.password);
+    await onCloseModal();
   };
   return (
     <form
@@ -25,7 +26,7 @@ export const EditUsersPasswordForm = ({ formRef }) => {
         variant="auth"
         fontSize="sm"
         ms={{ base: "0px", md: "0px" }}
-        type="text"
+        type="password"
         placeholder="Nova Senha"
         margin="0 0 10px 0 "
         fontWeight="500"
