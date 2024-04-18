@@ -43,12 +43,10 @@ export const GroupsPage = () => {
   } = useContext(GroupContext);
 
   const debouncedSearch = debounce((inputValue) => {
-    if (!inputValue.length) {
-      searchParams.set("search", inputValue);
-      searchParams.set("page", 1);
-      setSearchParams(searchParams);
-      getGroups(true, 1, inputValue);
-    }
+    searchParams.set("search", inputValue);
+    searchParams.set("page", 1);
+    setSearchParams(searchParams);
+    getGroups(true, 1, inputValue);
   }, 500);
 
   const {

@@ -58,10 +58,15 @@ const AuthProvider = ({ children }) => {
       return user;
     }
   };
+  const logout = (history) => {
+    localStorage.removeItem(accessTokenKey);
+    localStorage.removeItem(userKey);
 
+    history("/");
+  };
   return (
     <AuthContext.Provider
-      value={{ signIn, dealingWithAuth, getToken, getUserInfo }}
+      value={{ signIn, dealingWithAuth, getToken, getUserInfo, logout }}
     >
       {children}
     </AuthContext.Provider>

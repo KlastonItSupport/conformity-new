@@ -6,7 +6,7 @@ import {
   keyframes,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import whiteLogo from "../../assets/img/logo_branco.png";
 import {
   FolderSimple,
@@ -21,6 +21,8 @@ import {
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "providers/auth";
 
 const animation = keyframes`
 from {top: 0px;}
@@ -29,8 +31,10 @@ to {top: 200px;}
 
 export const NavBar = () => {
   const finalAnimation = `${animation}  2s`;
-
+  const { logout } = useContext(AuthContext);
+  const history = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
+
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -150,7 +154,8 @@ export const NavBar = () => {
               itemsList={[
                 {
                   src: "/",
-                  label: "N/A",
+                  label: "Sair",
+                  onClick: () => logout(history),
                 },
                 {
                   src: "/users",

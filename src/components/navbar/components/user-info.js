@@ -63,7 +63,10 @@ export const UserInfo = ({ icon, itemsList, name, companyName }) => {
       </MenuButton>
       <MenuList onMouseEnter={onOpen} onMouseLeave={onClose}>
         {itemsList.map((item, index) => (
-          <MenuItem key={index}>
+          <MenuItem
+            onClick={item.onClick ? item.onClick : () => {}}
+            key={index}
+          >
             <Link href={item.src}>{item.label}</Link>
           </MenuItem>
         ))}
