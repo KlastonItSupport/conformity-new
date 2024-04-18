@@ -8,22 +8,30 @@ import {
 } from "@chakra-ui/react";
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
-import CustomTable from "../../components/customTable";
-import { columns, usersMock } from "./components/table-helper";
-import { Pagination } from "../../components/pagination/pagination";
+import { columns } from "./components/table-helper";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
-import DeleteModal from "components/modals/delete-modal";
-import { ButtonPrimary } from "components/button-primary";
-import { EditUsersForm } from "components/forms/users/editUsers/edit-users";
-import { EditUsersPasswordForm } from "components/forms/users/editUsers/edit-password";
-import NavigationLinks from "components/navigationLinks";
 import { UserContext } from "providers/users";
-import { ModalForm } from "components/modals/modalForm";
-import { AddUserForm } from "components/forms/users/add-user/add-user";
-import { NavBar } from "components/navbar";
+import { useSearchParams } from "react-router-dom";
+import { useQuery } from "helpers/query";
+import { debounce } from "lodash";
+import {
+  NavBar,
+  NavigationLinks,
+  ButtonPrimary,
+  CustomTable,
+  ModalForm,
+  Pagination,
+  EditUsersForm,
+  EditUsersPasswordForm,
+  DeleteModal,
+  AddUserForm,
+} from "components/components";
 
 export const UsersPage = () => {
   const { dealingWithAuth } = useContext(AuthContext);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParams = useQuery();
+
   const itemsPerPage = 10;
   const {
     deleteId,
@@ -44,27 +52,58 @@ export const UsersPage = () => {
     changePasswordIsLoading,
     setEditPasswordId,
     editIsLoading,
+    pagination,
   } = useContext(UserContext);
 
   const formRef = useRef(null);
 
+  const updateData = (page) => {
+    searchParams.set("page", page);
+    setSearchParams(searchParams);
+
+    getUsersFromThisCompany(page, queryParams.get("search"));
+  };
+
+  const debouncedSearch = debounce((inputValue) => {
+    if (inputValue.length >= 3 || !inputValue.length) {
+      searchParams.set("search", inputValue);
+      searchParams.set("page", 1);
+      setSearchParams(searchParams);
+      getUsersFromThisCompany(1, inputValue);
+    }
+  }, 500);
+
   useEffect(() => {
     // dealingWithAuth(true, "/users", history);
-    // updateData(1);
     const fetchData = async () => {
-      getUsersFromThisCompany();
+      const currentPage = queryParams.get("page");
+      const searchQuery = queryParams.get("search");
+
+      if (!currentPage) {
+        searchParams.set("page", 1);
+        setSearchParams(searchParams);
+      }
+      if (!searchQuery) {
+        searchParams.set("search", "");
+        setSearchParams(searchParams);
+      }
+
+      getUsersFromThisCompany(
+        !currentPage ? 1 : currentPage,
+        !searchQuery ? "" : searchQuery
+      );
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateData = (page) => {
-    const firstPostIndex = (page - 1) * itemsPerPage;
-    const lastItemIndex = firstPostIndex + itemsPerPage;
-    const slicedData = usersMock.slice(firstPostIndex, lastItemIndex);
+  // useEffect(() => {
+  //   searchParams.set("search", search);
+  //   setSearchParams(searchParams);
+  //   getUsersFromThisCompany(1, search);
+  //   set
+  // }, [search]);
 
-    setUsers([...slicedData]);
-  };
   const isMobile = useBreakpointValue({
     base: false,
     md: false,
@@ -209,6 +248,8 @@ export const UsersPage = () => {
             <Key size={20} cursor={"pointer"} color="black" />,
           ]}
           icons={tableIcons}
+          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+          searchInputValue={queryParams.get("search")}
           onCheckItems={(show) => {
             setTableIcons(
               tableIcons.map((icon) => {
@@ -223,11 +264,17 @@ export const UsersPage = () => {
           w={isMobile ? "99vw" : "95vw"}
           bgColor={"white"}
         >
-          <Pagination
-            data={users}
-            onClickPagination={updateData}
-            itemsPerPage={itemsPerPage}
-          />
+          {pagination && (
+            <Pagination
+              data={users}
+              onClickPagination={updateData}
+              itemsPerPage={itemsPerPage}
+              totalPages={pagination.totalPages}
+              currentPage={pagination.currentPage}
+              nextPage={pagination.next}
+              lastPage={pagination.last}
+            />
+          )}
         </Flex>
 
         <ModalForm

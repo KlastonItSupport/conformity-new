@@ -5,6 +5,9 @@ export const Pagination = ({
   onClickPagination,
   itemsPerPage,
   currentPage,
+  totalPages,
+  nextPage,
+  lastPage,
 }) => {
   const pages = [];
 
@@ -12,11 +15,10 @@ export const Pagination = ({
     pages.push(i);
   }
 
-  const totalPages = pages[pages.length - 1];
   const initalPage = pages[0];
 
-  const onPageClick = (page) => {
-    onClickPagination(page);
+  const onPageClick = (next) => {
+    onClickPagination(next);
   };
 
   const dotsButton = () => {
@@ -102,7 +104,7 @@ export const Pagination = ({
         sx={{ borderRadius: "7px" }}
         fontWeight={"normal"}
         onClick={() => onPageClick(currentPage + 1)}
-        disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
+        disabled={currentPage === lastPage || lastPage === 0}
         bgColor={"secondaryGray.100"}
       >
         Próximo

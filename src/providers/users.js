@@ -20,18 +20,20 @@ const UserProvider = ({ children }) => {
   const [editIsLoading, setEditIsLoading] = useState(false);
 
   const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState(null);
   const editFormRef = useRef(null);
 
   const changeDeleteId = (id) => {
     setDeleteId(id);
   };
 
-  const getUsersFromThisCompany = async () => {
-    const response = await api.get("/users", {
+  const getUsersFromThisCompany = async (page = 1, search = "") => {
+    const response = await api.get(`/users?page=${page}&search=${search}`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setUsers(response.data);
+    setUsers(response.data.items);
+    setPagination(response.data.pages);
     return response.data;
   };
 
@@ -162,6 +164,8 @@ const UserProvider = ({ children }) => {
         setEditPasswordId,
         editUser,
         editIsLoading,
+        pagination,
+        setPagination,
       }}
     >
       {children}

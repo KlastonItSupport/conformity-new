@@ -25,6 +25,8 @@ const TableCustom = ({
   onCheckItems,
   icons,
   formatOnDownLoad,
+  onChangeSearchInput,
+  searchInputValue,
 }) => {
   const [sort, setSort] = useState({
     column: "",
@@ -267,6 +269,8 @@ const TableCustom = ({
           borderRadius="6px"
           bgColor={"primary.50"}
           width="200px"
+          onChange={onChangeSearchInput}
+          defaultValue={searchInputValue}
         />
       </HStack>
     );
@@ -277,7 +281,12 @@ const TableCustom = ({
     return icon.isDisabled;
   };
   return (
-    <Box w={isMobile ? "99vw" : "95vw"} margin={"0 auto"} bgColor={"white"}>
+    <Box
+      w={isMobile ? "99vw" : "95vw"}
+      margin={"0 auto"}
+      bgColor={"white"}
+      minH={{ lg: "500px", md: "500px" }}
+    >
       <VStack alignItems={"start"} padding={"20px"}>
         <Flex
           flexDirection={isMobile ? "column" : "row"}
