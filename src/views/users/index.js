@@ -1,11 +1,5 @@
 import { useRef, useState } from "react";
-import {
-  Box,
-  Flex,
-  VStack,
-  useBreakpointValue,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import { columns } from "./components/table-helper";
@@ -26,10 +20,13 @@ import {
   DeleteModal,
   AddUserForm,
 } from "components/components";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 export const UsersPage = () => {
   const { dealingWithAuth } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { isMobile } = useBreakpoint();
+
   const queryParams = useQuery();
 
   const itemsPerPage = 10;
@@ -96,13 +93,6 @@ export const UsersPage = () => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const isMobile = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: false,
-    sm: true,
-  });
 
   const {
     isOpen: isDeleteModalOpen,

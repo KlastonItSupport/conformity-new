@@ -12,11 +12,11 @@ import {
   Thead,
   Tr,
   VStack,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { InteractiveButtons } from "./components/interactive-buttons";
 import FormInput from "components/form-input/form-input";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 const TableCustom = ({
   columns,
@@ -28,6 +28,8 @@ const TableCustom = ({
   onChangeSearchInput,
   searchInputValue,
 }) => {
+  const { isMobile } = useBreakpoint();
+
   const [sort, setSort] = useState({
     column: "",
     direction: "asc",
@@ -83,13 +85,6 @@ const TableCustom = ({
   const [visibleColumns, setVisibleColumns] = useState(
     columns.map((column) => column.header)
   );
-
-  const isMobile = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: false,
-    sm: true,
-  });
 
   const checkSortDirection = (columnName) => {
     if (columnName === sort.column && sort.direction === "desc") {

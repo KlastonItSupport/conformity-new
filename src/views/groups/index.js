@@ -1,10 +1,4 @@
-import {
-  Box,
-  Flex,
-  VStack,
-  useBreakpointValue,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import { NavBar } from "components/navbar";
 import NavigationLinks from "components/navigationLinks";
@@ -20,11 +14,13 @@ import { Pagination } from "components/pagination/pagination";
 import { useQuery } from "hooks/query";
 import { useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 export const GroupsPage = () => {
   const formRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
+  const { isMobile } = useBreakpoint();
 
   const {
     groups,
@@ -54,13 +50,6 @@ export const GroupsPage = () => {
       getGroups(true, 1, inputValue);
     }
   }, 500);
-
-  const isMobile = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: false,
-    sm: true,
-  });
 
   const {
     isOpen: isAddGroupModalOpen,

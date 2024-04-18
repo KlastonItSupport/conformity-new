@@ -7,11 +7,11 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { Check } from "@phosphor-icons/react";
 import * as XLSX from "xlsx/xlsx.mjs";
 import Papa from "papaparse";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 export const InteractiveButtons = ({
   visibleColumns,
@@ -21,12 +21,7 @@ export const InteractiveButtons = ({
   downloadTitle,
   formatOnDownLoad,
 }) => {
-  const isMobile = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: false,
-    sm: true,
-  });
+  const { isMobile } = useBreakpoint();
 
   const dataKeys = Object.keys(data[0]).filter(
     (key) => key !== "id" && key !== "passwordHash"

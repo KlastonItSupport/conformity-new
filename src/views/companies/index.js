@@ -1,11 +1,5 @@
 import { useRef, useState } from "react";
-import {
-  Box,
-  Flex,
-  VStack,
-  useBreakpointValue,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
 // import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import CustomTable from "../../components/customTable";
@@ -18,9 +12,12 @@ import { ModalForm } from "components/modals/modalForm";
 import { CompanyForm } from "components/forms/companies/company/company";
 import { CompanyContext } from "providers/company";
 import { NavBar } from "components/navbar";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 export const CompaniesPage = () => {
   // const { dealingWithAuth } = useContext(AuthContext);
+  const { isMobile, isDesktop } = useBreakpoint();
+
   const {
     editId,
     changeEditId,
@@ -43,19 +40,6 @@ export const CompaniesPage = () => {
     getCompanies();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const isMobile = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: false,
-    sm: true,
-  });
-  const isDesktop = useBreakpointValue({
-    base: false,
-    md: false,
-    lg: true,
-    sm: false,
-  });
 
   const {
     isOpen: isEditModalOpen,
