@@ -97,13 +97,6 @@ export const UsersPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // useEffect(() => {
-  //   searchParams.set("search", search);
-  //   setSearchParams(searchParams);
-  //   getUsersFromThisCompany(1, search);
-  //   set
-  // }, [search]);
-
   const isMobile = useBreakpointValue({
     base: false,
     md: false,

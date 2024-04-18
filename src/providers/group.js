@@ -11,7 +11,9 @@ const GroupProvider = ({ children }) => {
   const [deleteId, setDeleteId] = useState();
   const [editSelected, setEditSelected] = useState();
   const [selecteds, setSelecteds] = useState();
+
   const [groups, setGroups] = useState([]);
+  const [pagination, setPagination] = useState(null);
 
   const [createGroupIsLoading, setCreateGroupIsLoading] = useState(false);
   const [deleteGroupIsLoading, setDeleteGroupIsLoading] = useState(false);
@@ -22,20 +24,21 @@ const GroupProvider = ({ children }) => {
 
   const changeGroup = (groups) => setGroups([...groups]);
 
-  const getGroups = async (shouldSetGroups = true) => {
+  const getGroups = async (shouldSetGroups = true, page = 1, search = "") => {
     const companyId = getUserInfo().companyId;
 
     const response = await api.get(
-      `/permissions/groups-by-company/${companyId}`,
+      `/permissions/groups-by-company/${companyId}?page=${page}&search=${search}`,
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }
     );
 
     if (shouldSetGroups) {
-      setGroups(response.data);
+      setPagination(response.data.pages);
+      setGroups(response.data.items);
     }
-    return response.data;
+    return response.data.items;
   };
 
   const createGroup = async (data) => {
@@ -139,6 +142,7 @@ const GroupProvider = ({ children }) => {
         getUsersGroup,
         selectedIsLoading,
         setSelectedIsLoading,
+        pagination,
       }}
     >
       {children}

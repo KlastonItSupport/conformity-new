@@ -10,16 +10,21 @@ import { NavBar } from "components/navbar";
 import NavigationLinks from "components/navigationLinks";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import CustomTable from "../../components/customTable";
-import { columns, formatOnDownLoad, groupsMock } from "./table-helper";
+import { columns, formatOnDownLoad } from "./table-helper";
 import { Trash, NotePencil } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
 import DeleteModal from "components/modals/delete-modal";
 import { GroupForm } from "components/forms/groups/group";
 import { GroupContext } from "providers/group";
 import { Pagination } from "components/pagination/pagination";
+import { useQuery } from "hooks/query";
+import { useSearchParams } from "react-router-dom";
+import { debounce } from "lodash";
 
 export const GroupsPage = () => {
   const formRef = useRef(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParams = useQuery();
 
   const {
     groups,
@@ -38,7 +43,17 @@ export const GroupsPage = () => {
     selectedIsLoading,
     deleteGroupIsLoading,
     setDeleteGroupIsLoading,
+    pagination,
   } = useContext(GroupContext);
+
+  const debouncedSearch = debounce((inputValue) => {
+    if (!inputValue.length) {
+      searchParams.set("search", inputValue);
+      searchParams.set("page", 1);
+      setSearchParams(searchParams);
+      getGroups(true, 1, inputValue);
+    }
+  }, 500);
 
   const isMobile = useBreakpointValue({
     base: false,
@@ -136,16 +151,31 @@ export const GroupsPage = () => {
   ];
 
   const updateData = (page) => {
-    const firstPostIndex = (page - 1) * itemsPerPage;
-    const lastItemIndex = firstPostIndex + itemsPerPage;
-    const slicedData = groupsMock.slice(firstPostIndex, lastItemIndex);
+    searchParams.set("page", page);
+    setSearchParams(searchParams);
 
-    changeGroup([...slicedData]);
+    getGroups(true, page, queryParams.get("search"));
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      getGroups();
+      const currentPage = queryParams.get("page");
+      const searchQuery = queryParams.get("search");
+
+      if (!currentPage) {
+        searchParams.set("page", 1);
+        setSearchParams(searchParams);
+      }
+      if (!searchQuery) {
+        searchParams.set("search", "");
+        setSearchParams(searchParams);
+      }
+
+      getGroups(
+        true,
+        !currentPage ? 1 : currentPage,
+        !searchQuery ? "" : searchQuery
+      );
     };
 
     fetchData();
@@ -180,6 +210,8 @@ export const GroupsPage = () => {
           columns={columns}
           title={"Grupos"}
           icons={tableIcons}
+          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+          searchInputValue={queryParams.get("search")}
           onCheckItems={(show) => {
             setTableIcons(
               tableIcons.map((icon) => {
@@ -195,11 +227,17 @@ export const GroupsPage = () => {
           w={isMobile ? "99vw" : "95vw"}
           bgColor={"white"}
         >
-          <Pagination
-            data={groupsMock}
-            onClickPagination={updateData}
-            itemsPerPage={itemsPerPage}
-          />
+          {pagination && (
+            <Pagination
+              data={groups}
+              onClickPagination={updateData}
+              itemsPerPage={itemsPerPage}
+              totalPages={pagination.totalPages}
+              currentPage={pagination.currentPage}
+              nextPage={pagination.next}
+              lastPage={pagination.last}
+            />
+          )}
         </Flex>
       </VStack>
       <ModalForm
