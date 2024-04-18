@@ -31,7 +31,7 @@ to {top: 200px;}
 
 export const NavBar = () => {
   const finalAnimation = `${animation}  2s`;
-  const { logout } = useContext(AuthContext);
+  const { logout, getUserInfo } = useContext(AuthContext);
   const history = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
@@ -149,7 +149,7 @@ export const NavBar = () => {
           <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>
             {[...iconsMenu]}
             <UserInfo
-              name={"Gustavo Santos"}
+              name={getUserInfo().name}
               companyName={"Empresa Teste"}
               itemsList={[
                 {

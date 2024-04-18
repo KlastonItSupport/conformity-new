@@ -5,7 +5,7 @@ import { useContext, useEffect } from "react";
 import { columns } from "./components/table-helper";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
 import { UserContext } from "providers/users";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import {
@@ -23,8 +23,9 @@ import {
 import { useBreakpoint } from "hooks/usebreakpoint";
 
 export const UsersPage = () => {
-  const { dealingWithAuth } = useContext(AuthContext);
+  const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const history = useNavigate();
   const { isMobile } = useBreakpoint();
 
   const queryParams = useQuery();
@@ -71,8 +72,11 @@ export const UsersPage = () => {
   }, 500);
 
   useEffect(() => {
-    // dealingWithAuth(true, "/users", history);
+    dealingWithAuth(true, "/users", history);
     const fetchData = async () => {
+      if (!getUserInfo()) {
+        return;
+      }
       const currentPage = queryParams.get("page");
       const searchQuery = queryParams.get("search");
 

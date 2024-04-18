@@ -12,20 +12,22 @@ import { GroupForm } from "components/forms/groups/group";
 import { GroupContext } from "providers/group";
 import { Pagination } from "components/pagination/pagination";
 import { useQuery } from "hooks/query";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { AuthContext } from "providers/auth";
 
 export const GroupsPage = () => {
   const formRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const { isMobile } = useBreakpoint();
+  const history = useNavigate();
 
+  const { isMobile } = useBreakpoint();
+  const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const {
     groups,
     itemsPerPage,
-    changeGroup,
     getGroups,
     deleteGroup,
     handleChangeDeleteId,
@@ -145,7 +147,12 @@ export const GroupsPage = () => {
   };
 
   useEffect(() => {
+    dealingWithAuth(true, "/groups", history);
+
     const fetchData = async () => {
+      if (!getUserInfo()) {
+        return;
+      }
       const currentPage = queryParams.get("page");
       const searchQuery = queryParams.get("search");
 
