@@ -12,7 +12,7 @@ import { columns } from "./components/table-helper";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
 import { UserContext } from "providers/users";
 import { useSearchParams } from "react-router-dom";
-import { useQuery } from "helpers/query";
+import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import {
   NavBar,
