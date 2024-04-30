@@ -5,8 +5,10 @@ import editUsersFormSchema from "./schema";
 import SelectInput from "components/select";
 import { useContext } from "react";
 import { UserContext } from "providers/users";
+import { useTranslation } from "react-i18next";
 
 export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
+  const { t } = useTranslation();
   const { editUser } = useContext(UserContext);
   const {
     handleSubmit,
@@ -48,7 +50,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         size="lg"
         borderRadius="6px"
         bgColor={"primary.50"}
-        label="Nome *"
+        label={t("Nome *")}
         width="100%"
         defaultValue={formValues.name}
         {...register("name")}
@@ -81,7 +83,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         size="lg"
         borderRadius="6px"
         bgColor={"primary.50"}
-        label="Telefone *"
+        label={t("Telefone *")}
         width="100%"
         defaultValue={formValues.celphone}
         {...register("celphone")}
@@ -98,7 +100,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
       />
       <SelectInput
         errors={errors.departament}
-        label="Departamento"
+        label={t("Departamento")}
         options={[
           { label: "Qualidade", value: "1" },
           { label: "Compras", value: "2" },
@@ -109,7 +111,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
 
       <SelectInput
         errors={errors.accessRule}
-        label="Regra de acesso"
+        label={t("Regra de acesso")}
         {...register("accessRule")}
         defaultValue={getAccessDefaultValue()}
         options={[
@@ -124,16 +126,16 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         label="Status"
         errors={errors.status}
         defaultValue={{
-          label: formValues.status === "active" ? "Ativo" : "Inativo",
+          label: formValues.status === "active" ? t("Ativo") : t("Inativo"),
           value: formValues.status,
         }}
         options={[
           {
-            label: "Ativo",
+            label: t("Ativo"),
             value: "active",
           },
           {
-            label: "Inativo",
+            label: t("Inativo"),
             value: "inactive",
           },
         ]}

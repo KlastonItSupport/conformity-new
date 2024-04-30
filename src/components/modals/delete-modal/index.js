@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 const DeleteModal = ({
   isOpen,
@@ -19,6 +20,7 @@ const DeleteModal = ({
   subtitle,
   isLoading = false,
 }) => {
+  const { t } = useTranslation();
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
@@ -38,7 +40,7 @@ const DeleteModal = ({
             borderRadius="7px"
             _active={{ bgColor: "red.800" }}
             type="submit"
-            label="Excluir"
+            label={t("Excluir")}
             onClick={onConfirm}
             width="150px"
             margin={"0 auto"}

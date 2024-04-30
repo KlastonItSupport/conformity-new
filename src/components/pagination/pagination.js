@@ -1,4 +1,5 @@
 import { Button, HStack } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
 
 export const Pagination = ({
   data,
@@ -10,6 +11,7 @@ export const Pagination = ({
   lastPage,
 }) => {
   const pages = [];
+  const { t } = useTranslation();
 
   for (let i = 1; i <= Math.ceil(data?.length / itemsPerPage); i++) {
     pages.push(i);
@@ -95,7 +97,7 @@ export const Pagination = ({
         disabled={currentPage === 1}
         bgColor={"secondaryGray.100"}
       >
-        Anterior
+        {t("Anterior")}
       </Button>
       {handleMiddlePages()}
 
@@ -107,7 +109,7 @@ export const Pagination = ({
         disabled={currentPage === lastPage || lastPage === 0}
         bgColor={"secondaryGray.100"}
       >
-        Próximo
+        {t("Próximo")}
       </Button>
     </HStack>
   );

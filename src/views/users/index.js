@@ -21,10 +21,12 @@ import {
   AddUserForm,
 } from "components/components";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { useTranslation } from "react-i18next";
 
 export const UsersPage = () => {
   const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
+  const { t } = useTranslation();
   const history = useNavigate();
   const { isMobile } = useBreakpoint();
 
@@ -197,7 +199,7 @@ export const UsersPage = () => {
     },
     {
       path: "/users",
-      label: "Usuários",
+      label: t("Usuários"),
       isCurrent: true,
     },
   ];
@@ -220,7 +222,7 @@ export const UsersPage = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             type="submit"
-            label=" + Adicionar"
+            label={` + ${t("Adicionar")}`}
             width="150px"
             onClick={onAddUserModalOpen}
           />
@@ -228,7 +230,7 @@ export const UsersPage = () => {
         <CustomTable
           data={users}
           columns={columns}
-          title={"Usuários"}
+          title={t("Usuários")}
           actionButtons={[
             <NotePencil size={20} cursor={"pointer"} color="black" />,
             <Trash size={20} cursor={"pointer"} color="black" />,
@@ -275,10 +277,10 @@ export const UsersPage = () => {
             />
           }
           formRef={formRef}
-          title={"Editar Usuário"}
-          description={"Tem certeza de que deseja Editar este usuário?"}
-          leftButtonLabel={"Cancelar"}
-          rightButtonLabel={"Editar"}
+          title={t("Editar Usuário")}
+          description={t("Tem certeza de que deseja Editar este usuário?")}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Editar")}
           modalSize="xl"
           isLoading={editIsLoading}
         />
@@ -294,10 +296,10 @@ export const UsersPage = () => {
             />
           }
           formRef={formRef}
-          title={"Editar Senha"}
-          description={"Tem certeza que deseja alterar a senha?"}
-          leftButtonLabel={"Cancelar"}
-          rightButtonLabel={"Editar"}
+          title={t("Editar Senha")}
+          description={t("Tem certeza que deseja alterar a senha?")}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Editar")}
           modalSize="xl"
           isLoading={changePasswordIsLoading}
         />
@@ -309,15 +311,15 @@ export const UsersPage = () => {
             <AddUserForm formRef={formRef} onCloseModal={onAddUserModalClose} />
           }
           formRef={formRef}
-          title={"Adicionar usuário"}
+          title={t("Adicionar usuário")}
           description={""}
-          leftButtonLabel={"Cancelar"}
-          rightButtonLabel={"Criar"}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Criar")}
           isLoading={createUserIsLoading}
         />
         <DeleteModal
-          title={"Excluir Usuário"}
-          subtitle={"Tem certeza de que deseja excluir este usuário?"}
+          title={t("Excluir Usuário")}
+          subtitle={t("Tem certeza de que deseja excluir este usuário?")}
           isOpen={isDeleteModalOpen}
           onClose={onDeleteModalClose}
           onConfirm={async () => {
@@ -328,8 +330,8 @@ export const UsersPage = () => {
           isLoading={deleteIsLoading}
         />
         <DeleteModal
-          title={"Excluir Usuários"}
-          subtitle={"Tem certeza de que deseja excluir estes usuários?"}
+          title={t("Excluir Usuários")}
+          subtitle={t("Tem certeza de que deseja excluir estes usuários?")}
           isOpen={isDeleteSelectedUsers}
           onClose={onDeleteSelectedUsersClose}
           id={selectedItems}

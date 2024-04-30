@@ -23,6 +23,7 @@ import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "providers/auth";
+import { useTranslation } from "react-i18next";
 
 const animation = keyframes`
 from {top: 0px;}
@@ -30,6 +31,7 @@ to {top: 200px;}
 `;
 
 export const NavBar = () => {
+  const { t } = useTranslation();
   const finalAnimation = `${animation}  2s`;
   const { logout, getUserInfo } = useContext(AuthContext);
   const history = useNavigate();
@@ -111,19 +113,19 @@ export const NavBar = () => {
       key={"admin-users"}
     />,
     <ItemMenu
-      label={"Administração"}
+      label={t("Administração")}
       itemsList={[
         {
           src: "/companies",
-          label: "Empresas",
+          label: t("Empresas"),
         },
         {
           src: "/users",
-          label: "Usuários",
+          label: t("Usuários"),
         },
         {
           src: "/groups",
-          label: "Grupos e Permissões",
+          label: t("Grupos e Permissões"),
         },
       ]}
       key={"admin-admin"}
@@ -154,7 +156,7 @@ export const NavBar = () => {
               itemsList={[
                 {
                   src: "/",
-                  label: "Sair",
+                  label: t("Sair"),
                   onClick: () => logout(history),
                 },
                 {

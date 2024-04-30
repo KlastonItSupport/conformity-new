@@ -17,6 +17,7 @@ import { CaretDown, CaretUp } from "@phosphor-icons/react";
 import { InteractiveButtons } from "./components/interactive-buttons";
 import FormInput from "components/form-input/form-input";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { useTranslation } from "react-i18next";
 
 const TableCustom = ({
   columns,
@@ -29,6 +30,7 @@ const TableCustom = ({
   searchInputValue,
 }) => {
   const { isMobile } = useBreakpoint();
+  const { t } = useTranslation();
 
   const [sort, setSort] = useState({
     column: "",
@@ -257,7 +259,7 @@ const TableCustom = ({
           fontSize="sm"
           ms={{ base: "0px", md: "0px" }}
           type="text"
-          placeholder="Pesquisar"
+          placeholder={t("Pesquisar")}
           margin="0 0 10px 0 "
           fontWeight="500"
           size="lg"
