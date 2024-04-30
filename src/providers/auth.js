@@ -1,5 +1,6 @@
 import { api } from "api/api";
 import { createContext } from "react";
+import { Navigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
@@ -8,9 +9,12 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const accessTokenKey = "@Conformity:accessToken";
   const userKey = "@Conformity:user";
+  const languageKey = "@Conformity:language";
 
   const signIn = async (data, history) => {
     try {
+      const language = data.language;
+      delete data.language;
       const response = await api.post("/users/signIn", data);
 
       const { accessToken } = response.data;
@@ -24,6 +28,7 @@ const AuthProvider = ({ children }) => {
 
       localStorage.setItem(accessTokenKey, accessToken);
       localStorage.setItem(userKey, JSON.stringify(user));
+      localStorage.setItem(languageKey, JSON.stringify(language));
 
       toast.success("Login feito com sucesso");
       history("/users");

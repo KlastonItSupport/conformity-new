@@ -137,10 +137,12 @@ export const SignInForm = () => {
             size="lg"
             borderRadius="6px"
             bgColor={"primary.50"}
+            {...register("language")}
+            error={errors.language?.message}
           >
-            <option value="option1">{t("Português")}</option>
-            <option value="option1">{t("Inglês")}</option>
-            <option value="option1">{t("Espanhol")}</option>
+            <option value="pt">{t("Português")}</option>
+            <option value="en-US">{t("Inglês")}</option>
+            <option value="es">{t("Espanhol")}</option>
           </Select>
           <Flex mb="24px">
             <NavLink to="/auth/forgot-password">
