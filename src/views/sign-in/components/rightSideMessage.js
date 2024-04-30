@@ -6,8 +6,10 @@ import {
   useBreakpointValue,
 } from "@chakra-ui/react";
 import illustration from "assets/img/auth/notebook-design.png";
+import { useTranslation } from "react-i18next";
 
 export const RightSideMessage = () => {
+  const { t } = useTranslation();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   return (
@@ -17,10 +19,10 @@ export const RightSideMessage = () => {
         color="navy.700"
         fontSize={{ lg: "36px", md: "32px", sm: "24px" }}
       >
-        Seja bem-vindo ao Conformity!
+        {t("Seja bem-vindo ao Conformity!")}
       </Heading>
       <Text mt="10px" color="gray.600" fontWeight="400">
-        A solução mais completa e segura em gestão administrativa.
+        {t("A solução mais completa e segura em gestão administrativa.")}
       </Text>
       {isDesktop && <Image src={illustration} />}
     </VStack>

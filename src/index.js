@@ -15,6 +15,8 @@ import { CompaniesPage } from "views/companies";
 import { CompanyProvider } from "providers/company";
 import { GroupsPage } from "views/groups";
 import { GroupProvider } from "providers/group";
+// eslint-disable-next-line no-unused-vars
+import i18n from "./i18n/index.js";
 
 const routes = createBrowserRouter([
   {

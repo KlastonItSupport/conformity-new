@@ -1,0 +1,21 @@
+{
+    "translation":{
+        "Seja bem-vindo ao Conformity!": "Welcome to Conformity!",
+        "A solução mais completa e segura em gestão administrativa.": "The most complete and secure solution in administrative management.",
+        "Logar": "Sign In",
+        "Insira seu email e senha para entrar na nossa plataforma": "Insert your email and password to access our platform",
+        "Senha *": "Password *",
+        "Min. 8 caracteres": "Min. 8 characters",
+        "Idioma":"Language",
+        "Selecione o idioma": "Select the language",
+        "Português":"Portuguese",
+        "Inglês": "English",
+        "Espanhol":"Spanish",
+        "Esqueceu a senha?":"Forgot your password?",
+        "Entrar":"Sign in",
+        "* Email obrigatório":"* Email required",
+        "* Senha obrigatória": "* Password required",
+        "* Insira um email válido":"* Enter a valid email"
+
+    }
+}

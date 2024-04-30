@@ -19,9 +19,12 @@ import FormInput from "components/form-input/form-input";
 import { RiEyeCloseLine } from "react-icons/ri";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { ButtonPrimary } from "components/button-primary";
+import { useTranslation } from "react-i18next";
 
 export const SignInForm = () => {
   const { signIn } = useContext(AuthContext);
+  const { t } = useTranslation();
+
   const history = useNavigate();
 
   const {
@@ -57,7 +60,7 @@ export const SignInForm = () => {
           fontSize={{ lg: "36px", md: "32px", sm: "24px" }}
           color={textColor}
         >
-          Logar
+          {t("Logar")}
         </Heading>
         <Text
           mb="36px"
@@ -66,7 +69,7 @@ export const SignInForm = () => {
           fontWeight="400"
           fontSize="md"
         >
-          Insira seu email e senha para entrar na nossa plataforma
+          {t("Insira seu email e senha para entrar na nossa plataforma")}
         </Text>
       </VStack>
       <Flex
@@ -100,7 +103,7 @@ export const SignInForm = () => {
 
           <FormInput
             fontSize="sm"
-            placeholder="Min. 8 caracteres"
+            placeholder={t("Min. 8 caracteres")}
             margin="0 0 10px 0 "
             size="lg"
             type={show ? "text" : "password"}
@@ -110,7 +113,7 @@ export const SignInForm = () => {
             bgColor={"primary.50"}
             {...register("password")}
             error={errors.password?.message}
-            label="Senha *"
+            label={t("Senha *")}
             onClickIcon={handleClick}
           />
 
@@ -121,35 +124,33 @@ export const SignInForm = () => {
             color={textColor}
             display="flex"
           >
-            Idioma
+            {t("Idioma")}
           </FormLabel>
           <Select
             variant="auth"
             fontSize="sm"
             ms={{ base: "0px", md: "0px" }}
             type="email"
-            placeholder="Selecione o idioma"
+            placeholder={t("Selecione o idioma")}
             mb="24px"
             fontWeight="500"
             size="lg"
             borderRadius="6px"
             bgColor={"primary.50"}
-            // {...register("language")}
-            // error={errors.language?.message}
           >
-            <option value="option1">Portugues</option>
-            <option value="option1">Inglês</option>
-            <option value="option1">Espanhol</option>
+            <option value="option1">{t("Português")}</option>
+            <option value="option1">{t("Inglês")}</option>
+            <option value="option1">{t("Espanhol")}</option>
           </Select>
           <Flex mb="24px">
             <NavLink to="/auth/forgot-password">
               <Text
                 color={"primary.100"}
                 fontSize="sm"
-                w="124px"
                 fontWeight="500"
+                w={"100%"}
               >
-                Esqueceu a senha?
+                {t("Esqueceu a senha?")}
               </Text>
             </NavLink>
           </Flex>
@@ -166,7 +167,7 @@ export const SignInForm = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             type="submit"
-            label="Entrar"
+            label={t("Entrar")}
             isLoading={isSignInLoading}
           />
         </form>

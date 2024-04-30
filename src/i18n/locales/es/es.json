@@ -1,0 +1,20 @@
+{
+    "translation":{
+        "Seja bem-vindo ao Conformity!": "¡Bienvenidos al Conformity!",
+        "A solução mais completa e segura em gestão administrativa.":"La solución más completa y segura en gestión administrativa.",
+        "Logar":"Iniciar sesión",
+        "Insira seu email e senha para entrar na nossa plataforma":"Insira su correo electrónico y senha para entrar en nuestra plataforma",
+        "Senha *": "Senha *",
+        "Min. 8 caracteres": "Mín. 8 caracteres",
+        "Idioma":"Idioma",
+        "Selecione o idioma": "Selecciona el idioma",
+        "Português":"Portugués",
+        "Inglês": "Inglés",
+        "Espanhol":"Español",
+        "Esqueceu a senha?":"Olvido la contraseña?",
+        "Entrar":"Entrar",
+        "* Email obrigatório":"Email obligatorio",
+        "* Senha obrigatória": "Contraseña obligatorio",
+        "* Insira um email válido":"* Introduzca un Email válido"
+    }
+}
