@@ -21,9 +21,9 @@ import {
   AddUserForm,
 } from "components/components";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import { useTranslation } from "react-i18next";
+import { useTranslation, withTranslation } from "react-i18next";
 
-export const UsersPage = () => {
+const UsersPage = () => {
   const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
@@ -342,3 +342,5 @@ export const UsersPage = () => {
     </>
   );
 };
+
+export default withTranslation()(UsersPage);

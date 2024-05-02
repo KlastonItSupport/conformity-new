@@ -2,6 +2,7 @@ import { api } from "api/api";
 import { createContext, useContext, useRef, useState } from "react";
 
 import { toast } from "react-toastify";
+import i18n from "../i18n/index";
 import { AuthContext } from "./auth";
 
 const UserContext = createContext();
@@ -50,9 +51,9 @@ const UserProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
 
-      toast.success("Senha alterada com sucesso");
+      toast.success(i18n.t("Senha alterada com sucesso"));
     } catch (_) {
-      toast.error("Erro ao alterar a senha");
+      toast.error(i18n.t("Erro ao alterar a senha"));
     }
     setChangePasswordIsLoading(false);
   };
@@ -76,7 +77,7 @@ const UserProvider = ({ children }) => {
       );
 
       if (response.status === 201) {
-        toast.success("Usuário criado com sucesso");
+        toast.success(i18n.t("Usuário criado com sucesso"));
         setUsers([response.data, ...users]);
         setCreateUserIsLoading(false);
 
@@ -84,7 +85,7 @@ const UserProvider = ({ children }) => {
       }
     } catch (e) {
       if ((e.status = 409)) {
-        toast.error("Ja existe um usuário com este email");
+        toast.error(i18n.t("Ja existe um usuário com este email"));
         setCreateUserIsLoading(false);
 
         return false;
@@ -102,10 +103,10 @@ const UserProvider = ({ children }) => {
       if (response.status === 200) {
         setDeleteIsLoading(false);
         setUsers(users.filter((user) => user.id !== id));
-        toast.success("Usuário deletado com sucesso");
+        toast.success(i18n.t("Usuário deletado com sucesso"));
       }
     } catch (e) {
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
     }
   };
 
@@ -128,12 +129,12 @@ const UserProvider = ({ children }) => {
 
         setUsers(updatedUsers);
 
-        toast.success("Usuário editado com sucesso");
+        toast.success(i18n.t("Usuário editado com sucesso"));
       } else {
-        toast.error("Resposta inválida da API ao editar usuário");
+        toast.error(i18n.t("Resposta inválida da API ao editar usuário"));
       }
     } catch (error) {
-      toast.error("Ocorreu um erro ao editar usuário");
+      toast.error(i18n.t("Ocorreu um erro ao editar usuário"));
     } finally {
       setEditIsLoading(false);
     }

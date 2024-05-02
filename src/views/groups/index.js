@@ -16,9 +16,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { debounce } from "lodash";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { AuthContext } from "providers/auth";
+import { useTranslation } from "react-i18next";
 
 export const GroupsPage = () => {
   const formRef = useRef(null);
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
   const history = useNavigate();
@@ -194,7 +196,7 @@ export const GroupsPage = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             type="submit"
-            label=" + Adicionar"
+            label={` + ${t("Adicionar")}`}
             width="150px"
             onClick={onAddGroupModalOpen}
           />
@@ -202,7 +204,7 @@ export const GroupsPage = () => {
         <CustomTable
           data={groups}
           columns={columns}
-          title={"Grupos"}
+          title={t("Grupos")}
           icons={tableIcons}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
           searchInputValue={queryParams.get("search")}
@@ -242,10 +244,10 @@ export const GroupsPage = () => {
           <GroupForm formRef={formRef} onCloseModal={onAddGroupModalClose} />
         }
         formRef={formRef}
-        title={"Adicionar Grupo"}
+        title={t("Adicionar Grupo")}
         description={""}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Criar"}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Criar")}
         isLoading={createGroupIsLoading}
       />
       <ModalForm
@@ -261,24 +263,24 @@ export const GroupsPage = () => {
           />
         }
         formRef={formRef}
-        title={"Editar Grupo"}
-        description={"Tem certeza de que deseja Editar este Grupo?"}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
+        title={t("Editar Grupo")}
+        description={t("Tem certeza de que deseja Editar este Grupo?")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Editar")}
         modalSize="xl"
         isLoading={selectedIsLoading}
       />
       <DeleteModal
-        title={"Excluir Grupo"}
-        subtitle={"Tem certeza de que deseja excluir este Grupo?"}
+        title={t("Excluir Grupo")}
+        subtitle={t("Tem certeza de que deseja excluir este Grupo?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={onDeleteModalConfirm}
         isLoading={deleteGroupIsLoading}
       />
       <DeleteModal
-        title={"Excluir Grupo"}
-        subtitle={"Tem certeza de que deseja excluir estes Grupos?"}
+        title={t("Excluir Grupo")}
+        subtitle={t("Tem certeza de que deseja excluir estes Grupos?")}
         isOpen={isDeleteSelectedGroups}
         onClose={onDeleteSelectedGroupsClose}
         onConfirm={onConfirmDeleteSelecteds}

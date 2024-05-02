@@ -3,6 +3,7 @@ import { createContext, useContext, useState } from "react";
 
 import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
+import i18n from "../i18n/index";
 
 const GroupContext = createContext();
 
@@ -53,13 +54,13 @@ const GroupProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${getToken()}` },
         }
       );
-      toast.success("Grupo Criado com sucesso");
+      toast.success(i18n.t("Grupo Criado com sucesso"));
       setGroups([
         { ...response.data, ...response.data.permissions },
         ...groups,
       ]);
     } catch (_) {
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
     }
     setCreateGroupIsLoading(false);
   };
@@ -76,10 +77,10 @@ const GroupProvider = ({ children }) => {
             return group.id !== id;
           }),
         ]);
-        toast.success("Grupo Deletado com sucesso");
+        toast.success(i18n.t("Grupo Deletado com sucesso"));
       }
     } catch (_) {
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
     }
   };
 
@@ -90,14 +91,14 @@ const GroupProvider = ({ children }) => {
       const response = await api.patch(`/permissions/group/${data.id}`, data, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-      toast.success("Grupo Editado com sucesso");
+      toast.success(i18n.t("Grupo Editado com sucesso"));
 
       setGroups([
         { ...response.data, ...response.data.permissions },
         ...groups.filter((group) => group.id !== response.data.id),
       ]);
     } catch (_) {
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
     }
     setSelectedIsLoading(false);
   };
@@ -109,7 +110,9 @@ const GroupProvider = ({ children }) => {
       });
       return response.data;
     } catch (_) {
-      toast.error("Ocorreu um erro ao resgatar os usuários deste grupo");
+      toast.error(
+        i18n.t("Ocorreu um erro ao resgatar os usuários deste grupo")
+      );
     }
   };
 

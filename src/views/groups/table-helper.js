@@ -1,8 +1,10 @@
+import i18n from "../../i18n/index.js";
+
 /* eslint-disable no-useless-computed-key */
 const formatBoolean = (data) => (data ? "Sim" : "Não");
 
 const formatReadDeleteEditColumns = (data) => {
-  return `Criar: ${formatBoolean(data.canAdd)}| Consultar: ${formatBoolean(data.canRead)} | Deletar: ${formatBoolean(data.canDelete)}  | Editar: ${formatBoolean(data.canEdit)} `;
+  return `${i18n.t("Criar")}: ${formatBoolean(data.canAdd)} | ${i18n.t("Consultar")}: ${formatBoolean(data.canRead)} | ${i18n.t("Deletar")}: ${formatBoolean(data.canDelete)}  | ${i18n.t("Editar")}: ${formatBoolean(data.canEdit)} `;
 };
 
 export const formatOnDownLoad = (data) => {
@@ -10,43 +12,88 @@ export const formatOnDownLoad = (data) => {
 
   data.map((element) => {
     parsedDownload.push({
-      ["Nome"]: element.name,
-      ["Documentos - Pode Criar "]: formatBoolean(element.documents.canAdd),
-      ["Documentos - Pode Ler "]: formatBoolean(element.documents.canRead),
-      ["Documentos - Pode Editar "]: formatBoolean(element.documents.canEdit),
-      ["Documentos - Pode Apagar "]: formatBoolean(element.documents.canDelete),
-      ["Tarefas - Pode Criar "]: formatBoolean(element.tasks.canAdd),
-      ["Tarefas - Pode Ler "]: formatBoolean(element.tasks.canRead),
-      ["Tarefas - Pode Editar "]: formatBoolean(element.tasks.canEdit),
-      ["Tarefas - Pode Apagar "]: formatBoolean(element.tasks.canDelete),
-      ["Equipamentos - Pode Criar "]: formatBoolean(element.equipments.canAdd),
-      ["Equipamentos - Pode Ler "]: formatBoolean(element.equipments.canRead),
-      ["Equipamentos - Pode Editar "]: formatBoolean(
+      [i18n.t("Nome")]: element.name,
+      [`${i18n.t("Documentos")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.documents.canAdd
+      ),
+      [`${i18n.t("Documentos")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.documents.canRead
+      ),
+      [`${i18n.t("Documentos")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.documents.canEdit
+      ),
+      [`${i18n.t("Documentos")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
+        element.documents.canDelete
+      ),
+      [`${i18n.t("Tarefas")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.tasks.canAdd
+      ),
+      [`${i18n.t("Tarefas")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.tasks.canRead
+      ),
+      [`${i18n.t("Tarefas")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.tasks.canEdit
+      ),
+      [`${i18n.t("Tarefas")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
+        element.tasks.canDelete
+      ),
+      [`${i18n.t("Equipamentos")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.equipments.canAdd
+      ),
+      [`${i18n.t("Equipamentos")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.equipments.canRead
+      ),
+      [`${i18n.t("Equipamentos")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
         element.equipments.canEdit
       ),
-      ["Equipamentos - Pode Apagar "]: formatBoolean(
+      [`${i18n.t("Equipamentos")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
         element.equipments.canDelete
       ),
-      ["Indicadores - Pode Criar "]: formatBoolean(element.indicators.canAdd),
-      ["Indicadores - Pode Ler "]: formatBoolean(element.indicators.canRead),
-      ["Indicadores - Pode Editar "]: formatBoolean(element.indicators.canEdit),
-      ["Indicadores - Pode Apagar "]: formatBoolean(
+      [`${i18n.t("Indicadores")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.indicators.canAdd
+      ),
+      [`${i18n.t("Indicadores")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.indicators.canRead
+      ),
+      [`${i18n.t("Indicadores")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.indicators.canEdit
+      ),
+      [`${i18n.t("Indicadores")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
         element.indicators.canDelete
       ),
-      ["CRM - Pode Criar "]: formatBoolean(element.crm.canAdd),
-      ["CRM - Pode Ler "]: formatBoolean(element.crm.canRead),
-      ["CRM - Pode Editar "]: formatBoolean(element.crm.canEdit),
-      ["CRM - Pode Apagar "]: formatBoolean(element.crm.canDelete),
-      ["Treinamentos - Pode Criar "]: formatBoolean(element.training.canAdd),
-      ["Treinamentos - Pode Ler "]: formatBoolean(element.training.canRead),
-      ["Treinamentos - Pode Editar "]: formatBoolean(element.training.canEdit),
-      ["Treinamentos - Pode Apagar "]: formatBoolean(
+      [`${i18n.t("CRM")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.crm.canRead
+      ),
+      [`${i18n.t("CRM")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.crm.canEdit
+      ),
+      [`${i18n.t("CRM")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
+        element.crm.canDelete
+      ),
+      [`${i18n.t("Treinamentos")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.training.canAdd
+      ),
+      [`${i18n.t("Treinamentos")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.training.canRead
+      ),
+      [`${i18n.t("Treinamentos")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.training.canEdit
+      ),
+      [`${i18n.t("Treinamentos")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
         element.training.canDelete
       ),
-      ["Empresas - Pode Criar "]: formatBoolean(element.companies.canAdd),
-      ["Empresas - Pode Ler "]: formatBoolean(element.companies.canRead),
-      ["Empresas - Pode Editar "]: formatBoolean(element.companies.canEdit),
-      ["Empresas - Pode Apagar "]: formatBoolean(element.companies.canDelete),
+      [`${i18n.t("Empresas")} - ${i18n.t("Pode Criar")} `]: formatBoolean(
+        element.companies.canAdd
+      ),
+      [`${i18n.t("Empresas")} - ${i18n.t("Pode Ler")} `]: formatBoolean(
+        element.companies.canRead
+      ),
+      [`${i18n.t("Empresas")} - ${i18n.t("Pode Editar")} `]: formatBoolean(
+        element.companies.canEdit
+      ),
+      [`${i18n.t("Empresas")} - ${i18n.t("Pode Apagar")} `]: formatBoolean(
+        element.companies.canDelete
+      ),
     });
     return false;
   });
@@ -54,119 +101,47 @@ export const formatOnDownLoad = (data) => {
 };
 
 export const columns = [
-  { header: "Nome", access: "name" },
+  { header: i18n.t("Nome"), access: "name" },
   {
-    header: "Documentos",
+    header: i18n.t("Documentos"),
     access: "documents",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "Tarefas",
+    header: i18n.t("Tarefas"),
     access: "tasks",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "Equipamentos",
+    header: i18n.t("Equipamentos"),
     access: "equipments",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "Indicadores",
+    header: i18n.t("Indicadores"),
     access: "indicators",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "CRM",
+    header: i18n.t("CRM"),
     access: "crm",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "Treinamentos",
+    header: i18n.t("Treinamentos"),
     access: "training",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
   },
   {
-    header: "Empresas",
+    header: i18n.t("Empresas"),
     access: "companies",
     formatData: formatReadDeleteEditColumns,
     sortFunc: () => {},
-  },
-];
-
-export const groupsMock = [
-  {
-    id: 1,
-    name: "RH",
-    documents: {
-      cannAdd: false,
-      canRead: false,
-      canDelete: false,
-      canEdit: false,
-    },
-    tasks: { cannAdd: false, canRead: true, canDelete: false, canEdit: true },
-    equipments: {
-      cannAdd: false,
-      canRead: true,
-      canDelete: false,
-      canEdit: false,
-    },
-    indicators: {
-      cannAdd: false,
-      canRead: true,
-      canDelete: true,
-      canEdit: true,
-    },
-    crm: { cannAdd: false, canRead: true, canDelete: false, canEdit: false },
-    training: { cannAdd: false, canRead: true, canDelete: true, canEdit: true },
-    companies: {
-      cannAdd: false,
-      canRead: true,
-      canDelete: false,
-      canEdit: false,
-    },
-  },
-  {
-    id: 2,
-    name: "Finance",
-    documents: {
-      canRead: true,
-      canDelete: false,
-      canEdit: false,
-    },
-    tasks: {
-      canRead: true,
-      canDelete: true,
-      canEdit: true,
-    },
-    equipments: { canRead: false, canDelete: false, canEdit: true },
-    indicators: { canRead: true, canDelete: true, canEdit: false },
-    crm: { canRead: true, canDelete: false, canEdit: true },
-    training: { canRead: false, canDelete: true, canEdit: false },
-    companies: { canRead: true, canDelete: true, canEdit: true },
-  },
-  {
-    id: 3,
-    name: "Marketing",
-    documents: {
-      canRead: true,
-      canDelete: true,
-      canEdit: true,
-    },
-    tasks: {
-      canRead: false,
-      canDelete: false,
-      canEdit: false,
-    },
-    equipments: { canRead: false, canDelete: false, canEdit: false },
-    indicators: { canRead: true, canDelete: false, canEdit: true },
-    crm: { canRead: true, canDelete: true, canEdit: false },
-    training: { canRead: true, canDelete: false, canEdit: true },
-    companies: { canRead: true, canDelete: true, canEdit: true },
   },
 ];

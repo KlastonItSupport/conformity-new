@@ -1,9 +1,8 @@
 import { api } from "api/api";
 import { createContext } from "react";
-import { Navigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
-
+import i18n from "../i18n/index";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -28,12 +27,13 @@ const AuthProvider = ({ children }) => {
 
       localStorage.setItem(accessTokenKey, accessToken);
       localStorage.setItem(userKey, JSON.stringify(user));
-      localStorage.setItem(languageKey, JSON.stringify(language));
+      localStorage.setItem(languageKey, language);
 
-      toast.success("Login feito com sucesso");
+      i18n.changeLanguage(language);
+      toast.success(i18n.t("Login feito com sucesso"));
       history("/users");
     } catch (_) {
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
     }
   };
 
@@ -66,9 +66,11 @@ const AuthProvider = ({ children }) => {
   const logout = (history) => {
     localStorage.removeItem(accessTokenKey);
     localStorage.removeItem(userKey);
+    localStorage.removeItem(languageKey);
 
     history("/");
   };
+
   return (
     <AuthContext.Provider
       value={{ signIn, dealingWithAuth, getToken, getUserInfo, logout }}

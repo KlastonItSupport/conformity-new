@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { AuthContext } from "./auth";
+import i18n from "../i18n/index";
 
 const CompanyContext = createContext();
 
@@ -36,15 +37,15 @@ const CompanyProvider = ({ children }) => {
       setCompanies([response.data, ...companies]);
       setCompaniesCopy([response.data, ...companiesCopy]);
       setCurrentPage(1);
-      toast.success("Empresa Criada com sucesso");
+      toast.success(i18n.t("Empresa Criada com sucesso"));
 
       return true;
     } catch (e) {
       if ((e.statusCode = 409)) {
-        toast.error("Já existe uma empresa com este email");
+        toast.error(i18n.t("Já existe uma empresa com este email"));
         return false;
       }
-      toast.error("Ocorreu um erro");
+      toast.error(i18n.t("Ocorreu um erro"));
       return false;
     }
   };

@@ -15,6 +15,8 @@ import { CompanyContext } from "providers/company";
 import { SelectDropDown } from "components/select-drop-down";
 import { GroupContext } from "providers/group";
 import { getCheckBoxes } from "./helper";
+import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 
 export const GroupForm = ({
   formRef,
@@ -24,6 +26,7 @@ export const GroupForm = ({
 }) => {
   const { getCompanyUsers, users } = useContext(CompanyContext);
   const { createGroup, editGroup, getUsersGroup } = useContext(GroupContext);
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(true);
   const [groupUsers, setGroupUsers] = useState([]);
@@ -95,7 +98,7 @@ export const GroupForm = ({
               });
             }}
           >
-            Adicionar
+            {t("Adicionar")}
           </Checkbox>
           <Checkbox
             pr={"25px"}
@@ -110,7 +113,7 @@ export const GroupForm = ({
               });
             }}
           >
-            Vizualizar
+            {t("Visualizar")}
           </Checkbox>
           <Checkbox
             pr={"25px"}
@@ -125,7 +128,7 @@ export const GroupForm = ({
               });
             }}
           >
-            Editar
+            {t("Editar")}
           </Checkbox>
           <Checkbox
             isChecked={checkboxList[access].canDelete === 1 ? true : false}
@@ -139,7 +142,7 @@ export const GroupForm = ({
               });
             }}
           >
-            Deletar
+            {t("Deletar")}
           </Checkbox>
         </HStack>
       </VStack>
@@ -154,14 +157,14 @@ export const GroupForm = ({
   const giveAllPermissions = () => {
     return (
       <VStack justifyContent={"start"} paddingY={"15px"} alignItems={"start"}>
-        <Text fontWeight={"bold"}> Dar Todas as permissoes</Text>
+        <Text fontWeight={"bold"}> {t("Dar Todas as permissoes")}</Text>
         <Checkbox
           pr={"25px"}
           onChange={(e) => {
             setCheckBoxList(getCheckBoxes(e.currentTarget.checked));
           }}
         >
-          Selecione para dar todas as permissoes
+          {t("Selecione para dar todas as permissoes")}
         </Checkbox>
       </VStack>
     );
@@ -205,7 +208,7 @@ export const GroupForm = ({
           size="lg"
           borderRadius="6px"
           bgColor={"primary.50"}
-          label="Nome do grupo *"
+          label={t("Nome do grupo *")}
           width="100%"
           {...register("name")}
           error={errors.name?.message}
@@ -219,22 +222,22 @@ export const GroupForm = ({
         ) : (
           <SelectDropDown
             options={options}
-            label={"Selecione os usuários"}
+            label={t("Selecione os usuários")}
             defaultValue={groupUsers}
             error={errors.users}
             control={control}
             name={"users"}
-            placeholder="Clique ou digite para adicionar o usuário"
+            placeholder={t("Clique ou digite para adicionar o usuário")}
           />
         )}
         {giveAllPermissions()}
-        {buildCheckBoxes("Documentos", "documents")}
-        {buildCheckBoxes("Tasks", "tasks")}
-        {buildCheckBoxes("Equipamentos", "equipments")}
-        {buildCheckBoxes("Indicadores", "indicators")}
-        {buildCheckBoxes("CRM", "crm")}
-        {buildCheckBoxes("Treinamentos", "training")}
-        {buildCheckBoxes("Empresas", "companies")}
+        {buildCheckBoxes(t("Documentos"), "documents")}
+        {buildCheckBoxes(t("Tasks"), "tasks")}
+        {buildCheckBoxes(t("Equipamentos"), "equipments")}
+        {buildCheckBoxes(t("Indicadores"), "indicators")}
+        {buildCheckBoxes(t("CRM"), "crm")}
+        {buildCheckBoxes(t("Treinamentos"), "training")}
+        {buildCheckBoxes(t("Empresas"), "companies")}
       </form>
     </VStack>
   );
