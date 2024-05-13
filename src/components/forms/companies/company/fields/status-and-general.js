@@ -4,7 +4,7 @@ import FormInput from "components/form-input/form-input";
 import SelectInput from "components/select";
 import React from "react";
 
-export const StatusAndLimitGeralUsers = ({ register, errors }) => {
+export const StatusAndLimitGeralUsers = ({ register, errors, formValues }) => {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const fields = [
@@ -22,6 +22,7 @@ export const StatusAndLimitGeralUsers = ({ register, errors }) => {
       label="Limite de Usuários (Geral)*"
       width="100%"
       key={"addCompany-generaLimit"}
+      defaultValue={formValues ? formValues.generaLimit : null}
     />,
     <VStack w={"100%"} align={"start"} justify={"start"} m={"0px"}>
       <SelectInput
@@ -40,7 +41,6 @@ export const StatusAndLimitGeralUsers = ({ register, errors }) => {
         ]}
         key={"addCompany-status"}
       />
-      ,
     </VStack>,
   ];
 

@@ -47,7 +47,7 @@ export const Pagination = ({
         fontWeight={"normal"}
         key={page}
         onClick={() => onPageClick(page)}
-        isActive={currentPage === page}
+        isActive={Number(currentPage) === page}
         bgColor={"secondaryGray.100"}
       >
         {page}
@@ -62,13 +62,13 @@ export const Pagination = ({
       }
       return pageButtons;
     }
-    if (currentPage <= 3) {
+    if (Number(currentPage) <= 3) {
       for (let i = 1; i <= 5; i++) {
         pageButtons.push(mountButtonPage(i));
       }
       pageButtons.push(dotsButton());
       pageButtons.push(mountButtonPage(totalPages));
-    } else if (currentPage > totalPages - 2) {
+    } else if (Number(currentPage) > totalPages - 2) {
       pageButtons.push(mountButtonPage(1));
       pageButtons.push(dotsButton());
       for (let i = totalPages - 4; i <= totalPages; i++) {
@@ -77,7 +77,7 @@ export const Pagination = ({
     } else {
       pageButtons.push(mountButtonPage(1));
       pageButtons.push(dotsButton());
-      for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+      for (let i = Number(currentPage) - 1; i <= Number(currentPage) + 1; i++) {
         pageButtons.push(mountButtonPage(i));
       }
       pageButtons.push(dotsButton());
@@ -93,8 +93,8 @@ export const Pagination = ({
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
         fontWeight={"normal"}
-        onClick={() => onPageClick(currentPage - 1)}
-        disabled={currentPage === 1}
+        onClick={() => onPageClick(Number(currentPage) - 1)}
+        disabled={Number(currentPage) === 1}
         bgColor={"secondaryGray.100"}
       >
         {t("Anterior")}
@@ -105,8 +105,8 @@ export const Pagination = ({
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
         fontWeight={"normal"}
-        onClick={() => onPageClick(currentPage + 1)}
-        disabled={currentPage === lastPage || lastPage === 0}
+        onClick={() => onPageClick(Number(currentPage) + 1)}
+        disabled={Number(currentPage) === lastPage || lastPage === 0}
         bgColor={"secondaryGray.100"}
       >
         {t("Próximo")}

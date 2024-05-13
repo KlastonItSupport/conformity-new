@@ -3,9 +3,8 @@ import { useForm } from "react-hook-form";
 import { addCompanySchema } from "./schema";
 import FormInput from "components/form-input/form-input";
 import { HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
-import SelectInput from "components/select";
 import { CompanyContext } from "providers/company";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import {
   CityAndNeighborhood,
   ComplementAndState,
@@ -16,8 +15,13 @@ import {
   ZipeCodeAndCelphone,
 } from "./fields/fields";
 
-export const CompanyForm = ({ formRef, onCloseModal }) => {
-  const { addCompany } = useContext(CompanyContext);
+export const CompanyForm = ({
+  formRef,
+  onCloseModal,
+  formValues,
+  event = "add",
+}) => {
+  const { addCompany, editCompany } = useContext(CompanyContext);
   const {
     handleSubmit,
     register,
@@ -27,8 +31,16 @@ export const CompanyForm = ({ formRef, onCloseModal }) => {
   });
 
   const onSubmit = async (data) => {
-    const hasBeenAdded = await addCompany(data);
-    if (hasBeenAdded) {
+    if (event === "add") {
+      const hasBeenAdded = await addCompany(data);
+      if (hasBeenAdded) {
+        onCloseModal();
+      }
+      return;
+    }
+
+    const hasBeenEdited = await editCompany(formValues.id, data);
+    if (hasBeenEdited) {
       onCloseModal();
     }
   };
@@ -56,40 +68,97 @@ export const CompanyForm = ({ formRef, onCloseModal }) => {
         width="100%"
         {...register("name")}
         error={errors.name?.message}
+        defaultValue={formValues ? formValues.name : null}
       />
       {!isDesktop && (
         <VStack>
-          <ContactAndEmail errors={errors} register={register} />
-          <CityAndNeighborhood errors={errors} register={register} />
-          <StreetAndNumber errors={errors} register={register} />
-          <ComplementAndState errors={errors} register={register} />
-          <ZipeCodeAndCelphone errors={errors} register={register} />
-          <SpaceLimitAndUsersLimit errors={errors} register={register} />
-          <StatusAndLimitGeralUsers errors={errors} register={register} />
+          <ContactAndEmail
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <CityAndNeighborhood
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <StreetAndNumber
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <ComplementAndState
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <ZipeCodeAndCelphone
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <SpaceLimitAndUsersLimit
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
+          <StatusAndLimitGeralUsers
+            errors={errors}
+            register={register}
+            formValues={formValues}
+          />
         </VStack>
       )}
       {isDesktop && (
         <>
           <HStack>
-            <ContactAndEmail errors={errors} register={register} />
+            <ContactAndEmail
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <CityAndNeighborhood errors={errors} register={register} />
+            <CityAndNeighborhood
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <StreetAndNumber errors={errors} register={register} />
+            <StreetAndNumber
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <ComplementAndState errors={errors} register={register} />
+            <ComplementAndState
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <ZipeCodeAndCelphone errors={errors} register={register} />
+            <ZipeCodeAndCelphone
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <SpaceLimitAndUsersLimit errors={errors} register={register} />
+            <SpaceLimitAndUsersLimit
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
           <HStack>
-            <StatusAndLimitGeralUsers errors={errors} register={register} />
+            <StatusAndLimitGeralUsers
+              errors={errors}
+              register={register}
+              formValues={formValues}
+            />
           </HStack>
         </>
       )}{" "}

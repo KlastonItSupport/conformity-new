@@ -86,6 +86,12 @@
         "Usuário criado com sucesso":"Usuario creado exitosamente",
         "Ja existe um usuário com este email":"Ya existe un usuario con este correo electrónico",
         "Usuário deletado com sucesso":"Usuario eliminado exitosamente",
-        "Usuário editado com sucesso":"Usuario editado exitosamente"
+        "Usuário editado com sucesso":"Usuario editado exitosamente",
+        "Editar Empresa":"Editar Empresa",
+        "Tem certeza de que deseja Editar esta empresa?":"¿Estás seguro de que quieres editar esta empresa?",
+        "Adicionar Empresa":"Agregar empresa",
+        "Contato":"Contact",
+        "Limite de Usuários":"Límite de Usuarios",
+        "Limite de Espaço(MB)":"Límite de Espacio(MB)"
     }
 }

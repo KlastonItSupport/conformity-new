@@ -60,7 +60,6 @@ const UsersPage = () => {
   const updateData = (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-
     getUsersFromThisCompany(page, queryParams.get("search"));
   };
 

@@ -3,7 +3,7 @@ import { HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import FormInput from "components/form-input/form-input";
 import React from "react";
 
-export const ComplementAndState = ({ register, errors }) => {
+export const ComplementAndState = ({ register, errors, formValues }) => {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const fields = [
@@ -23,6 +23,7 @@ export const ComplementAndState = ({ register, errors }) => {
       {...register("complement")}
       error={errors.complement?.message}
       key={"addCompany-complement"}
+      defaultValue={formValues ? formValues.complement : null}
     />,
     <FormInput
       variant="auth"
@@ -40,6 +41,7 @@ export const ComplementAndState = ({ register, errors }) => {
       {...register("state")}
       error={errors.state?.message}
       key={"addCompany-state"}
+      defaultValue={formValues ? formValues.state : null}
     />,
   ];
 

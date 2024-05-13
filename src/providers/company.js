@@ -1,5 +1,5 @@
 import { api } from "api/api";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 import { AuthContext } from "./auth";
@@ -12,10 +12,12 @@ const CompanyProvider = ({ children }) => {
   const itemsPerPage = 10;
   const [deleteId, setDeleteId] = useState();
   const [editId, setEditId] = useState(0);
+  const [editCompanyIsLoading, setEditCompanyIsLoading] = useState(false);
+  const [createCompanyIsLoading, setCreateCompanyIsLoading] = useState(false);
   const [companies, setCompanies] = useState([]);
-  const [currentPage, setCurrentPage] = useState([]);
-  const [companiesCopy, setCompaniesCopy] = useState([]);
   const [users, setUsers] = useState([]);
+  const [pagination, setPagination] = useState(null);
+
   const editFormRef = useRef(null);
 
   const changeDeleteId = (id) => {
@@ -30,46 +32,73 @@ const CompanyProvider = ({ children }) => {
 
   const addCompany = async (data) => {
     try {
+      setCreateCompanyIsLoading(true);
       const response = await api.post("companies", data, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
 
       setCompanies([response.data, ...companies]);
-      setCompaniesCopy([response.data, ...companiesCopy]);
-      setCurrentPage(1);
       toast.success(i18n.t("Empresa Criada com sucesso"));
 
       return true;
     } catch (e) {
       if ((e.statusCode = 409)) {
         toast.error(i18n.t("Já existe uma empresa com este email"));
+        setCreateCompanyIsLoading(false);
         return false;
       }
       toast.error(i18n.t("Ocorreu um erro"));
+      setCreateCompanyIsLoading(false);
       return false;
     }
   };
 
-  const getCompanies = async () => {
+  const getCompanies = async (page = 1, search = "") => {
     try {
-      const response = await api.get("companies", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const response = await api.get(
+        `companies?page=${page}&search=${search}`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
 
-      setCompanies(response.data);
-      setCompaniesCopy(response.data);
+      setCompanies(response.data.items);
+      setPagination(response.data.pages);
     } catch (error) {
       console.error("Error fetching companies:", error);
     }
   };
 
-  const updatePagination = (page) => {
-    if (companies.length > 0) {
-      const firstPostIndex = (page - 1) * itemsPerPage;
-      const lastItemIndex = firstPostIndex + itemsPerPage;
-      const slicedData = companiesCopy.slice(firstPostIndex, lastItemIndex);
-      setCompanies([...slicedData]);
-      setCurrentPage(page);
+  const editCompany = async (id, data) => {
+    try {
+      setEditCompanyIsLoading(true);
+      const response = await api.patch(`companies/${id}`, data, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      const editedCompanyIndex = companies.findIndex(
+        (user) => user.id === response.data.id
+      );
+
+      const updatedCompanies = [...companies];
+
+      updatedCompanies[editedCompanyIndex] = response.data;
+
+      setCompanies(updatedCompanies);
+      toast.success(i18n.t("Empresa Editada com sucesso"));
+      setEditCompanyIsLoading(false);
+
+      return true;
+    } catch (e) {
+      if ((e.statusCode = 409)) {
+        toast.error(i18n.t("Já existe uma empresa com este email"));
+        setEditCompanyIsLoading(false);
+        return false;
+      }
+      toast.error(i18n.t("Ocorreu um erro"));
+      setEditCompanyIsLoading(false);
+
+      return false;
     }
   };
 
@@ -81,29 +110,26 @@ const CompanyProvider = ({ children }) => {
     setUsers(response.data);
   };
 
-  useEffect(() => {
-    updatePagination(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companiesCopy]);
-
   return (
     <CompanyContext.Provider
       value={{
         deleteId,
         changeDeleteId,
         editId,
+        setEditId,
         changeEditId,
         changeCompanies,
         editFormRef,
         addCompany,
         getCompanies,
-        updatePagination,
         itemsPerPage,
         companies,
-        companiesCopy,
-        currentPage,
         getCompanyUsers,
         users,
+        pagination,
+        editCompany,
+        editCompanyIsLoading,
+        createCompanyIsLoading,
       }}
     >
       {children}

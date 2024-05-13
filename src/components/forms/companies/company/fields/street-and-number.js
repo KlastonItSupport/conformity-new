@@ -3,7 +3,7 @@ import { HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import FormInput from "components/form-input/form-input";
 import React from "react";
 
-export const StreetAndNumber = ({ register, errors }) => {
+export const StreetAndNumber = ({ register, errors, formValues }) => {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const fields = [
@@ -23,6 +23,7 @@ export const StreetAndNumber = ({ register, errors }) => {
       {...register("address")}
       error={errors.address?.message}
       key={"addCompany-address"}
+      defaultValue={formValues ? formValues.address : null}
     />,
     <FormInput
       variant="auth"
@@ -40,6 +41,7 @@ export const StreetAndNumber = ({ register, errors }) => {
       {...register("number")}
       error={errors.number?.message}
       key={"addCompany-number"}
+      defaultValue={formValues ? formValues.number : null}
     />,
   ];
 

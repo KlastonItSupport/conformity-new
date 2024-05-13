@@ -3,7 +3,7 @@ import { HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import FormInput from "components/form-input/form-input";
 import React from "react";
 
-export const SpaceLimitAndUsersLimit = ({ register, errors }) => {
+export const SpaceLimitAndUsersLimit = ({ register, errors, formValues }) => {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const fields = [
@@ -23,6 +23,7 @@ export const SpaceLimitAndUsersLimit = ({ register, errors }) => {
       {...register("memoryLimit")}
       error={errors.memoryLimit?.message}
       key={"addCompany-memoriLimit"}
+      defaultValue={formValues ? formValues.memoryLimit : null}
     />,
     <FormInput
       variant="auth"
@@ -40,6 +41,7 @@ export const SpaceLimitAndUsersLimit = ({ register, errors }) => {
       {...register("usersLimit")}
       error={errors.usersLimit?.message}
       key={"addCompany-usersLimit"}
+      defaultValue={formValues ? formValues.usersLimit : null}
     />,
   ];
 

@@ -1,43 +1,71 @@
 import { useRef, useState } from "react";
 import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
-// import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
-import CustomTable from "../../components/customTable";
 import { columns } from "./companieArray";
-import { Pagination } from "../../components/pagination/pagination";
-import { ArrowsLeftRight, NotePencil } from "@phosphor-icons/react";
-import { ButtonPrimary } from "components/button-primary";
-import NavigationLinks from "components/navigationLinks";
-import { ModalForm } from "components/modals/modalForm";
-import { CompanyForm } from "components/forms/companies/company/company";
+import { NotePencil } from "@phosphor-icons/react";
 import { CompanyContext } from "providers/company";
-import { NavBar } from "components/navbar";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQuery } from "hooks/query";
+import { debounce } from "lodash";
+import { AuthContext } from "providers/auth";
+import {
+  Pagination,
+  CustomTable,
+  ButtonPrimary,
+  ModalForm,
+  CompanyForm,
+  NavBar,
+  NavigationLinks,
+} from "components/components";
+import { useTranslation } from "react-i18next";
 
 export const CompaniesPage = () => {
-  // const { dealingWithAuth } = useContext(AuthContext);
+  const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const { isMobile, isDesktop } = useBreakpoint();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParams = useQuery();
+  const history = useNavigate();
+  const { t } = useTranslation();
 
   const {
     editId,
-    changeEditId,
+    setEditId,
     companies,
-    updatePagination,
     itemsPerPage,
-    companiesCopy,
-    currentPage,
     getCompanies,
+    pagination,
+    editCompanyIsLoading,
+    createCompanyIsLoading,
   } = useContext(CompanyContext);
 
   const formRef = useRef(null);
 
   useEffect(() => {
-    // dealingWithAuth(true, "/users", history);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    dealingWithAuth(true, "/companies", history);
 
-  useEffect(() => {
-    getCompanies();
+    const fetchData = async () => {
+      if (!getUserInfo()) {
+        return;
+      }
+      const currentPage = queryParams.get("page");
+      const searchQuery = queryParams.get("search");
+
+      if (!currentPage) {
+        searchParams.set("page", 1);
+        setSearchParams(searchParams);
+      }
+      if (!searchQuery) {
+        console.log("entrei");
+        searchParams.set("search", "");
+        setSearchParams(searchParams);
+      }
+      const page = !currentPage ? 1 : currentPage;
+      const search = !searchQuery ? "" : searchQuery;
+
+      getCompanies(page, search);
+    };
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -54,7 +82,7 @@ export const CompaniesPage = () => {
   } = useDisclosure();
 
   const handleEditModalOpen = (item) => {
-    changeEditId(item);
+    setEditId(item);
     onEditModalOpen();
   };
 
@@ -63,13 +91,6 @@ export const CompaniesPage = () => {
       icon: <NotePencil size={20} />,
       onClickRow: (item) => handleEditModalOpen(item),
       onClickHeader: () => [],
-      isDisabled: false,
-      shouldShow: false,
-    },
-    {
-      icon: <ArrowsLeftRight size={20} />,
-      onClickRow: () => {},
-      onClickHeader: () => {},
       isDisabled: false,
       shouldShow: false,
     },
@@ -87,6 +108,20 @@ export const CompaniesPage = () => {
     },
   ];
 
+  const updateData = (page) => {
+    searchParams.set("page", page);
+    setSearchParams(searchParams);
+    getCompanies(page, queryParams.get("search"));
+  };
+
+  const debouncedSearch = debounce((inputValue) => {
+    if (inputValue.length >= 3 || !inputValue.length) {
+      searchParams.set("search", inputValue);
+      searchParams.set("page", 1);
+      setSearchParams(searchParams);
+      getCompanies(1, inputValue);
+    }
+  }, 500);
   return (
     <>
       <NavBar />
@@ -105,7 +140,7 @@ export const CompaniesPage = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             type="submit"
-            label=" + Adicionar"
+            label={" + " + t("Adicionar")}
             width="150px"
             onClick={onAddUserModalOpen}
           />
@@ -114,8 +149,10 @@ export const CompaniesPage = () => {
         <CustomTable
           data={companies}
           columns={columns}
-          title={"Empresas"}
+          title={t("Empresas")}
           icons={tableIcons}
+          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+          searchInputValue={queryParams.get("search")}
           onCheckItems={(show) => {
             setTableIcons(
               tableIcons.map((icon) => {
@@ -131,24 +168,38 @@ export const CompaniesPage = () => {
           w={isMobile ? "99vw" : "95vw"}
           bgColor={"white"}
         >
-          <Pagination
-            data={companiesCopy}
-            onClickPagination={updatePagination}
-            itemsPerPage={itemsPerPage}
-            currentPage={currentPage}
-          />
+          {pagination && (
+            <Pagination
+              data={companies}
+              onClickPagination={updateData}
+              itemsPerPage={itemsPerPage}
+              totalPages={pagination.totalPages}
+              currentPage={pagination.currentPage}
+              nextPage={pagination.next}
+              lastPage={pagination.last}
+            />
+          )}
         </Flex>
-        {/* <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
-        id={editId}
-        form={<EditUsersForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Editar Usuário"}
-        description={"Tem certeza de que deseja Editar este usuário?"}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-      /> */}
+        <ModalForm
+          isOpen={isEditModalOpen}
+          onClose={onEditModalClose}
+          id={editId}
+          form={
+            <CompanyForm
+              formRef={formRef}
+              onCloseModal={onEditModalClose}
+              formValues={editId}
+              event={"edit"}
+            />
+          }
+          formRef={formRef}
+          title={t("Editar Empresa")}
+          description={t("Tem certeza de que deseja Editar esta empresa?")}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Editar")}
+          modalSize={isDesktop ? "4xl" : "xl"}
+          isLoading={editCompanyIsLoading}
+        />
         <ModalForm
           isOpen={isAddUserModalOpen}
           onClose={onAddUserModalClose}
@@ -157,24 +208,13 @@ export const CompaniesPage = () => {
             <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
           }
           formRef={formRef}
-          title={"Adicionar Empresa"}
+          title={t("Adicionar Empresa")}
           description={""}
           leftButtonLabel={"Cancelar"}
           rightButtonLabel={"Criar"}
           modalSize={isDesktop ? "4xl" : "xl"}
+          isLoading={createCompanyIsLoading}
         />
-        {/* <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
-        id={editId}
-        form={<CompanyForm formRef={formRef} />}
-        formRef={formRef}
-        title={"Editar empresa"}
-        description={""}
-        leftButtonLabel={"Cancelar"}
-        rightButtonLabel={"Editar"}
-        modalSize={isDesktop ? "4xl" : "xl"}
-      /> */}
       </VStack>
     </>
   );

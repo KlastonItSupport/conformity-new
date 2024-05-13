@@ -87,7 +87,13 @@
         "Usuário criado com sucesso":"User created successfully",
         "Ja existe um usuário com este email":"There is already a user with this email",
         "Usuário deletado com sucesso":"User deleted successfully",
-        "Usuário editado com sucesso":"User edited successfully"
+        "Usuário editado com sucesso":"User edited successfully",
+        "Editar Empresa":"Edit company",
+        "Tem certeza de que deseja Editar esta empresa?":"Are you sure you want to Edit this company?",
+        "Adicionar Empresa":"Add Company",
+        "Contato":"Contact",
+        "Limite de Usuários":"Users Limit",
+        "Limite de Espaço(MB)":"Space Limit(MB)"
     }
 }
 

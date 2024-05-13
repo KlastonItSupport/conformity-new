@@ -3,7 +3,7 @@ import { HStack, VStack, useBreakpointValue } from "@chakra-ui/react";
 import FormInput from "components/form-input/form-input";
 import React from "react";
 
-export const ZipeCodeAndCelphone = ({ register, errors }) => {
+export const ZipeCodeAndCelphone = ({ register, errors, formValues }) => {
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const fields = [
@@ -23,6 +23,7 @@ export const ZipeCodeAndCelphone = ({ register, errors }) => {
       {...register("zipCode")}
       error={errors.zipCode?.message}
       key={"addCompany-zipCode"}
+      defaultValue={formValues ? formValues.zipCode : null}
     />,
     <FormInput
       variant="auth"
@@ -40,6 +41,7 @@ export const ZipeCodeAndCelphone = ({ register, errors }) => {
       {...register("celphone")}
       error={errors.celphone?.message}
       key={"addCompany-celphone"}
+      defaultValue={formValues ? formValues.celphone : null}
     />,
   ];
 
