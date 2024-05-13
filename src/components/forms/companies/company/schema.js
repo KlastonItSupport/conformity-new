@@ -5,7 +5,7 @@ export const addCompanySchema = Yup.object().shape({
   email: Yup.string().required("Email obrigatório"),
   celphone: Yup.string().required("Telefone Obrigatório"),
   zipCode: Yup.string().required("CEP obrigatório"),
-  state: Yup.string().required("Estado obrigatório"),
+  state: Yup.string(),
   city: Yup.string().required("Cidade obrigatória"),
   neighborhood: Yup.string().required("Bairro obrigatório"),
   address: Yup.string().required("Endereço obrigatório"),
