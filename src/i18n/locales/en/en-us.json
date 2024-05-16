@@ -93,7 +93,15 @@
         "Adicionar Empresa":"Add Company",
         "Contato":"Contact",
         "Limite de Usuários":"Users Limit",
-        "Limite de Espaço(MB)":"Space Limit(MB)"
+        "Limite de Espaço(MB)":"Space Limit(MB)",
+        "Meu Perfil":"My profile",
+        "Somente arquivos PNG, JPG ou JPEG são permitidos":"Only PNG, JPG or JPEG files are allowed",
+        "Nome é obrigatório":"Name is required",
+        "O telefone é obrigatório":"Celphone is required",
+        "Insira sua foto":"Insert your profile picture",
+        "Data de aniversário":"Birthdate",
+        "Salvar":"Save",
+        "Formato inválido. Use o formato dd/mm/yyyy":"Invalid format. Use the format dd/mm/yyyy"
     }
 }
 

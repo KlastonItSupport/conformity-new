@@ -1,5 +1,6 @@
 import { api } from "api/api";
-import { createContext } from "react";
+import { createContext, useState } from "react";
+import moment from "moment";
 
 import { toast } from "react-toastify";
 import i18n from "../i18n/index";
@@ -9,6 +10,7 @@ const AuthProvider = ({ children }) => {
   const accessTokenKey = "@Conformity:accessToken";
   const userKey = "@Conformity:user";
   const languageKey = "@Conformity:language";
+  const [user, setUser] = useState(getUserInfo());
 
   const signIn = async (data, history) => {
     try {
@@ -21,6 +23,9 @@ const AuthProvider = ({ children }) => {
         id: response.data.id,
         name: response.data.name,
         email: data.email,
+        celphone: response.data.celphone,
+        profilePic: response.data.profilePic,
+        birthDate: response.data.birthDate,
         accessRule: response.data.accessRule,
         companyId: response.data.companyId,
       };
@@ -57,10 +62,32 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const getUserInfo = () => {
+  function getUserInfo() {
     const user = JSON.parse(localStorage.getItem(userKey));
     if (user) {
       return user;
+    }
+  }
+
+  const editProfile = async (data) => {
+    if (data.profilePic) {
+      data.profilePic = data.profilePic.toString();
+    }
+    try {
+      const response = await api.patch(`/users/${user.id}`, data, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      setUser(response.data);
+      moment(response.data.profilePic).format("DD/MM/YYYY");
+
+      toast.success("Usuário editado com sucesso");
+      localStorage.setItem(userKey, JSON.stringify(response.data));
+
+      return true;
+    } catch (e) {
+      toast.error("Ocorreu um erro.");
+      return false;
     }
   };
   const logout = (history) => {
@@ -73,7 +100,16 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ signIn, dealingWithAuth, getToken, getUserInfo, logout }}
+      value={{
+        signIn,
+        dealingWithAuth,
+        getToken,
+        getUserInfo,
+        logout,
+        editProfile,
+        user,
+        setUser,
+      }}
     >
       {children}
     </AuthContext.Provider>

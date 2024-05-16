@@ -92,6 +92,15 @@
         "Adicionar Empresa":"Agregar empresa",
         "Contato":"Contact",
         "Limite de Usuários":"Límite de Usuarios",
-        "Limite de Espaço(MB)":"Límite de Espacio(MB)"
+        "Limite de Espaço(MB)":"Límite de Espacio(MB)",
+        "Meu Perfil":"Mi perfil",
+        "Somente arquivos PNG, JPG ou JPEG são permitidos":"Sólo se permiten archivos PNG, JPG o JPEG",
+        "Nome é obrigatório":"El nombre es obligatorio",
+        "O telefone é obrigatório":"El teléfono es obligatorio.",
+        "Insira sua foto":"Inserta tu foto",
+        "Data de aniversário":"Fecha de cumpleaños",
+        "Salvar":"Ahorrar",
+        "Formato inválido. Use o formato dd/mm/yyyy":"Formato no válido. Utilice el formato dd/mm/aaaa"
+
     }
 }

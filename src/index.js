@@ -17,6 +17,7 @@ import { GroupProvider } from "providers/group";
 // eslint-disable-next-line no-unused-vars
 import i18n from "./i18n/index.js";
 import UsersPage from "./views/users/index";
+import ProfilePage from "views/profile";
 
 const routes = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const routes = createBrowserRouter([
   {
     path: "groups",
     element: <GroupsPage />,
+  },
+  {
+    path: "profile",
+    element: <ProfilePage />,
   },
 ]);
 

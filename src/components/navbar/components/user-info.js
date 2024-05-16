@@ -14,7 +14,7 @@ import {
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import React from "react";
 
-export const UserInfo = ({ icon, itemsList, name, companyName }) => {
+export const UserInfo = ({ itemsList, name, companyName, profilePhoto }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const color = isOpen ? "white" : "#87A3BC";
@@ -38,11 +38,7 @@ export const UserInfo = ({ icon, itemsList, name, companyName }) => {
             padding="1px"
             borderRadius={"5px"}
           >
-            <Image
-              w={"30px"}
-              h={"30px"}
-              src="https://conformity.s3.us-east-2.amazonaws.com/43/usuarios/66c045398fa81c68b1555fed886cd8dba500df2e_klastonblue.png"
-            />
+            <Image w={"30px"} h={"30px"} src={profilePhoto} />
           </Box>
           <VStack spacing={1} alignItems={"start"}>
             <Text fontSize={"13px"} color={color}>

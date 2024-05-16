@@ -56,7 +56,6 @@ export const CompaniesPage = () => {
         setSearchParams(searchParams);
       }
       if (!searchQuery) {
-        console.log("entrei");
         searchParams.set("search", "");
         setSearchParams(searchParams);
       }

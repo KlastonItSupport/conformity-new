@@ -6,7 +6,7 @@ import {
   keyframes,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import whiteLogo from "../../assets/img/logo_branco.png";
 import {
   FolderSimple,
@@ -33,7 +33,7 @@ to {top: 200px;}
 export const NavBar = () => {
   const { t } = useTranslation();
   const finalAnimation = `${animation}  2s`;
-  const { logout, getUserInfo } = useContext(AuthContext);
+  const { logout, getUserInfo, user, setUser } = useContext(AuthContext);
   const history = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
@@ -132,6 +132,11 @@ export const NavBar = () => {
     />,
   ];
 
+  useEffect(() => {
+    if (!user) {
+      setUser(getUserInfo());
+    }
+  }, []);
   return (
     <>
       <HStack
@@ -151,17 +156,18 @@ export const NavBar = () => {
           <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>
             {[...iconsMenu]}
             <UserInfo
-              name={getUserInfo().name}
+              name={user.name}
+              profilePhoto={user.profilePic}
               companyName={"Empresa Teste"}
               itemsList={[
+                {
+                  src: "/profile",
+                  label: t("Meu Perfil"),
+                },
                 {
                   src: "/",
                   label: t("Sair"),
                   onClick: () => logout(history),
-                },
-                {
-                  src: "/users",
-                  label: "N/A",
                 },
               ]}
             />
