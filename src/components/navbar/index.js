@@ -2,6 +2,8 @@ import {
   Box,
   HStack,
   Img,
+  Spinner,
+  Text,
   VStack,
   keyframes,
   useBreakpointValue,
@@ -33,110 +35,199 @@ to {top: 200px;}
 export const NavBar = () => {
   const { t } = useTranslation();
   const finalAnimation = `${animation}  2s`;
-  const { logout, getUserInfo, user, setUser } = useContext(AuthContext);
+  const {
+    logout,
+    getUserInfo,
+    user,
+    setUser,
+    getUserPermission,
+    permissions,
+    setPermissions,
+    getUserAccessRule,
+    userAccessRule,
+  } = useContext(AuthContext);
   const history = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const toggleMenu = () => setIsOpen(!isOpen);
 
-  const iconsMenu = [
-    <ItemMenu
-      icon={<FolderSimple size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-documents"}
-    />,
+  const checkingPermission = (type) => {
+    if (userAccessRule.current.isAdmin) {
+      return true;
+    }
 
-    <ItemMenu
-      icon={<House size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-dashboard"}
-    />,
-    <ItemMenu
-      icon={<CheckFat size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-tasks"}
-    />,
-    <ItemMenu
-      icon={<Gear size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-equipments"}
-    />,
-    <ItemMenu
-      icon={<ChartLineUp size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-indicators"}
-    />,
-    <ItemMenu
-      icon={<HardDrives size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-crm"}
-    />,
-    <ItemMenu
-      icon={<Users size={28} />}
-      itemsList={[
-        {
-          src: "/",
-          label: "N/A",
-        },
-      ]}
-      key={"admin-users"}
-    />,
-    <ItemMenu
-      label={t("Administração")}
-      itemsList={[
-        {
-          src: "/companies",
-          label: t("Empresas"),
-        },
-        {
-          src: "/users",
-          label: t("Usuários"),
-        },
-        {
-          src: "/groups",
-          label: t("Grupos e Permissões"),
-        },
-      ]}
-      key={"admin-admin"}
-    />,
+    if (userAccessRule.current.isSuperUser && type !== "admin") {
+      return true;
+    }
+
+    if (type === "admin") return false;
+    if (type === "dashboard") return true;
+
+    const permission = permissions[type];
+    if (!permission) {
+      return false;
+    }
+    const shouldShowModule =
+      permission.canAdd ||
+      permission.canDelete ||
+      permission.canEdit ||
+      permission.canRead;
+
+    return shouldShowModule;
+  };
+
+  const iconsMenu = [
+    {
+      type: "dashboard",
+      icon: (
+        <ItemMenu
+          icon={<House size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-dashboard"}
+        />
+      ),
+    },
+    {
+      type: "documents",
+      icon: (
+        <ItemMenu
+          icon={<FolderSimple size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-documents"}
+        />
+      ),
+    },
+    {
+      type: "tasks",
+      icon: (
+        <ItemMenu
+          icon={<CheckFat size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-tasks"}
+        />
+      ),
+    },
+    {
+      type: "equipments",
+      icon: (
+        <ItemMenu
+          icon={<Gear size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-equipments"}
+        />
+      ),
+    },
+    {
+      type: "indicators",
+      icon: (
+        <ItemMenu
+          icon={<ChartLineUp size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-indicators"}
+        />
+      ),
+    },
+    {
+      type: "crm",
+      icon: (
+        <ItemMenu
+          icon={<HardDrives size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-crm"}
+        />
+      ),
+    },
+    {
+      type: "users",
+      icon: (
+        <ItemMenu
+          icon={<Users size={28} />}
+          itemsList={[
+            {
+              src: "/",
+              label: "N/A",
+            },
+          ]}
+          key={"admin-users"}
+        />
+      ),
+    },
+    {
+      type: "admin",
+      icon: (
+        <ItemMenu
+          label={t("Administração")}
+          itemsList={[
+            {
+              src: "/companies",
+              label: t("Empresas"),
+            },
+            {
+              src: "/users",
+              label: t("Usuários"),
+            },
+            {
+              src: "/groups",
+              label: t("Grupos e Permissões"),
+            },
+          ]}
+          key={"admin-admin"}
+        />
+      ),
+    },
   ];
 
   useEffect(() => {
-    if (!user) {
-      setUser(getUserInfo());
-    }
+    const fetchData = async () => {
+      if (user) {
+        await getUserAccessRule();
+      }
+      if (!user) {
+        setUser(getUserInfo());
+        await getUserAccessRule();
+      }
+      if (!permissions) {
+        const response = await getUserPermission();
+        setPermissions(response);
+      }
+      setIsLoading(false);
+    };
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   return (
     <>
       <HStack
@@ -154,26 +245,42 @@ export const NavBar = () => {
         </HStack>
         {isDesktop && (
           <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>
-            {[...iconsMenu]}
-            <UserInfo
-              name={user.name}
-              profilePhoto={user.profilePic}
-              companyName={"Empresa Teste"}
-              itemsList={[
-                {
-                  src: "/profile",
-                  label: t("Meu Perfil"),
-                },
-                {
-                  src: "/",
-                  label: t("Sair"),
-                  onClick: () => logout(history),
-                },
-              ]}
-            />
+            {isLoading ? (
+              <HStack w={"80%"}>
+                <Text mr={"20px"} color={"white"}>
+                  Carregando permissões
+                </Text>
+                <Spinner color="white" />
+              </HStack>
+            ) : (
+              iconsMenu.map((iconMenu) => {
+                if (checkingPermission(iconMenu.type)) {
+                  return iconMenu.icon;
+                }
+                return null;
+              })
+            )}
+            {!isLoading && (
+              <UserInfo
+                name={user?.name}
+                profilePhoto={user?.profilePic}
+                companyName={"Empresa Teste"}
+                itemsList={[
+                  {
+                    src: "/profile",
+                    label: t("Meu Perfil"),
+                  },
+                  {
+                    src: "/",
+                    label: t("Sair"),
+                    onClick: () => logout(history),
+                  },
+                ]}
+              />
+            )}
           </HStack>
         )}
-        {!isDesktop && (
+        {!isDesktop && !isLoading && (
           <HStack justifyContent={"end"} w={"100%"} zIndex={10}>
             <Box cursor={"pointer"} isOpen={isOpen} onClick={toggleMenu}>
               {!isOpen ? (
@@ -185,7 +292,7 @@ export const NavBar = () => {
           </HStack>
         )}
       </HStack>
-      {!isDesktop && isOpen && (
+      {!isDesktop && isOpen && !isLoading && (
         <VStack
           animation={finalAnimation}
           bgColor="#2B3D4C"
@@ -194,11 +301,16 @@ export const NavBar = () => {
           w="100vw"
           mt={"65px"}
         >
-          {iconsMenu.map((item, index) => (
-            <HStack w="100%" key={index}>
-              {item}
-            </HStack>
-          ))}
+          {iconsMenu.map((iconMenu, index) => {
+            if (checkingPermission(iconMenu.type)) {
+              return (
+                <HStack w="100%" key={index}>
+                  {iconMenu.icon}
+                </HStack>
+              );
+            }
+            return null;
+          })}
         </VStack>
       )}
     </>

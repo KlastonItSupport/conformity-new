@@ -1,5 +1,5 @@
 import { api } from "api/api";
-import { createContext, useState } from "react";
+import { createContext, useRef, useState } from "react";
 import moment from "moment";
 
 import { toast } from "react-toastify";
@@ -11,6 +11,8 @@ const AuthProvider = ({ children }) => {
   const userKey = "@Conformity:user";
   const languageKey = "@Conformity:language";
   const [user, setUser] = useState(getUserInfo());
+  const [permissions, setPermissions] = useState();
+  const userAccessRule = useRef();
 
   const signIn = async (data, history) => {
     try {
@@ -90,6 +92,21 @@ const AuthProvider = ({ children }) => {
       return false;
     }
   };
+
+  const getUserPermission = async () => {
+    const response = await api.get(
+      `/permissions/get-user-permissions/${user.id}`
+    );
+
+    return response.data;
+  };
+
+  const getUserAccessRule = async () => {
+    const response = await api.get(`/users/access-rule/${user.id}`);
+    userAccessRule.current = response.data;
+    return response.data;
+  };
+
   const logout = (history) => {
     localStorage.removeItem(accessTokenKey);
     localStorage.removeItem(userKey);
@@ -109,6 +126,11 @@ const AuthProvider = ({ children }) => {
         editProfile,
         user,
         setUser,
+        getUserPermission,
+        permissions,
+        setPermissions,
+        getUserAccessRule,
+        userAccessRule,
       }}
     >
       {children}
