@@ -29,13 +29,15 @@ const UserProvider = ({ children }) => {
   };
 
   const getUsersFromThisCompany = async (page = 1, search = "") => {
-    const response = await api.get(`/users?page=${page}&search=${search}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+    try {
+      const response = await api.get(`/users?page=${page}&search=${search}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
 
-    setUsers(response.data.items);
-    setPagination(response.data.pages);
-    return response.data;
+      setUsers(response.data.items);
+      setPagination(response.data.pages);
+      return response.data;
+    } catch (_) {}
   };
 
   const changePassword = async (newPassword) => {

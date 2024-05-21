@@ -30,12 +30,14 @@ const AuthProvider = ({ children }) => {
         birthDate: response.data.birthDate,
         accessRule: response.data.accessRule,
         companyId: response.data.companyId,
+        companyName: response.data.companyName,
       };
 
       localStorage.setItem(accessTokenKey, accessToken);
       localStorage.setItem(userKey, JSON.stringify(user));
       localStorage.setItem(languageKey, language);
 
+      setUser(user);
       i18n.changeLanguage(language);
       toast.success(i18n.t("Login feito com sucesso"));
       history("/users");

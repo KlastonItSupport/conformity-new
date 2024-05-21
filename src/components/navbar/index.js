@@ -211,22 +211,24 @@ export const NavBar = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (user) {
+      if (!user || !user.id) {
+        const userInfo = getUserInfo();
+        setUser(userInfo);
+      }
+
+      if (user && user.id) {
         await getUserAccessRule();
+
+        if (!permissions) {
+          const response = await getUserPermission();
+          setPermissions(response);
+        }
+        setIsLoading(false);
       }
-      if (!user) {
-        setUser(getUserInfo());
-        await getUserAccessRule();
-      }
-      if (!permissions) {
-        const response = await getUserPermission();
-        setPermissions(response);
-      }
-      setIsLoading(false);
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   return (
     <>
@@ -264,7 +266,7 @@ export const NavBar = () => {
               <UserInfo
                 name={user?.name}
                 profilePhoto={user?.profilePic}
-                companyName={"Empresa Teste"}
+                companyName={user.companyName}
                 itemsList={[
                   {
                     src: "/profile",
