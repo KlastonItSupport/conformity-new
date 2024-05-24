@@ -41,7 +41,7 @@ const DocumentsDetailsPage = () => {
 
   const leftContainer = (
     <Container
-      w={isMobile ? "100%" : "30%"}
+      w={isMobile ? "100%" : "100%"}
       h={"100%"}
       m={"0"}
       mr={isMobile ? null : "20px"}
