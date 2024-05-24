@@ -7,6 +7,10 @@ export const globalStyles = {
       100: "#0086FF",
       200: "#0075df",
     },
+    header: {
+      100: "#2B3D4C",
+    },
+
     brand: {
       100: "#E9E3FF",
       200: "#422AFB",
@@ -59,7 +63,7 @@ export const globalStyles = {
     global: (props) => ({
       body: {
         overflowX: "hidden",
-        bg: mode("primary.50", "navy.900")(props),
+        bg: mode("#F4F4F4", "navy.900")(props),
         fontFamily: "DM Sans",
         letterSpacing: "-0.5px",
       },

@@ -28,6 +28,10 @@ const TableCustom = ({
   formatOnDownLoad,
   onChangeSearchInput,
   searchInputValue,
+  deskWidth,
+  paddingOnTitle = true,
+  showSearchInput = true,
+  hasMinHg = true,
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -279,12 +283,12 @@ const TableCustom = ({
   };
   return (
     <Box
-      w={isMobile ? "99vw" : "95vw"}
+      w={isMobile ? "99%" : deskWidth ?? "95%"}
       margin={"0 auto"}
       bgColor={"white"}
-      minH={{ lg: "500px", md: "500px" }}
+      minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
     >
-      <VStack alignItems={"start"} padding={"20px"}>
+      <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
         <Flex
           flexDirection={isMobile ? "column" : "row"}
           w={"100%"}
@@ -298,7 +302,7 @@ const TableCustom = ({
           >
             {title}
           </Text>
-          {searchInput()}
+          {showSearchInput && searchInput()}
         </Flex>
         {data.length > 0 && (
           <InteractiveButtons
@@ -311,7 +315,7 @@ const TableCustom = ({
           />
         )}
       </VStack>
-      <Box width={"95vw"} overflow={"auto"}>
+      <Box width={"100%"} overflow={"auto"}>
         <Table overflow={"auto"}>
           <Thead>
             <Tr>

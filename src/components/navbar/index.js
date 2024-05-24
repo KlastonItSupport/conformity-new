@@ -101,8 +101,8 @@ export const NavBar = () => {
           icon={<FolderSimple size={28} />}
           itemsList={[
             {
-              src: "/",
-              label: "N/A",
+              src: "/documents/details",
+              label: "Detalhes Documentos",
             },
           ]}
           key={"admin-documents"}

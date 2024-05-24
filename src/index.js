@@ -18,6 +18,7 @@ import { GroupProvider } from "providers/group";
 import i18n from "./i18n/index.js";
 import UsersPage from "./views/users/index";
 import ProfilePage from "views/profile";
+import DocumentsDetailsPage from "views/documents/details";
 
 const routes = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const routes = createBrowserRouter([
   {
     path: "profile",
     element: <ProfilePage />,
+  },
+  {
+    path: "documents/details",
+    element: <DocumentsDetailsPage />,
   },
 ]);
 
