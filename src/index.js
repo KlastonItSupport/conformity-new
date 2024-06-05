@@ -19,6 +19,7 @@ import i18n from "./i18n/index.js";
 import UsersPage from "./views/users/index";
 import ProfilePage from "views/profile";
 import DocumentsDetailsPage from "views/documents/details";
+import ListDocumentsPage from "views/documents/list-documents";
 
 const routes = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const routes = createBrowserRouter([
   {
     path: "documents/details",
     element: <DocumentsDetailsPage />,
+  },
+  {
+    path: "/documents",
+    element: <ListDocumentsPage />,
   },
 ]);
 

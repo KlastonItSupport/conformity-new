@@ -26,13 +26,14 @@ export const ModalForm = ({
   isLoading = false,
 }) => {
   const onSubmit = () => {
+    console.log("entrei");
     formRef.current.dispatchEvent(
       new Event("submit", { cancelable: true, bubbles: true })
     );
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={modalSize}>
+    <Modal isOpen={isOpen} onClose={onClose} size={modalSize} trapFocus={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>

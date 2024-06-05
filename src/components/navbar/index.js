@@ -104,6 +104,10 @@ export const NavBar = () => {
               src: "/documents/details",
               label: "Detalhes Documentos",
             },
+            {
+              src: "documents",
+              label: "Documentos Cadastrados",
+            },
           ]}
           key={"admin-documents"}
         />

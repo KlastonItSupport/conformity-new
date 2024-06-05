@@ -8,7 +8,10 @@ import {
 import React, { forwardRef } from "react";
 
 const FormInput = forwardRef(
-  ({ label, error, margin, onClickIcon, width, icon, ...rest }, ref) => {
+  (
+    { label, error, margin, onClickIcon, width, icon, innerPadding, ...rest },
+    ref
+  ) => {
     return (
       <InputGroup
         size="md"
@@ -18,7 +21,12 @@ const FormInput = forwardRef(
         width={width}
       >
         {label && (
-          <FormLabel ms="4px" fontSize="sm" fontWeight="500" display="flex">
+          <FormLabel
+            padding={innerPadding}
+            fontSize="sm"
+            fontWeight="500"
+            display="flex"
+          >
             {label}
           </FormLabel>
         )}
