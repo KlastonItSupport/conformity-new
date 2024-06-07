@@ -60,7 +60,7 @@ const TextEditor = forwardRef(({ value, onChange, ref }) => {
     <Editor
       onEditorChange={handleEditorChange}
       value={value}
-      apiKey=""
+      apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
       init={editorConfig}
       ref={ref}
     />

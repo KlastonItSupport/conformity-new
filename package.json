@@ -34,6 +34,7 @@
     "babel-register": "^6.26.0",
     "buffer": "^6.0.3",
     "chakra-react-select": "^4.7.6",
+    "dotenv": "^16.4.5",
     "file-saver": "^2.0.5",
     "framer-motion": "^4.1.17",
     "html2pdf.js": "^0.10.1",

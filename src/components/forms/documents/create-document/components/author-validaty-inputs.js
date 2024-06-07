@@ -1,7 +1,9 @@
 import { FormInput } from "components/components";
-import React from "react";
+import { AuthContext } from "providers/auth";
+import React, { useContext } from "react";
 
 const AuthorAndValidityInput = ({ register, errors }) => {
+  const { user } = useContext(AuthContext);
   return (
     <>
       <FormInput
@@ -16,8 +18,9 @@ const AuthorAndValidityInput = ({ register, errors }) => {
         bgColor={"primary.50"}
         label="Autor"
         width="100%"
-        {...register("author")}
-        error={errors.author?.message}
+        {...register("owner")}
+        error={errors.owner?.message}
+        defaultValue={user.name}
       />
       <FormInput
         variant="auth"

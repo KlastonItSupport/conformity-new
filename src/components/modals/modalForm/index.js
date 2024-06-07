@@ -26,7 +26,6 @@ export const ModalForm = ({
   isLoading = false,
 }) => {
   const onSubmit = () => {
-    console.log("entrei");
     formRef.current.dispatchEvent(
       new Event("submit", { cancelable: true, bubbles: true })
     );

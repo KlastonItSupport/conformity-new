@@ -2,26 +2,26 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { departamentSchema } from "./schemas/create-departament.schema";
 import { FormInput } from "components/components";
-import { DepartamentContext } from "providers/departament";
+import { categorySchema } from "./schemas/create-category.schema";
+import { CategoryContext } from "providers/category";
 
-const DepartamentForm = ({ formRef, onClose }) => {
+const CategoryForm = ({ formRef, onClose }) => {
+  const { createCategory, setCreateCategoryIsLoading } =
+    useContext(CategoryContext);
+
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm({
-    resolver: yupResolver(departamentSchema),
+    resolver: yupResolver(categorySchema),
   });
 
-  const { createDepartament, setCreateDepartamentIsLoading } =
-    useContext(DepartamentContext);
-
   const onSubmit = async (data) => {
-    setCreateDepartamentIsLoading(true);
-    await createDepartament(data);
-    setCreateDepartamentIsLoading(false);
+    setCreateCategoryIsLoading(true);
+    await createCategory(data);
+    setCreateCategoryIsLoading(false);
     onClose();
   };
 
@@ -40,4 +40,4 @@ const DepartamentForm = ({ formRef, onClose }) => {
   );
 };
 
-export default DepartamentForm;
+export default CategoryForm;

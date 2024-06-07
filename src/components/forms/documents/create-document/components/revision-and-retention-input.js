@@ -31,8 +31,8 @@ const ReivisionAndRetentionInput = ({ register, errors }) => {
         bgColor={"primary.50"}
         label="Retenção Mínima (anos)"
         width="100%"
-        {...register("retention")}
-        error={errors.retention?.message}
+        {...register("minimumRetention")}
+        error={errors.minimumRetention?.message}
       />
     </>
   );

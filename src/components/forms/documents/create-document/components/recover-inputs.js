@@ -17,8 +17,9 @@ const RecoverInputs = ({ register, errors }) => {
         bgColor={"primary.50"}
         label="Local *"
         width="100%"
-        {...register("name")}
-        error={errors.name?.message}
+        {...register("local")}
+        error={errors.local?.message}
+        defaultValue="REDE"
       />
       <FormInput
         variant="auth"
@@ -35,6 +36,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("identification")}
         error={errors.identification?.message}
+        defaultValue="DOC#"
       />
       <FormInput
         variant="auth"
@@ -51,6 +53,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("protection")}
         error={errors.protection?.message}
+        defaultValue="ACESSO NO SERVIDOR"
       />
       <FormInput
         variant="auth"
@@ -65,8 +68,9 @@ const RecoverInputs = ({ register, errors }) => {
         bgColor={"primary.50"}
         label="Recuperação *"
         width="100%"
-        {...register("recover")}
-        error={errors.recover?.message}
+        {...register("recovery")}
+        error={errors.recovery?.message}
+        defaultValue="BACKUP"
       />
       <FormInput
         variant="auth"
@@ -80,6 +84,7 @@ const RecoverInputs = ({ register, errors }) => {
         borderRadius="6px"
         bgColor={"primary.50"}
         label="Disposição *"
+        defaultValue="DIGITAL"
         width="100%"
         {...register("disposition")}
         error={errors.disposition?.message}

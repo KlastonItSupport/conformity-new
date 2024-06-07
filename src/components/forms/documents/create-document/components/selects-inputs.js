@@ -1,33 +1,45 @@
-import {
-  Container,
-  Flex,
-  HStack,
-  VStack,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Container, Flex, HStack, VStack } from "@chakra-ui/react";
 import { Plus } from "@phosphor-icons/react";
-import { ModalForm } from "components/components";
-import DepartamentForm from "components/forms/departaments/create-departament";
 import SelectInput from "components/select";
-import React, { useRef } from "react";
-import { useTranslation } from "react-i18next";
+import { CategoryContext } from "providers/category";
+import { DepartamentContext } from "providers/departament";
+import React, { useContext, useEffect } from "react";
+import {} from "react-i18next";
 
-const SelectsInputs = ({ register, errors }) => {
-  const categoryRef = useRef(null);
-  const departamentRef = useRef(null);
-  const { t } = useTranslation();
+const SelectsInputs = ({
+  register,
+  errors,
+  onCategoryModalOpen,
+  onDepartamentModalOpen,
+}) => {
+  const { getCategories, categories, setCategories } =
+    useContext(CategoryContext);
 
-  const {
-    isOpen: isDepartamentModalOpen,
-    onOpen: onDepartamentModalOpen,
-    onClose: onDepartamentModalClose,
-  } = useDisclosure();
+  const { getDepartaments, departaments, setDepartaments } =
+    useContext(DepartamentContext);
 
-  const {
-    isOpen: isCategoryModalOpen,
-    onOpen: onCategoryModalOpen,
-    onClose: onCategoryModalClose,
-  } = useDisclosure();
+  const handlingSelects = async () => {
+    const [categoriesRes, departamentRes] = await Promise.all([
+      getCategories(),
+      getDepartaments(),
+    ]);
+
+    setCategories(
+      categoriesRes.map((category) => {
+        return { label: category.name, value: category.id };
+      })
+    );
+    setDepartaments(
+      departamentRes.map((departament) => {
+        return { label: departament.name, value: departament.id };
+      })
+    );
+  };
+  useEffect(() => {
+    handlingSelects();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -60,30 +72,13 @@ const SelectsInputs = ({ register, errors }) => {
         <VStack w={"100%"} align={"start"}>
           <SelectInput
             label="Departamento"
-            {...register("departament")}
-            errors={errors.departament}
-            options={[
-              {
-                label: "IT",
-                value: "ativo",
-              },
-              {
-                label: "RH",
-                value: "rh",
-              },
-              {
-                label: "Marketing",
-                value: "marketing",
-              },
-              {
-                label: "Vendas",
-                value: "sales",
-              },
-              {
-                label: "RH",
-                value: "rh",
-              },
-            ]}
+            {...register("departamentId")}
+            errors={errors.departamentId}
+            options={departaments}
+            // defaultValue={{
+            //   label: "Selecione um departamento",
+            //   value: "0",
+            // }}
           />
         </VStack>
         <Flex
@@ -104,27 +99,13 @@ const SelectsInputs = ({ register, errors }) => {
         <VStack w={"100%"} align={"start"}>
           <SelectInput
             label="Categoria"
-            {...register("category")}
-            errors={errors.category}
-            options={[
-              {
-                label: "Procedimentos",
-                value: "ativo",
-              },
-              {
-                label: "Formulário",
-                value: "rh",
-              },
-              {
-                label: "Manuais",
-                value: "marketing",
-              },
-              {
-                label: "Requisitos Clientes",
-                value: "sales",
-              },
-            ]}
-            key={"addCompany-status"}
+            {...register("categoryId")}
+            errors={errors.categoryId}
+            options={categories}
+            // defaultValue={{
+            //   label: "Selecione uma categoria",
+            //   value: "0",
+            // }}
           />
         </VStack>
         <Container
@@ -143,35 +124,17 @@ const SelectsInputs = ({ register, errors }) => {
           />
         </Container>
       </HStack>
-      <ModalForm
-        isOpen={isDepartamentModalOpen}
-        onClose={onDepartamentModalClose}
-        form={
-          <DepartamentForm
-            formRef={departamentRef}
-            onCloseModal={onDepartamentModalClose}
-          />
-        }
-        formRef={departamentRef}
-        title={t("Criar Departamento")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Criar")}
-      />
-
-      <ModalForm
-        isOpen={isCategoryModalOpen}
-        onClose={onCategoryModalClose}
-        form={
-          <DepartamentForm
-            formRef={categoryRef}
-            onCloseModal={onCategoryModalClose}
-          />
-        }
-        formRef={categoryRef}
-        title={t("Criar Categoria")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Criar")}
-      />
+      <VStack marginTop={"10px"} alignItems={"start"}>
+        <SelectInput
+          label="Tipo"
+          {...register("type")}
+          errors={errors.type}
+          options={[
+            { label: "Interno", value: "intern" },
+            { label: "Externo", value: "extern" },
+          ]}
+        />
+      </VStack>
     </>
   );
 };

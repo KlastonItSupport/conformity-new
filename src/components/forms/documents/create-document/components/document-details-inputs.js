@@ -20,6 +20,7 @@ const DocumentDetailsInputs = ({ register, errors }) => {
         label={t("Insira seu documento")}
         className="center-file-input"
         {...register("document")}
+        multiple
         error={errors.document?.message}
       />
       <FormInput

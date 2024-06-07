@@ -20,6 +20,9 @@ import UsersPage from "./views/users/index";
 import ProfilePage from "views/profile";
 import DocumentsDetailsPage from "views/documents/details";
 import ListDocumentsPage from "views/documents/list-documents";
+import { DocumentProvider } from "providers/document";
+import { CategoryProvider } from "providers/category";
+import { DepartamentProvider } from "providers/departament";
 
 const routes = createBrowserRouter([
   {
@@ -61,14 +64,20 @@ ReactDOM.render(
     <CompanyProvider>
       <UserProvider>
         <GroupProvider>
-          <ChakraProvider theme={theme}>
-            <ToastContainer />
-            <React.StrictMode>
-              <ThemeEditorProvider>
-                <RouterProvider router={routes} />
-              </ThemeEditorProvider>
-            </React.StrictMode>
-          </ChakraProvider>
+          <DocumentProvider>
+            <CategoryProvider>
+              <DepartamentProvider>
+                <ChakraProvider theme={theme}>
+                  <ToastContainer />
+                  <React.StrictMode>
+                    <ThemeEditorProvider>
+                      <RouterProvider router={routes} />
+                    </ThemeEditorProvider>
+                  </React.StrictMode>
+                </ChakraProvider>
+              </DepartamentProvider>
+            </CategoryProvider>
+          </DocumentProvider>
         </GroupProvider>
       </UserProvider>
     </CompanyProvider>

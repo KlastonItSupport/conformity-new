@@ -3,13 +3,14 @@ import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
 import DocumentForm from "components/forms/documents/create-document/create-document";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 const ActionsButtons = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const formRef = useRef(null);
+  const [createDocumentIsLoading, setCreateDocumentIsLoading] = useState(false);
 
   const {
     isOpen: isAddModalOpen,
@@ -104,12 +105,19 @@ const ActionsButtons = () => {
       <ModalForm
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
-        form={<DocumentForm formRef={formRef} onClose={onAddModalClose} />}
+        form={
+          <DocumentForm
+            formRef={formRef}
+            onClose={onAddModalClose}
+            setIsLoading={setCreateDocumentIsLoading}
+          />
+        }
         formRef={formRef}
         title={t("Adicionar Documento")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"
+        isLoading={createDocumentIsLoading}
       />
     </>
   );

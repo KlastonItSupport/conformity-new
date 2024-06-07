@@ -7,8 +7,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import editProfileSchema from "./schema";
 import { AuthContext } from "providers/auth";
-import { arrayBufferToBase64 } from "helpers/buffer-to-base-64";
 import { useTranslation } from "react-i18next";
+import { handlingFileToBase64 } from "helpers/buffer-to-base-64";
 
 export const ProfileForm = () => {
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
@@ -33,13 +33,10 @@ export const ProfileForm = () => {
     let profilePicFileType;
 
     if (profilePic) {
-      const file = profilePic;
-      const blob = await file.slice(0, file.size, file.type);
-
-      profilePicBuffer = await new Response(blob).arrayBuffer();
-      profilePicBuffer = arrayBufferToBase64(profilePicBuffer);
-      profilePicFileName = file.name;
-      profilePicFileType = file.type;
+      const fileTreated = await handlingFileToBase64(profilePic);
+      profilePicBuffer = fileTreated.base;
+      profilePicFileName = fileTreated.name;
+      profilePicFileType = fileTreated.type;
     }
 
     await editProfile({

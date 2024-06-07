@@ -1,6 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { CalendarCustom } from "components/calendar";
 import { FormInput } from "components/components";
+import moment from "moment";
 import React, { useRef, useState } from "react";
 
 const DatesInputs = ({ register, errors, setValue }) => {
@@ -41,6 +42,7 @@ const DatesInputs = ({ register, errors, setValue }) => {
           }}
           {...register("inclusionDate")}
           error={errors.inclusionDate?.message}
+          defaultValue={moment(new Date()).format("DD/MM/YYYY")}
         />
         {isShowingCalendarInclusion && (
           <Box position={"absolute"} top="100%" left={0} zIndex={2} w="100%">
