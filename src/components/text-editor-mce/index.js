@@ -60,7 +60,7 @@ const TextEditor = forwardRef(({ value, onChange, ref }) => {
     <Editor
       onEditorChange={handleEditorChange}
       value={value}
-      apiKey="wbazxvm2zptpnjnmih8mp515eq31khxt088glzh05djh075u"
+      apiKey="5mwa0woc644jxq3s2f0wfehvpyc9x508lbh5f763zcumgpzq"
       init={editorConfig}
       ref={ref}
     />
