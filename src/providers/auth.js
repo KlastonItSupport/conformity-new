@@ -28,6 +28,7 @@ const AuthProvider = ({ children }) => {
         celphone: response.data.celphone,
         profilePic: response.data.profilePic,
         birthDate: response.data.birthDate,
+        birthday: response.data.birthDate,
         accessRule: response.data.accessRule,
         companyId: response.data.companyId,
         companyName: response.data.companyName,
@@ -82,7 +83,7 @@ const AuthProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
 
-      setUser(response.data);
+      setUser({ ...response.data, birthDate: data.birthday });
       moment(response.data.profilePic).format("DD/MM/YYYY");
 
       toast.success("Usuário editado com sucesso");

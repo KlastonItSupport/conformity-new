@@ -117,7 +117,7 @@ export const ProfileForm = () => {
         label={t("Data de aniversário")}
         onClick={() => setIsShowingCalendar(!isShowingCalendar)}
         width="100%"
-        defaultValue={user.birthDate ?? ""}
+        defaultValue={user.birthday ?? ""}
         autocomplete="off"
         {...register("birthday")}
         error={errors.birthday?.message}
