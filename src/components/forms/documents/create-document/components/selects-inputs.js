@@ -1,9 +1,16 @@
-import { Container, Flex, HStack, VStack } from "@chakra-ui/react";
+import {
+  Center,
+  Container,
+  Flex,
+  HStack,
+  Spinner,
+  VStack,
+} from "@chakra-ui/react";
 import { Plus } from "@phosphor-icons/react";
 import SelectInput from "components/select";
 import { CategoryContext } from "providers/category";
 import { DepartamentContext } from "providers/departament";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {} from "react-i18next";
 
 const SelectsInputs = ({
@@ -12,6 +19,7 @@ const SelectsInputs = ({
   onCategoryModalOpen,
   onDepartamentModalOpen,
 }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const { getCategories, categories, setCategories } =
     useContext(CategoryContext);
 
@@ -34,6 +42,7 @@ const SelectsInputs = ({
         return { label: departament.name, value: departament.id };
       })
     );
+    setIsLoading(false);
   };
   useEffect(() => {
     handlingSelects();
@@ -41,6 +50,11 @@ const SelectsInputs = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const loading = (
+    <Center marginTop={"30px"}>
+      <Spinner color="primary.100" />
+    </Center>
+  );
   return (
     <>
       <SelectInput
@@ -62,68 +76,68 @@ const SelectsInputs = ({
           },
         ]}
       />
-      <HStack
-        w={"100%"}
-        h={"100%"}
-        alignContent={"center"}
-        alignItems={"center"}
-        margin="0 0 10px 0 "
-      >
-        <VStack w={"100%"} align={"start"}>
-          <SelectInput
-            label="Departamento"
-            {...register("departamentId")}
-            errors={errors.departamentId}
-            options={departaments}
-            // defaultValue={{
-            //   label: "Selecione um departamento",
-            //   value: "0",
-            // }}
-          />
-        </VStack>
-        <Flex
-          bgColor={"primary.100"}
-          cursor={"pointer"}
-          style={{ marginTop: "40px" }}
-          padding={"5px"}
+      {!isLoading ? (
+        <HStack
+          w={"100%"}
+          h={"100%"}
+          alignContent={"center"}
+          alignItems={"center"}
+          margin="0 0 10px 0 "
         >
-          <Plus
-            color="white"
-            size={20}
-            weight="bold"
-            onClick={onDepartamentModalOpen}
-          />
-        </Flex>
-      </HStack>
-      <HStack>
-        <VStack w={"100%"} align={"start"}>
-          <SelectInput
-            label="Categoria"
-            {...register("categoryId")}
-            errors={errors.categoryId}
-            options={categories}
-            // defaultValue={{
-            //   label: "Selecione uma categoria",
-            //   value: "0",
-            // }}
-          />
-        </VStack>
-        <Container
-          bgColor={"primary.100"}
-          cursor={"pointer"}
-          padding={"5px"}
-          w={"30px"}
-          height={"100%"}
-          style={{ marginTop: "35px" }}
-        >
-          <Plus
-            color="white"
-            size={20}
-            weight="bold"
-            onClick={onCategoryModalOpen}
-          />
-        </Container>
-      </HStack>
+          <VStack w={"100%"} align={"start"}>
+            <SelectInput
+              label="Departamento"
+              {...register("departamentId")}
+              errors={errors.departamentId}
+              options={departaments}
+            />
+          </VStack>
+          <Flex
+            bgColor={"primary.100"}
+            cursor={"pointer"}
+            style={{ marginTop: "40px" }}
+            padding={"5px"}
+          >
+            <Plus
+              color="white"
+              size={20}
+              weight="bold"
+              onClick={onDepartamentModalOpen}
+            />
+          </Flex>
+        </HStack>
+      ) : (
+        loading
+      )}
+      {!isLoading ? (
+        <HStack>
+          <VStack w={"100%"} align={"start"}>
+            <SelectInput
+              label="Categoria"
+              {...register("categoryId")}
+              errors={errors.categoryId}
+              options={categories}
+            />
+          </VStack>
+          <Container
+            bgColor={"primary.100"}
+            cursor={"pointer"}
+            padding={"5px"}
+            w={"30px"}
+            height={"100%"}
+            style={{ marginTop: "35px" }}
+          >
+            <Plus
+              color="white"
+              size={20}
+              weight="bold"
+              onClick={onCategoryModalOpen}
+            />
+          </Container>
+        </HStack>
+      ) : (
+        loading
+      )}
       <VStack marginTop={"10px"} alignItems={"start"}>
         <SelectInput
           label="Tipo"
