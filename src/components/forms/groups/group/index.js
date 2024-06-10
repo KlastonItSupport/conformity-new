@@ -48,6 +48,7 @@ export const GroupForm = ({
     control,
     handleSubmit,
     register,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(groupSchema),
@@ -63,6 +64,7 @@ export const GroupForm = ({
       data.users && data.users.length > 0
         ? data.users.map((user) => user.value)
         : [];
+
     const payload = {
       ...data,
       users: users,
@@ -177,12 +179,15 @@ export const GroupForm = ({
 
       if (type !== "create") {
         const users = await getUsersGroup(formValues.id);
-        setGroupUsers(
-          users.map((user) => ({
-            value: user.id,
-            label: user.name,
-          }))
-        );
+        const mappedUsers = users.map((user) => ({
+          label: user.name,
+          value: user.id,
+        }));
+
+        setGroupUsers(mappedUsers);
+        if (mappedUsers.length > 0) {
+          setValue("users", [mappedUsers[0]]);
+        }
       }
       setIsLoading(false);
     };
@@ -223,7 +228,6 @@ export const GroupForm = ({
           <SelectDropDown
             options={options}
             label={t("Selecione os usuários")}
-            defaultValue={groupUsers}
             error={errors.users}
             control={control}
             name={"users"}
