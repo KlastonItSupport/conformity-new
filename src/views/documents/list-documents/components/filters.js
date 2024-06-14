@@ -82,7 +82,6 @@ const Filters = () => {
           (departament) =>
             departament.value === queryParams.get("departamentId")
         );
-        console.log("departament", departament);
         if (departament) {
           defaults.departamentId = {
             label: departament.label,
@@ -246,7 +245,13 @@ const Filters = () => {
         label="Departamento"
         {...register("departamentId")}
         errors={errors.departamentId}
-        options={departaments}
+        options={[
+          {
+            label: "Selecione um departamento",
+            value: "not-selected",
+          },
+          ...departaments,
+        ]}
         defaultValue={formDefaultValues.departamentId}
       />
     </VStack>
@@ -258,14 +263,13 @@ const Filters = () => {
         label="Categoria"
         {...register("categoryId")}
         errors={errors.categoryId}
-        options={categories}
-        onChange={(e) => {
-          if (e.target.value === "not-selected") {
-            setValue("categoryId", null);
-          } else {
-            setValue("categoryId", e.target.value);
-          }
-        }}
+        options={[
+          {
+            label: "Selecione um departamento",
+            value: "not-selected",
+          },
+          ...categories,
+        ]}
         defaultValue={formDefaultValues.categoryId}
       />
     </VStack>
