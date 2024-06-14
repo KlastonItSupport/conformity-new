@@ -4,7 +4,7 @@ import { FormInput } from "components/components";
 import moment from "moment";
 import React, { useRef, useState } from "react";
 
-const DatesInputs = ({ register, errors, setValue }) => {
+const DatesInputs = ({ register, errors, setValue, formValues }) => {
   const [isShowingCalendarInclusion, setIsShowingCalendarInclusion] =
     useState(false);
   const [isShowingCalendarRevision, setIsShowingCalendarRevision] =
@@ -42,7 +42,9 @@ const DatesInputs = ({ register, errors, setValue }) => {
           }}
           {...register("inclusionDate")}
           error={errors.inclusionDate?.message}
-          defaultValue={moment(new Date()).format("DD/MM/YYYY")}
+          defaultValue={moment(formValues.createdAt ?? new Date()).format(
+            "DD/MM/YYYY"
+          )}
         />
         {isShowingCalendarInclusion && (
           <Box position={"absolute"} top="100%" left={0} zIndex={2} w="100%">
@@ -87,6 +89,11 @@ const DatesInputs = ({ register, errors, setValue }) => {
           }}
           {...register("revisionDate")}
           error={errors.revisionDate?.message}
+          defaultValue={
+            formValues.revisionDate
+              ? moment(formValues.revisionDate).format("DD/MM/YYYY")
+              : null
+          }
         />
         {isShowingCalendarRevision && (
           <Box position={"absolute"} top="100%" left={0} zIndex={2} w="100%">
@@ -119,15 +126,22 @@ const DatesInputs = ({ register, errors, setValue }) => {
           borderRadius="6px"
           bgColor={"primary.50"}
           label={"Data de criação (Documento)"}
-          {...register("createDate")}
+          {...register("physicalDocumentCreatedDate")}
           onClick={() => setIsShowingCalendarCreate(!isShowingCalendarCreate)}
           width="100%"
           autocomplete="off"
           onChange={(e) => {
             if (e.target.value.length === 10) setIsShowingCalendarCreate(false);
           }}
-          {...register("createDate")}
-          error={errors.createDate?.message}
+          {...register("physicalDocumentCreatedDate")}
+          error={errors.physicalDocumentCreatedDate?.message}
+          defaultValue={
+            formValues.physicalDocumentCreatedDate
+              ? moment(formValues.physicalDocumentCreatedDate).format(
+                  "DD/MM/YYYY"
+                )
+              : null
+          }
         />
         {isShowingCalendarCreate && (
           <Box position={"absolute"} top="100%" left={0} zIndex={2} w="100%">
@@ -139,7 +153,7 @@ const DatesInputs = ({ register, errors, setValue }) => {
 
                 const formattedDate = `${day}/${month}/${year}`;
 
-                setValue("createDate", formattedDate);
+                setValue("physicalDocumentCreatedDate", formattedDate);
                 setIsShowingCalendarCreate(!isShowingCalendarCreate);
               }}
             />

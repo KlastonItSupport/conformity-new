@@ -1,3 +1,4 @@
+import moment from "moment";
 import i18n from "../../../i18n/index.js";
 
 /* eslint-disable no-useless-computed-key */
@@ -119,41 +120,34 @@ export const columns = [
   {
     header: i18n.t("Empresa"),
     access: "companyName",
-    sortFunc: () => {},
   },
   {
     header: i18n.t("Departamento"),
-    access: "departmentName",
-    sortFunc: () => {},
+    access: "departamentName",
   },
   {
     header: i18n.t("Categoria"),
-    access: "category",
-    sortFunc: () => {},
+    access: "categoryName",
   },
   {
     header: i18n.t("Autor"),
-    access: "author",
-    sortFunc: () => {},
+    access: "owner",
   },
   {
     header: i18n.t("Nome"),
-    access: "documentName",
-    sortFunc: () => {},
+    access: "name",
   },
   {
     header: i18n.t("Revisão"),
     access: "revision",
-    sortFunc: () => {},
   },
   {
     header: i18n.t("Validade"),
     access: "validity",
-    sortFunc: () => {},
   },
   {
     header: i18n.t("Data de revisão"),
     access: "revisionDate",
-    sortFunc: () => {},
+    formatData: (data) => moment(data).format("DD/MM/YYYY"),
   },
 ];

@@ -2,7 +2,7 @@ import { FormInput } from "components/components";
 import { AuthContext } from "providers/auth";
 import React, { useContext } from "react";
 
-const AuthorAndValidityInput = ({ register, errors }) => {
+const AuthorAndValidityInput = ({ register, errors, formValues }) => {
   const { user } = useContext(AuthContext);
   return (
     <>
@@ -20,7 +20,7 @@ const AuthorAndValidityInput = ({ register, errors }) => {
         width="100%"
         {...register("owner")}
         error={errors.owner?.message}
-        defaultValue={user.name}
+        defaultValue={formValues.owner ?? user?.name}
       />
       <FormInput
         variant="auth"
@@ -36,6 +36,7 @@ const AuthorAndValidityInput = ({ register, errors }) => {
         width="100%"
         {...register("validity")}
         error={errors.validity?.message}
+        defaultValue={formValues.validity}
       />
     </>
   );

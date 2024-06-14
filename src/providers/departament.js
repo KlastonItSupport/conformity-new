@@ -1,7 +1,7 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
 
-const { createContext, useContext, useState, useEffect } = require("react");
+import { createContext, useContext, useEffect, useState } from "react";
 
 const DepartamentContext = createContext();
 
@@ -35,6 +35,17 @@ const DepartamentProvider = ({ children }) => {
 
     return response.data;
   };
+
+  useEffect(() => {
+    getDepartaments().then((departamentRes) => {
+      setDepartaments(
+        departamentRes.map((departament) => {
+          return { label: departament.name, value: departament.id };
+        })
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <DepartamentContext.Provider

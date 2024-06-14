@@ -4,14 +4,44 @@ import { ButtonPrimary } from "components/button-primary";
 import { CalendarCustom } from "components/calendar";
 import { FormInput } from "components/components";
 import SelectInput from "components/select";
+import { useQuery } from "hooks/query";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import React, { useState, useRef } from "react";
+import { set } from "lodash";
+import moment from "moment";
+import { CategoryContext } from "providers/category";
+import { DepartamentContext } from "providers/departament";
+import { DocumentContext } from "providers/document";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "react-router-dom";
+import * as Yup from "yup";
+
+export const filtersSchema = Yup.object().shape({
+  initialDate: Yup.string().matches(
+    /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
+    "Formato inválido. Use o formato dd/mm/yyyy"
+  ),
+  endDate: Yup.string().matches(
+    /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
+    "Formato inválido. Use o formato dd/mm/yyyy"
+  ),
+  departamentId: Yup.string(),
+  categoryId: Yup.string(),
+  author: Yup.string(),
+});
 
 const Filters = () => {
   const [isShowingCalendarInitial, setIsShowingCalendarInitial] =
     useState(false);
   const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParams = useQuery();
+
+  const { departaments } = useContext(DepartamentContext);
+  const { categories } = useContext(CategoryContext);
+  const { getDocuments, setDocuments } = useContext(DocumentContext);
+
+  const [formDefaultValues, setFormDefaultValues] = useState({});
 
   const { isMobile } = useBreakpoint();
 
@@ -20,10 +50,85 @@ const Filters = () => {
     register,
     formState: { errors },
     setValue,
-  } = useForm({});
+  } = useForm(filtersSchema);
 
   const initialDateRef = useRef(null);
   const endDateRef = useRef(null);
+
+  useEffect(() => {
+    const defaults = {};
+
+    if (queryParams.get("author")) {
+      defaults.author = queryParams.get("author");
+    }
+    if (queryParams.get("initialDate")) {
+      try {
+        defaults.initialDate = moment(queryParams.get("initialDate")).format(
+          "DD/MM/YYYY"
+        );
+      } catch (_) {}
+    }
+    if (queryParams.get("finalDate")) {
+      try {
+        defaults.endDate = moment(queryParams.get("finalDate")).format(
+          "DD/MM/YYYY"
+        );
+      } catch (_) {}
+    }
+
+    if (queryParams.get("departamentId")) {
+      try {
+        const departament = departaments.find(
+          (departament) =>
+            departament.value === queryParams.get("departamentId")
+        );
+        console.log("departament", departament);
+        if (departament) {
+          defaults.departamentId = {
+            label: departament.label,
+            value: departament.value,
+          };
+        } else {
+          defaults.departamentId = {
+            label: "Selecione um departamento",
+            value: "not-selected",
+          };
+        }
+      } catch (_) {}
+    } else {
+      defaults.departamentId = {
+        label: "Selecione um departamento",
+        value: "not-selected",
+      };
+    }
+    if (queryParams.get("categoryId")) {
+      try {
+        const category = categories.find(
+          (category) => category.value === queryParams.get("categoryId")
+        );
+        if (category) {
+          defaults.categoryId = {
+            label: category.label,
+            value: category.value,
+          };
+        } else {
+          defaults.categoryId = {
+            label: "Selecione uma categoria",
+            value: "not-selected",
+          };
+        }
+      } catch (_) {}
+    } else {
+      defaults.categoryId = {
+        label: "Selecione uma categoria",
+        value: "not-selected",
+      };
+    }
+
+    setFormDefaultValues(defaults);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [departaments, categories]);
 
   const initialDateInput = (
     <Box position="relative" w="100%">
@@ -44,8 +149,23 @@ const Filters = () => {
         onClick={() => setIsShowingCalendarInitial(!isShowingCalendarInitial)}
         autocomplete="off"
         onChange={(e) => {
-          if (e.target.value.length === 10) setIsShowingCalendarInitial(false);
+          if (e.target.value.length === 10) {
+            setIsShowingCalendarInitial(false);
+            // try {
+            //   const value = e.target.value;
+            //   const initialDate = moment(value, "DD/MM/YYYY").format(
+            //     "YYYY-MM-DD"
+            //   );
+            //   searchParams.set("initialDate", initialDate);
+            //   setSearchParams(searchParams);
+            // } catch (_) {}
+          }
+          if (e.target.value.length === 0) {
+            searchParams.delete("initialDate");
+            setSearchParams(searchParams);
+          }
         }}
+        defaultValue={formDefaultValues.initialDate}
       />
       {isShowingCalendarInitial && (
         <Box position={"absolute"} top="20" left={0} zIndex={2} w="100%">
@@ -85,8 +205,21 @@ const Filters = () => {
         onClick={() => setIsShowingCalendarEnd(!isShowingCalendarEnd)}
         autocomplete="off"
         onChange={(e) => {
-          if (e.target.value.length === 10) setIsShowingCalendarEnd(false);
+          if (e.target.value.length === 10) {
+            setIsShowingCalendarEnd(false);
+            // try {
+            //   const value = e.target.value;
+            //   const endDate = moment(value, "DD/MM/YYYY").format("YYYY-MM-DD");
+            //   searchParams.set("finalDate", endDate);
+            //   setSearchParams(searchParams);
+            // } catch (_) {}
+          }
+          if (e.target.value.length === 0) {
+            searchParams.delete("finalDate");
+            setSearchParams(searchParams);
+          }
         }}
+        defaultValue={formDefaultValues.endDate}
       />
       {isShowingCalendarEnd && (
         <Box position={"absolute"} top="20" left={0} zIndex={2} w="100%">
@@ -107,64 +240,33 @@ const Filters = () => {
     </Box>
   );
 
-  const departamentInput = (
+  const departamentInput = formDefaultValues.departamentId && (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
         label="Departamento"
-        options={[
-          {
-            label: "IT",
-            value: "ativo",
-          },
-          {
-            label: "RH",
-            value: "rh",
-          },
-          {
-            label: "Marketing",
-            value: "marketing",
-          },
-          {
-            label: "Vendas",
-            value: "sales",
-          },
-          {
-            label: "RH",
-            value: "rh",
-          },
-        ]}
-        key={"addCompany-status"}
+        {...register("departamentId")}
+        errors={errors.departamentId}
+        options={departaments}
+        defaultValue={formDefaultValues.departamentId}
       />
     </VStack>
   );
 
-  const categoryInput = (
+  const categoryInput = formDefaultValues.categoryId && (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
         label="Categoria"
-        options={[
-          {
-            label: "IT",
-            value: "ativo",
-          },
-          {
-            label: "RH",
-            value: "rh",
-          },
-          {
-            label: "Marketing",
-            value: "marketing",
-          },
-          {
-            label: "Vendas",
-            value: "sales",
-          },
-          {
-            label: "RH",
-            value: "rh",
-          },
-        ]}
-        key={"addCompany-status"}
+        {...register("categoryId")}
+        errors={errors.categoryId}
+        options={categories}
+        onChange={(e) => {
+          if (e.target.value === "not-selected") {
+            setValue("categoryId", null);
+          } else {
+            setValue("categoryId", e.target.value);
+          }
+        }}
+        defaultValue={formDefaultValues.categoryId}
       />
     </VStack>
   );
@@ -184,10 +286,48 @@ const Filters = () => {
       innerPadding="10px 0"
       label="Autor"
       width="100%"
+      {...register("author")}
+      defaultValue={formDefaultValues.author}
     />
   );
+
+  const onSubmit = async (data) => {
+    if (data.author) {
+      searchParams.set("author", data.author);
+      setSearchParams(searchParams);
+    }
+    if (data.initialDate) {
+      data.initialDate = moment(data?.initialDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+
+      searchParams.set("initialDate", data.initialDate);
+      setSearchParams(searchParams);
+    }
+    if (data.endDate) {
+      data.finalDate = moment(data.endDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+
+      searchParams.set("finalDate", data.finalDate);
+      setSearchParams(searchParams);
+    }
+    if (data.departamentId === "not-selected") {
+      delete data.departamentId;
+    } else {
+      searchParams.set("departamentId", data.departamentId);
+      setSearchParams(searchParams);
+    }
+    if (data.categoryId === "not-selected") {
+      delete data.categoryId;
+    } else {
+      searchParams.set("categoryId", data.categoryId);
+      setSearchParams(searchParams);
+    }
+
+    const res = await getDocuments(1, "", data);
+    setDocuments(res.items);
+  };
   return isMobile ? (
-    <VStack w={"100%"} paddingX={"20px"}>
+    <VStack w={"100%"} paddingX={"20px"} as="form">
       <HStack mb={"30px "}>
         {initialDateInput}
         {finalDateInput}
@@ -218,6 +358,8 @@ const Filters = () => {
       position="relative"
       pb={"20px"}
       alignItems={"center"}
+      as={"form"}
+      onSubmit={handleSubmit(onSubmit)}
     >
       {initialDateInput}
       {finalDateInput}
@@ -237,6 +379,7 @@ const Filters = () => {
         label={<MagnifyingGlass size={32} color={"white"} />}
         width="150px"
         mt={"35px !important"}
+        type="submit"
       />
     </HStack>
   );

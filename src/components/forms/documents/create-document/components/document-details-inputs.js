@@ -2,9 +2,8 @@ import { FormInput } from "components/components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentDetailsInputs = ({ register, errors }) => {
+const DocumentDetailsInputs = ({ register, errors, formValues }) => {
   const { t } = useTranslation();
-
   return (
     <>
       <FormInput
@@ -38,6 +37,7 @@ const DocumentDetailsInputs = ({ register, errors }) => {
         width="100%"
         {...register("name")}
         error={errors.name?.message}
+        defaultValue={formValues?.name}
       />
     </>
   );

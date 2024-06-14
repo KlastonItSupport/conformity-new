@@ -14,7 +14,7 @@ export const documentSchema = Yup.object().shape({
     /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
     "Formato inválido. Use o formato dd/mm/yyyy"
   ),
-  createDate: Yup.string().matches(
+  physicalDocumentCreatedDate: Yup.string().matches(
     /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
     "Formato inválido. Use o formato dd/mm/yyyy"
   ),

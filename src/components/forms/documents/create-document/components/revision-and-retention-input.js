@@ -1,7 +1,7 @@
 import { FormInput } from "components/components";
 import React from "react";
 
-const ReivisionAndRetentionInput = ({ register, errors }) => {
+const ReivisionAndRetentionInput = ({ register, errors, formValues }) => {
   return (
     <>
       <FormInput
@@ -18,6 +18,7 @@ const ReivisionAndRetentionInput = ({ register, errors }) => {
         width="100%"
         {...register("revision")}
         error={errors.revision?.message}
+        defaultValue={formValues.revision}
       />
       <FormInput
         variant="auth"
@@ -33,6 +34,7 @@ const ReivisionAndRetentionInput = ({ register, errors }) => {
         width="100%"
         {...register("minimumRetention")}
         error={errors.minimumRetention?.message}
+        defaultValue={formValues.minimumRetention}
       />
     </>
   );

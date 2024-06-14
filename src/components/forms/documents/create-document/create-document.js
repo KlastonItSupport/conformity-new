@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { documentSchema } from "../schemas/document.schema";
 import { useTranslation } from "react-i18next";
@@ -19,14 +19,20 @@ import DepartamentForm from "components/forms/departaments/create-departament";
 import { DepartamentContext } from "providers/departament";
 import moment from "moment";
 
-const DocumentForm = ({ formRef, onClose, setIsLoading }) => {
+const DocumentForm = ({ formRef, onClose, setIsLoading, event = "add" }) => {
   const { t } = useTranslation();
   const categoryRef = useRef();
   const departamentRef = useRef();
   const richTextRef = useRef(null);
   const [description, setDescription] = useState("");
 
-  const { createDocument } = useContext(DocumentContext);
+  const {
+    createDocument,
+    editSelected,
+    editDocument,
+    documents,
+    setDocuments,
+  } = useContext(DocumentContext);
   const { createCategoryIsLoading } = useContext(CategoryContext);
   const { createDepartamentIsLoading } = useContext(DepartamentContext);
 
@@ -53,17 +59,60 @@ const DocumentForm = ({ formRef, onClose, setIsLoading }) => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    await createDocument({
-      ...data,
-      description: description,
-      revisionDate: moment(data.revisionDate, "DD/MM/YYYY").format(
-        "YYYY-MM-DD"
-      ),
-    });
+
+    const revisionFormatted = moment(data.revisionDate, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    const inclusionDate = moment(data.inclusionDate, "DD/MM/YYYY").format(
+      "YYYY-MM-DD"
+    );
+    const physicalDocumentCreatedDate = moment(
+      data.physicalDocumentCreatedDate,
+      "DD/MM/YYYY"
+    ).format("YYYY-MM-DD");
+
+    if (event === "add") {
+      const document = await createDocument({
+        ...data,
+        description: description,
+        revisionDate: revisionFormatted,
+        inclusionDate,
+        physicalDocumentCreatedDate,
+      });
+
+      setDocuments([document, ...documents]);
+    } else {
+      const editedDocument = await editDocument({
+        ...data,
+        revisionDate: revisionFormatted,
+        description: description,
+        inclusionDate,
+        physicalDocumentCreatedDate,
+      });
+
+      const editedDocumentIndex = documents.findIndex(
+        (document) => document.id === editedDocument.id
+      );
+
+      if (editedDocumentIndex !== -1) {
+        const updatedDocuments = [...documents];
+        updatedDocuments[editedDocumentIndex] = editedDocument;
+        setDocuments(updatedDocuments);
+      }
+    }
     setIsLoading(false);
     onClose();
   };
 
+  const formValues = editSelected && event !== "add" ? editSelected : {};
+
+  useEffect(() => {
+    if (formValues.description) {
+      setDescription(formValues.description);
+      console.log(formValues.description);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <form
@@ -71,21 +120,45 @@ const DocumentForm = ({ formRef, onClose, setIsLoading }) => {
         onSubmit={handleSubmit(onSubmit)}
         ref={formRef}
       >
-        <DocumentDetailsInputs register={register} errors={errors} />
+        <DocumentDetailsInputs
+          register={register}
+          errors={errors}
+          formValues={formValues}
+        />
         <SelectsInputs
           register={register}
           errors={errors}
           onCategoryModalOpen={onCategoryModalOpen}
           onDepartamentModalOpen={onDepartamentModalOpen}
+          formValues={formValues}
         />
-        <DatesInputs register={register} errors={errors} setValue={setValue} />
+        <DatesInputs
+          register={register}
+          errors={errors}
+          setValue={setValue}
+          formValues={formValues}
+        />
         <HStack>
-          <AuthorAndValidityInput register={register} errors={errors} />
+          <AuthorAndValidityInput
+            register={register}
+            errors={errors}
+            formValues={formValues}
+          />
         </HStack>
         <HStack mt={"15px"}>
-          {<ReivisionAndRetentionInput register={register} errors={errors} />}
+          {
+            <ReivisionAndRetentionInput
+              register={register}
+              errors={errors}
+              formValues={formValues}
+            />
+          }
         </HStack>
-        <RecoverInputs register={register} errors={errors} />
+        <RecoverInputs
+          register={register}
+          errors={errors}
+          formValues={formValues}
+        />
         <TextEditor
           value={description}
           onChange={setDescription}

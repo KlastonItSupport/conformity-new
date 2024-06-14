@@ -35,6 +35,17 @@ const CategoryProvider = ({ children }) => {
     return response.data;
   };
 
+  useEffect(() => {
+    getCategories().then((categoryRes) => {
+      setCategories(
+        categoryRes.map((category) => {
+          return { label: category.name, value: category.id };
+        })
+      );
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <CategoryContext.Provider
       value={{

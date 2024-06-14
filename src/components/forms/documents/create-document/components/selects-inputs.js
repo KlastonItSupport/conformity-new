@@ -18,6 +18,7 @@ const SelectsInputs = ({
   errors,
   onCategoryModalOpen,
   onDepartamentModalOpen,
+  formValues,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { getCategories, categories, setCategories } =
@@ -31,6 +32,26 @@ const SelectsInputs = ({
       getCategories(),
       getDepartaments(),
     ]);
+
+    if (formValues.categoryId) {
+      const categoryIndexToRemove = categoriesRes.findIndex((category) => {
+        return category.id === formValues.categoryId;
+      });
+      categoriesRes.unshift(categoriesRes[categoryIndexToRemove]);
+      categoriesRes.splice(categoryIndexToRemove + 1, 1);
+    }
+
+    if (formValues.departamentId) {
+      const departamentIndexToRemove = departamentRes.findIndex(
+        (departament) => {
+          return departament.id === formValues.departamentId;
+        }
+      );
+      if (departamentIndexToRemove !== 0) {
+        departamentRes.unshift(departamentRes[departamentIndexToRemove]);
+        departamentRes.splice(departamentIndexToRemove + 1, 1);
+      }
+    }
 
     setCategories(
       categoriesRes.map((category) => {
@@ -147,6 +168,14 @@ const SelectsInputs = ({
             { label: "Interno", value: "intern" },
             { label: "Externo", value: "extern" },
           ]}
+          defaultValue={
+            formValues
+              ? {
+                  label: formValues.type === "intern" ? "Interno" : "Externo",
+                  value: formValues.type,
+                }
+              : null
+          }
         />
       </VStack>
     </>

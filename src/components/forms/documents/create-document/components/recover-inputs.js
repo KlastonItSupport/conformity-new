@@ -1,7 +1,7 @@
 import { FormInput } from "components/components";
 import React from "react";
 
-const RecoverInputs = ({ register, errors }) => {
+const RecoverInputs = ({ register, errors, formValues }) => {
   return (
     <>
       <FormInput
@@ -19,7 +19,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("local")}
         error={errors.local?.message}
-        defaultValue="REDE"
+        defaultValue={formValues.local ?? "REDE"}
       />
       <FormInput
         variant="auth"
@@ -36,7 +36,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("identification")}
         error={errors.identification?.message}
-        defaultValue="DOC#"
+        defaultValue={formValues.identification ?? "DOC#"}
       />
       <FormInput
         variant="auth"
@@ -53,7 +53,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("protection")}
         error={errors.protection?.message}
-        defaultValue="ACESSO NO SERVIDOR"
+        defaultValue={formValues.protection ?? "ACESSO NO SERVIDOR"}
       />
       <FormInput
         variant="auth"
@@ -70,7 +70,7 @@ const RecoverInputs = ({ register, errors }) => {
         width="100%"
         {...register("recovery")}
         error={errors.recovery?.message}
-        defaultValue="BACKUP"
+        defaultValue={formValues.recovery ?? "BACKUP"}
       />
       <FormInput
         variant="auth"
@@ -84,10 +84,10 @@ const RecoverInputs = ({ register, errors }) => {
         borderRadius="6px"
         bgColor={"primary.50"}
         label="Disposição *"
-        defaultValue="DIGITAL"
         width="100%"
         {...register("disposition")}
         error={errors.disposition?.message}
+        defaultValue={formValues.disposition ?? "DIGITAL"}
       />
     </>
   );
