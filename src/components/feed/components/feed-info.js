@@ -8,9 +8,10 @@ import moment from "moment";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const FeedInfo = ({ author, date, text }) => {
+const FeedInfo = ({ author, date, text, onDelete, onEdit, id }) => {
   const { t } = useTranslation();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isEditLoading, setIsEditLoading] = useState(false);
   const formRef = useRef(null);
 
   const dateFormatted = moment(date, "YYYY-MM-DD HH:mm:ss").format(
@@ -79,7 +80,7 @@ const FeedInfo = ({ author, date, text }) => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await sleep(1500);
+          await onDelete(id);
           setIsDeleteLoading(false);
           onDeleteModalClose();
         }}
@@ -88,9 +89,16 @@ const FeedInfo = ({ author, date, text }) => {
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
-        id={"editId"}
         form={
-          <FeedDescriptionForm formRef={formRef} onClose={onEditModalClose} />
+          <FeedDescriptionForm
+            formRef={formRef}
+            onClose={onEditModalClose}
+            defaultValue={text}
+            handleEdit={(item) => {
+              onEdit(id, item);
+            }}
+            setIsLoading={setIsEditLoading}
+          />
         }
         formRef={formRef}
         title={t("Editar Feed")}
@@ -98,6 +106,7 @@ const FeedInfo = ({ author, date, text }) => {
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="xl"
+        isLoading={isEditLoading}
       />
     </>
   );

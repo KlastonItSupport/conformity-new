@@ -15,7 +15,7 @@ import { DetailsDocumentsContext } from "providers/details-documents";
 import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentsDetails = ({ id }) => {
+const DocumentsDetails = () => {
   const { t } = useTranslation();
   const formRef = useRef(null);
   const { additionalDocuments, deleteAdditionalDocument } = useContext(

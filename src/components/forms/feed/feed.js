@@ -4,7 +4,13 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { feedSchema } from "./schema";
 
-const FeedDescriptionForm = ({ formRef, onClose }) => {
+const FeedDescriptionForm = ({
+  formRef,
+  onClose,
+  handleEdit,
+  defaultValue,
+  setIsLoading,
+}) => {
   const {
     handleSubmit,
     register,
@@ -14,6 +20,9 @@ const FeedDescriptionForm = ({ formRef, onClose }) => {
   });
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
+    await handleEdit(data);
+    setIsLoading(false);
     onClose();
   };
 
@@ -25,8 +34,9 @@ const FeedDescriptionForm = ({ formRef, onClose }) => {
     >
       <FormTextArea
         label={"Descrição"}
-        {...register("description")}
-        error={errors.description?.message}
+        {...register("text")}
+        error={errors.text?.message}
+        defaultValue={defaultValue}
       />
     </form>
   );

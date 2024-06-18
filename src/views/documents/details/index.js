@@ -24,6 +24,7 @@ import { useLocation } from "react-router-dom";
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const { getDocumentDetails } = useContext(DetailsDocumentsContext);
 
   const routeTreePaths = [
@@ -54,12 +55,11 @@ const DocumentsDetailsPage = () => {
     >
       <DocumentsDetails />
       <Container padding={"0 0 30px 0"}></Container>
-      <Feed />
+      <Feed moduleId={1} externalId={queryParams.get("id")} />
     </Container>
   );
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
     const documentId = queryParams.get("id");
 
     if (documentId) {

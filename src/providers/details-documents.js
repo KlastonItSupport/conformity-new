@@ -1,6 +1,7 @@
 import { useContext, createContext, useState } from "react";
 import { AuthContext } from "./auth";
 import { api } from "api/api";
+import { toast } from "react-toastify";
 
 const DetailsDocumentsContext = createContext();
 
@@ -31,6 +32,7 @@ const DetailsDocumentsProvider = ({ children }) => {
         }
       );
       if (response.status === 200) {
+        toast.success("Documento excluído com sucesso");
         setAdditionalDocuments(
           additionalDocuments.filter((document) => document.id !== id)
         );
@@ -44,6 +46,7 @@ const DetailsDocumentsProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (response.status === 201) {
+        toast.success("Documento adicionado com sucesso");
         setAdditionalDocuments([...additionalDocuments, ...response.data]);
       }
     } catch (error) {}

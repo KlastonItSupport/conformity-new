@@ -1,27 +1,83 @@
 import { Divider, Text, VStack } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import { FormTextArea } from "components/components";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import FeedInfo from "./components/feed-info";
+import { api } from "api/api";
+import { FeedSchema } from "./schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import { AuthContext } from "providers/auth";
+import { toast } from "react-toastify";
 
-const Feed = () => {
-  const items = [
-    {
-      author: "Gustavo",
-      date: "2020-06-25 15:50:55",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.",
-    },
-    {
-      author: "Bruno",
-      date: "2020-08-20 16:20:20",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.",
-    },
-    {
-      author: "Jorge",
-      date: "2024-05-21 16:12:23",
-      text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor.",
-    },
-  ];
+const Feed = ({ moduleId, externalId }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [feedItems, setFeedItems] = useState([]);
+  const { user } = useContext(AuthContext);
+
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+    setValue,
+  } = useForm({
+    resolver: yupResolver(FeedSchema),
+  });
+
+  const getFeedItems = async () => {
+    const response = await api.get("feed", {
+      moduleId,
+      externalId,
+    });
+    setFeedItems(response.data);
+  };
+
+  const deleteFeedItem = async (id) => {
+    const response = await api.delete(`feed/${id}`);
+
+    if (response.status === 200) {
+      toast.success("Item excluído com sucesso");
+      setFeedItems(feedItems.filter((item) => item.id !== id));
+    }
+  };
+
+  const updateFeedItem = async (id, data) => {
+    const response = await api.patch(`feed/${id}`, data);
+
+    if (response.status === 200) {
+      toast.success("Item atualizado com sucesso");
+      setFeedItems(
+        feedItems.map((item) => (item.id === id ? response.data : item))
+      );
+    }
+  };
+
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+
+    const res = await api.post("feed", {
+      ...data,
+      moduleId,
+      externalId,
+      user: user.id,
+    });
+
+    if (res.status === 201) {
+      setFeedItems([res.data, ...feedItems]);
+      setValue("text", "");
+      toast.success("Item adicionado com sucesso");
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getFeedItems();
+  }, []);
+
+  useEffect(() => {
+    console.log("feedItems", feedItems);
+  }, [feedItems]);
+
   return (
     <>
       <VStack
@@ -31,12 +87,18 @@ const Feed = () => {
         p={"25px"}
         border={"1px solid #ddd"}
         alignItems={"start"}
+        as={"form"}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <Text fontSize={"20px"} color={"header.100"}>
           Feed
         </Text>
         <Divider color={"#ddd"} />
-        <FormTextArea label={"Adicionar informação neste Documento"} />
+        <FormTextArea
+          {...register("text")}
+          error={errors.text?.message}
+          label={"Adicionar informação neste Documento"}
+        />
 
         <ButtonPrimary
           fontSize="sm"
@@ -48,20 +110,23 @@ const Feed = () => {
           boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
           borderRadius="7px"
           _active={{ bgColor: "primary.200" }}
-          type="submit"
           label={"Adicionar"}
           padding={"5px"}
           w={"100%"}
           h="40px"
+          type="submit"
+          isLoading={isLoading}
         />
       </VStack>
 
-      {items.map((item, index) => (
+      {feedItems.map((item) => (
         <FeedInfo
-          author={item.author}
-          date={new Date(item.date)}
+          author={item.userName}
+          date={item.createdAt}
           text={item.text}
-          id={index}
+          id={item.id}
+          onDelete={deleteFeedItem}
+          onEdit={updateFeedItem}
         />
       ))}
     </>
