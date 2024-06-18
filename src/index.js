@@ -23,6 +23,7 @@ import ListDocumentsPage from "views/documents/list-documents";
 import { DocumentProvider } from "providers/document";
 import { CategoryProvider } from "providers/category";
 import { DepartamentProvider } from "providers/departament";
+import { DetailsDocumentsProvider } from "providers/details-documents";
 
 const routes = createBrowserRouter([
   {
@@ -65,18 +66,20 @@ ReactDOM.render(
       <UserProvider>
         <GroupProvider>
           <DocumentProvider>
-            <CategoryProvider>
-              <DepartamentProvider>
-                <ChakraProvider theme={theme}>
-                  <ToastContainer />
-                  <React.StrictMode>
-                    <ThemeEditorProvider>
-                      <RouterProvider router={routes} />
-                    </ThemeEditorProvider>
-                  </React.StrictMode>
-                </ChakraProvider>
-              </DepartamentProvider>
-            </CategoryProvider>
+            <DetailsDocumentsProvider>
+              <CategoryProvider>
+                <DepartamentProvider>
+                  <ChakraProvider theme={theme}>
+                    <ToastContainer />
+                    <React.StrictMode>
+                      <ThemeEditorProvider>
+                        <RouterProvider router={routes} />
+                      </ThemeEditorProvider>
+                    </React.StrictMode>
+                  </ChakraProvider>
+                </DepartamentProvider>
+              </CategoryProvider>
+            </DetailsDocumentsProvider>
           </DocumentProvider>
         </GroupProvider>
       </UserProvider>

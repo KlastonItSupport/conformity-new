@@ -2,6 +2,7 @@ import {
   Box,
   Container,
   HStack,
+  Link,
   Text,
   VStack,
   useDisclosure,
@@ -10,13 +11,21 @@ import { BellRinging, Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
 import { ExtrasDocuments } from "components/components";
 import { DeleteModal } from "components/components";
-import { sleep } from "helpers/sleep";
-import React, { useRef, useState } from "react";
+import { DetailsDocumentsContext } from "providers/details-documents";
+import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentsDetails = () => {
+const DocumentsDetails = ({ id }) => {
   const { t } = useTranslation();
   const formRef = useRef(null);
+  const { additionalDocuments, deleteAdditionalDocument } = useContext(
+    DetailsDocumentsContext
+  );
+  const [deleteAdditionalDocumentId, setDeleteAdditionalDocumentId] =
+    useState();
+
+  const [createAdditionalIsLoading, setCreateAdditionalIsLoading] =
+    useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const {
@@ -30,6 +39,13 @@ const DocumentsDetails = () => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+
+  const handleDeleteAdditionalDocument = async () => {
+    setIsDeleteLoading(true);
+    await deleteAdditionalDocument(deleteAdditionalDocumentId);
+    setIsDeleteLoading(false);
+    onDeleteModalClose();
+  };
 
   const infoItem = (label, value, hasBorder = true) => {
     return (
@@ -48,7 +64,7 @@ const DocumentsDetails = () => {
     );
   };
 
-  const docInfo = (label, hasBorder = true) => {
+  const docInfo = (label, hasBorder = true, href, id) => {
     return (
       <HStack
         borderTop={hasBorder ? "1px solid #ddd" : null}
@@ -56,17 +72,18 @@ const DocumentsDetails = () => {
         w={"100%"}
         p={"10px"}
         marginTop={"0px !important"}
-        onClick={onDeleteModalOpen}
       >
-        <Text
+        <Link
           fontWeight={"bold"}
           cursor={"pointer"}
           color={"#0075df"}
           fontSize={"13px"}
           _hover={{ textDecoration: "underline" }}
+          href={href}
+          target="_blank"
         >
           {label}
-        </Text>
+        </Link>
         <HStack>
           <BellRinging
             size={16}
@@ -74,7 +91,16 @@ const DocumentsDetails = () => {
             color={"#0075df"}
             cursor={"pointer"}
           />
-          <Trash size={16} color="#0086FF" weight="fill" cursor={"pointer"} />
+          <Trash
+            size={16}
+            color="#0086FF"
+            weight="fill"
+            cursor={"pointer"}
+            onClick={() => {
+              setDeleteAdditionalDocumentId(id);
+              onDeleteModalOpen();
+            }}
+          />
         </HStack>
       </HStack>
     );
@@ -95,9 +121,9 @@ const DocumentsDetails = () => {
         </Text>
       </HStack>
       <Container m={"0px"} p={"0"} border={"1px solid #ddd"}>
-        {docInfo("Screenshot from 2024-05-20 20-38-36.png", false)}
-        {docInfo("Teste.pdf")}
-        {docInfo("Email-empresa-tal.ppt")}
+        {additionalDocuments.map((document, index) =>
+          docInfo(document.name, index !== 0, document.link, document.id)
+        )}
       </Container>
     </>
   );
@@ -134,23 +160,25 @@ const DocumentsDetails = () => {
         subtitle={t("Tem certeza de que deseja excluir este Documento?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
-        onConfirm={async () => {
-          setIsDeleteLoading(true);
-          await sleep(1500);
-          setIsDeleteLoading(false);
-          onDeleteModalClose();
-        }}
+        onConfirm={() => handleDeleteAdditionalDocument()}
         isLoading={isDeleteLoading}
       />
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
-        form={<ExtrasDocuments formRef={formRef} onClose={onEditModalClose} />}
+        form={
+          <ExtrasDocuments
+            formRef={formRef}
+            onClose={onEditModalClose}
+            setIsLoading={setCreateAdditionalIsLoading}
+          />
+        }
         formRef={formRef}
         title={t("Adicionar Documentos")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="xl"
+        isLoading={createAdditionalIsLoading}
       />
     </>
   );

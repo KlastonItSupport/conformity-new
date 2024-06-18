@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { NavBar } from "components/navbar";
 import NavigationLinks from "components/navigationLinks";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DepartamentPermissions,
@@ -18,9 +18,13 @@ import {
   Revisions,
 } from "./components/components";
 import Feed from "components/feed";
+import { DetailsDocumentsContext } from "providers/details-documents";
+import { useLocation } from "react-router-dom";
 
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const { getDocumentDetails } = useContext(DetailsDocumentsContext);
 
   const routeTreePaths = [
     {
@@ -28,7 +32,7 @@ const DocumentsDetailsPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/",
+      path: "/documents",
       label: t("Documentos"),
     },
     {
@@ -54,6 +58,14 @@ const DocumentsDetailsPage = () => {
     </Container>
   );
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const documentId = queryParams.get("id");
+
+    if (documentId) {
+      getDocumentDetails(documentId);
+    }
+  }, []);
   return (
     <>
       <NavBar />

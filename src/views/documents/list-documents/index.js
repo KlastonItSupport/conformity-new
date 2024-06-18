@@ -19,13 +19,14 @@ import { DeleteModal } from "components/components";
 import { ModalForm } from "components/components";
 import DocumentForm from "components/forms/documents/create-document/create-document";
 import { DocumentContext } from "providers/document";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
+  const history = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
 
@@ -72,7 +73,7 @@ const ListDocumentsPage = () => {
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <MagnifyingGlass size={20} />,
-      onClickRow: (item) => {},
+      onClickRow: (item) => history(`/documents/details?id=${item.id}`),
       onClickHeader: () => {},
       isDisabled: false,
       shouldShow: false,
