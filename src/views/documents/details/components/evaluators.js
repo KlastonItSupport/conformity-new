@@ -12,13 +12,25 @@ import { AddEvaluatorForm } from "components/components";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
 import { sleep } from "helpers/sleep";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  createEvaluator,
+  deleteEvaluator,
+  deleteMultipleEvaluators,
+  getEvaluators,
+} from "../helpers/evaluators-helper";
+import { columns } from "../helpers/evaluators-helper";
 
-const Evaluators = () => {
+const Evaluators = ({ documentId }) => {
   const { t } = useTranslation();
   const formRef = useRef(null);
+
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isMultipleLoading, setIsMultipleLoading] = useState(false);
+  const [evaluators, setEvaluators] = useState([]);
+  const [deleteId, setDeleteId] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -27,24 +39,41 @@ const Evaluators = () => {
   } = useDisclosure();
 
   const {
+    isOpen: isDeleteMultipleModalOpen,
+    onOpen: onDeleteMultipleModalOpen,
+    onClose: onDeleteMultipleModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isEditModalOpen,
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
 
-  const onDeleteClick = (item) => {
-    onDeleteModalOpen();
-  };
-
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <Trash size={20} />,
       onClickRow: (e) => onDeleteClick(e),
-      onClickHeader: (selecteds) => {},
+      onClickHeader: (selecteds) => {
+        setSelectedItems(selecteds);
+        onDeleteMultipleModalOpen();
+      },
       isDisabled: false,
       shouldShow: true,
     },
   ]);
+
+  const onDeleteClick = (item) => {
+    onDeleteModalOpen();
+    setDeleteId(item.id);
+  };
+
+  useEffect(() => {
+    if (evaluators.length === 0) {
+      getEvaluators(setEvaluators, documentId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <VStack
@@ -99,46 +128,32 @@ const Evaluators = () => {
       </HStack>
       <Container w={"100%"} maxW={"null"} p={"0px"}>
         <CustomTable
-          data={[
-            {
-              name: "Gustavo Santos",
-              cancelDescription: "Cancelado por taltaltaltaltlattl",
-              reviewed: "PENDENTE",
-              approved: "PENDENTE",
-              edited: "SIM",
-              delete: "SIM",
-            },
-          ]}
-          columns={[
-            { header: t("Nome"), access: "name" },
-            {
-              header: t("Descrição do cancelamento"),
-              access: "cancelDescription",
-            },
-            { header: "Revisado", access: "reviewed" },
-            { header: t("Aprovado?"), access: "approved" },
-            { header: t("Editar?"), access: "edited" },
-            { header: t("Deletar?"), access: "delete" },
-          ]}
+          data={evaluators}
+          columns={columns}
           title={t("Avaliações")}
           actionButtons={[<Trash size={20} cursor={"pointer"} color="black" />]}
           icons={tableIcons}
-          onChangeSearchInput={(e) => {}}
-          searchInputValue={() => {}}
-          onCheckItems={(show) => {}}
+          onCheckItems={(show) => {
+            setTableIcons(
+              tableIcons.map((icon) => {
+                icon.isDisabled = show;
+                return icon;
+              })
+            );
+          }}
           paddingOnTitle={false}
           showSearchInput={false}
           hasMinHg={false}
         />
       </Container>
       <DeleteModal
-        title={t("Excluir Feed")}
-        subtitle={t("Tem certeza de que deseja excluir este item do Feed?")}
+        title={t("Excluir Avaliação")}
+        subtitle={t("Tem certeza de que deseja excluir esta avaliação")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await sleep(1500);
+          await deleteEvaluator(setEvaluators, evaluators, deleteId);
           setIsDeleteLoading(false);
           onDeleteModalClose();
         }}
@@ -147,12 +162,37 @@ const Evaluators = () => {
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
-        form={<AddEvaluatorForm formRef={formRef} onClose={onEditModalClose} />}
+        form={
+          <AddEvaluatorForm
+            formRef={formRef}
+            onClose={onEditModalClose}
+            onAddEvaluator={(data) =>
+              createEvaluator(setEvaluators, evaluators, documentId, data)
+            }
+            documentId={documentId}
+          />
+        }
         formRef={formRef}
         title={t("Adicionar Avaliador / Gestor")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="xl"
+      />
+      <DeleteModal
+        title={t("Excluir Avaliações")}
+        subtitle={t("Tem certeza de que deseja excluir estas avaliações?")}
+        isOpen={isDeleteMultipleModalOpen}
+        onClose={onDeleteMultipleModalClose}
+        onConfirm={() =>
+          deleteMultipleEvaluators(
+            selectedItems,
+            evaluators,
+            setEvaluators,
+            onDeleteMultipleModalClose,
+            setIsMultipleLoading
+          )
+        }
+        isLoading={isMultipleLoading}
       />
     </VStack>
   );

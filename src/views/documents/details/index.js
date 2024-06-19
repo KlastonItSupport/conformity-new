@@ -65,6 +65,7 @@ const DocumentsDetailsPage = () => {
     if (documentId) {
       getDocumentDetails(documentId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <>
@@ -81,7 +82,7 @@ const DocumentsDetailsPage = () => {
                 }
               />
               <Revisions />
-              <Evaluators />
+              <Evaluators documentId={queryParams.get("id")} />
               <RelatedDocuments />
               <DepartamentPermissions />
             </Container>
@@ -96,7 +97,7 @@ const DocumentsDetailsPage = () => {
                 }
               />
               <Revisions />
-              <Evaluators />
+              <Evaluators documentId={queryParams.get("id")} />
               <RelatedDocuments />
               <DepartamentPermissions />
               <Container padding={"0 0 30px 0"}></Container>

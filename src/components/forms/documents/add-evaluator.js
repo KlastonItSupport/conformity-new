@@ -1,20 +1,25 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import SelectInput from "components/select";
-import React, { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { addEvaluatorSchema } from "./schemas/add-evaluator.schema";
 import { useForm } from "react-hook-form";
 import { Checkbox, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { api } from "api/api";
+import { AuthContext } from "providers/auth";
 
-const AddEvaluatorForm = ({ onClose, formRef }) => {
+const AddEvaluatorForm = ({ onClose, formRef, onAddEvaluator, documentId }) => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
-  const [checkBoxSelected, setCheckBoxSelected] = React.useState({
-    revision: true,
-    approve: true,
-    edit: true,
-    delete: true,
+  const { getToken } = useContext(AuthContext);
+
+  const [companyUsers, setCompanyUsers] = useState([]);
+  const [checkBoxSelected, setCheckBoxSelected] = useState({
+    reviewed: true,
+    approved: true,
+    edited: true,
+    deleted: true,
   });
 
   const {
@@ -26,12 +31,27 @@ const AddEvaluatorForm = ({ onClose, formRef }) => {
   });
 
   const onSubmit = async (data) => {
+    const formattedData = { ...data, ...checkBoxSelected, documentId };
+    console.log("formattedData", formattedData);
+    await onAddEvaluator(formattedData);
     onClose();
   };
 
+  const getCompanyUsers = async () => {
+    const response = await api.get("/companies/get-users", {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+
+    setCompanyUsers(
+      response.data.map((user) => {
+        return { label: user.name, value: user.id };
+      })
+    );
+  };
+
   useEffect(() => {
-    console.log(checkBoxSelected, "checkBoxSelected");
-  }, [checkBoxSelected]);
+    getCompanyUsers();
+  }, []);
 
   const buildCheckBoxes = (key, label) => {
     return (
@@ -58,33 +78,20 @@ const AddEvaluatorForm = ({ onClose, formRef }) => {
     >
       <SelectInput
         label="Nome do avaliador / Gestor"
-        options={[
-          {
-            label: "Bruno",
-            value: "1",
-          },
-          {
-            label: "Richard",
-            value: "2",
-          },
-        ]}
         placeholder="Selecione um Avaliador"
-        defaultValue={{
-          label: "Selecione um grupo",
-          value: "none-group-participant",
-        }}
-        {...register("evaluator")}
-        error={errors.evaluator?.message}
+        options={companyUsers}
+        {...register("userId")}
+        error={errors.userId?.message}
       />
       <Flex
         direction={isMobile ? "column" : "row"}
         justifyContent={"space-between"}
         alignItems={isMobile ? "start" : "center"}
       >
-        {buildCheckBoxes("revision", "Revisão?")}
-        {buildCheckBoxes("approve", "Aprovar?")}
-        {buildCheckBoxes("edit", "Editar?")}
-        {buildCheckBoxes("delete", "Deletar?")}
+        {buildCheckBoxes("reviewed", "Revisão?")}
+        {buildCheckBoxes("approved", "Aprovar?")}
+        {buildCheckBoxes("edited", "Editar?")}
+        {buildCheckBoxes("deleted", "Deletar?")}
       </Flex>
     </form>
   );
