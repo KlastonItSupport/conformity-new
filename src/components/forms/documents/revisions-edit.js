@@ -6,8 +6,15 @@ import { FormTextArea } from "components/components";
 import { FormInput } from "components/components";
 import { CalendarCustom } from "components/calendar";
 import { Box } from "@chakra-ui/react";
+import moment from "moment";
 
-const RevisionsForm = ({ onClose, formRef, event = "edit" }) => {
+const RevisionsForm = ({
+  onClose,
+  formRef,
+  event = "edit",
+  submitFunc,
+  defaultValues,
+}) => {
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
 
   const {
@@ -21,9 +28,11 @@ const RevisionsForm = ({ onClose, formRef, event = "edit" }) => {
 
   const onSubmit = async (data) => {
     if (event === "add") {
+      submitFunc(data);
       onClose();
       return;
     }
+    submitFunc(data);
     onClose();
   };
 
@@ -37,6 +46,7 @@ const RevisionsForm = ({ onClose, formRef, event = "edit" }) => {
         label={"Descrição da revisão"}
         {...register("description")}
         error={errors.description?.message}
+        defaultValue={defaultValues?.description}
       />
       <FormInput
         variant="auth"
@@ -52,13 +62,13 @@ const RevisionsForm = ({ onClose, formRef, event = "edit" }) => {
         label={"Data"}
         onClick={() => setIsShowingCalendar(!isShowingCalendar)}
         width="100%"
-        defaultValue={""}
         autocomplete="off"
-        {...register("date")}
-        error={errors.date?.message}
+        {...register("revisionDate")}
+        error={errors.revisionDate?.message}
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendar(false);
         }}
+        defaultValue={moment(defaultValues?.revisionDate).format("DD/MM/YYYY")}
       />
       {isShowingCalendar && (
         <Box
@@ -75,7 +85,7 @@ const RevisionsForm = ({ onClose, formRef, event = "edit" }) => {
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("date", formattedDate);
+              setValue("revisionDate", formattedDate);
               setIsShowingCalendar(!isShowingCalendar);
             }}
           />

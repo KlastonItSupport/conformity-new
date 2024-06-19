@@ -13,15 +13,37 @@ import {
   DeleteModal,
   CustomTable,
 } from "components/components";
-import { sleep } from "helpers/sleep";
-import React, { useRef, useState } from "react";
+import { AuthContext } from "providers/auth";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
+import {
+  addRevision,
+  columns,
+  deleteMultipleRevisions,
+  deleteRevision,
+  editRevision,
+  getRevision,
+} from "../helpers/revisions-helper";
 
 const Revisions = () => {
   const { t } = useTranslation();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [edit, setEdit] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedIsLoading, setSelectedIsLoading] = useState(false);
+
+  const { user } = useContext(AuthContext);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const documentId = queryParams.get("id");
+
+  const [revisions, setRevisions] = useState([]);
+
   const formRef = useRef(null);
   const formRefAdd = useRef(null);
 
@@ -29,6 +51,12 @@ const Revisions = () => {
     isOpen: isDeleteModalOpen,
     onOpen: onDeleteModalOpen,
     onClose: onDeleteModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isMultipleDeleteModalOpen,
+    onOpen: onMultipleDeleteModalOpen,
+    onClose: onMultipleDeleteModalClose,
   } = useDisclosure();
 
   const {
@@ -45,28 +73,38 @@ const Revisions = () => {
 
   const onDeleteClick = (item) => {
     onDeleteModalOpen();
+    setDeleteId(item.id);
   };
 
   const onEditClick = (item) => {
     onEditModalOpen();
+    setEdit(item);
   };
 
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <NotePencil size={20} />,
       onClickRow: (e) => onEditClick(e),
-      onClickHeader: () => [],
+
       isDisabled: false,
       shouldShow: false,
     },
     {
       icon: <Trash size={20} />,
       onClickRow: (e) => onDeleteClick(e),
-      onClickHeader: (selecteds) => {},
+      onClickHeader: (selecteds) => {
+        setSelectedItems(selecteds);
+        onMultipleDeleteModalOpen();
+      },
       isDisabled: false,
       shouldShow: true,
     },
   ]);
+
+  useEffect(() => {
+    getRevision(documentId, setRevisions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -105,31 +143,24 @@ const Revisions = () => {
         </HStack>
         <Container w={"100%"} maxW={"null"} p={"0px"} overflow={"hidden"}>
           <CustomTable
-            data={[
-              {
-                id: "529",
-                docId: "8570",
-                data: "23/05/2024	",
-                description: "Isso é um teste",
-                userId: "5384",
-              },
-            ]}
-            columns={[
-              { header: t("Código"), access: "id" },
-              { header: t("Código Documento"), access: "docId" },
-              { header: "Dados", access: "data" },
-              { header: t("Descrição"), access: "description" },
-              { header: t("Usuário"), access: "userId" },
-            ]}
+            data={revisions}
+            columns={columns}
             title={t("Revisões")}
             actionButtons={[
               <NotePencil size={20} cursor={"pointer"} color="black" />,
               <Trash size={20} cursor={"pointer"} color="black" />,
             ]}
             icons={tableIcons}
+            onCheckItems={(show) => {
+              setTableIcons(
+                tableIcons.map((icon) => {
+                  icon.isDisabled = show;
+                  return icon;
+                })
+              );
+            }}
             onChangeSearchInput={(e) => {}}
             searchInputValue={() => {}}
-            onCheckItems={(show) => {}}
             paddingOnTitle={false}
             showSearchInput={false}
             hasMinHg={false}
@@ -143,18 +174,44 @@ const Revisions = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await sleep(1500);
+          await deleteRevision(deleteId, revisions, setRevisions);
           setIsDeleteLoading(false);
           onDeleteModalClose();
         }}
         isLoading={isDeleteLoading}
       />
 
+      <DeleteModal
+        title={t("Excluir Revisoes")}
+        subtitle={t("Tem certeza de que deseja excluir estas Revisoes?")}
+        isOpen={isMultipleDeleteModalOpen}
+        onClose={onMultipleDeleteModalClose}
+        onConfirm={async () => {
+          setSelectedIsLoading(true);
+          await deleteMultipleRevisions(
+            selectedItems,
+            revisions,
+            setRevisions,
+            onMultipleDeleteModalClose
+          );
+          setSelectedIsLoading(false);
+        }}
+        isLoading={selectedIsLoading}
+      />
+
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
-        id={"editId"}
-        form={<RevisionsForm formRef={formRef} onClose={onEditModalClose} />}
+        form={
+          <RevisionsForm
+            formRef={formRef}
+            onClose={onEditModalClose}
+            submitFunc={(data) =>
+              editRevision(data, edit, revisions, setRevisions)
+            }
+            defaultValues={edit}
+          />
+        }
         formRef={formRef}
         title={t("Editar Revisão")}
         description={t("Tem certeza de que deseja Editar esta Revisão?")}
@@ -172,6 +229,9 @@ const Revisions = () => {
             formRef={formRefAdd}
             onClose={onAddModalClose}
             event={"add"}
+            submitFunc={(data) =>
+              addRevision(data, user.id, documentId, revisions, setRevisions)
+            }
           />
         }
         formRef={formRefAdd}

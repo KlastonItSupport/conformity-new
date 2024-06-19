@@ -74,10 +74,6 @@ const Feed = ({ moduleId, externalId }) => {
     getFeedItems();
   }, []);
 
-  useEffect(() => {
-    console.log("feedItems", feedItems);
-  }, [feedItems]);
-
   return (
     <>
       <VStack
