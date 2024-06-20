@@ -4,7 +4,13 @@ import { useForm } from "react-hook-form";
 import { relatedDocsSchema } from "./schemas/related-docs.schema";
 import SelectInput from "components/select";
 
-const RelatedDocsForm = ({ onClose, formRef }) => {
+const RelatedDocsForm = ({
+  onClose,
+  formRef,
+  options,
+  onConfirm,
+  setLoading,
+}) => {
   const {
     handleSubmit,
     register,
@@ -14,6 +20,9 @@ const RelatedDocsForm = ({ onClose, formRef }) => {
   });
 
   const onSubmit = async (data) => {
+    setLoading(true);
+    await onConfirm(data);
+    setLoading(false);
     onClose();
   };
 
@@ -25,23 +34,10 @@ const RelatedDocsForm = ({ onClose, formRef }) => {
     >
       <SelectInput
         label="Nome do documento"
-        options={[
-          {
-            label: "teste.pdf",
-            value: "1",
-          },
-          {
-            label: "orçamento-iso-9001.pdf",
-            value: "2",
-          },
-        ]}
+        options={options}
         placeholder="Selecione um Arquivo"
-        defaultValue={{
-          label: "Selecione um arquivo",
-          value: "none-archive-participant",
-        }}
-        {...register("file")}
-        error={errors.file?.message}
+        {...register("documentSideId")}
+        error={errors.documentSideId?.message}
       />
     </form>
   );

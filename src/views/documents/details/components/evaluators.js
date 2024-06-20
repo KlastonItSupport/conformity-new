@@ -11,7 +11,6 @@ import { ModalForm } from "components/components";
 import { AddEvaluatorForm } from "components/components";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
-import { sleep } from "helpers/sleep";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -21,10 +20,15 @@ import {
   getEvaluators,
 } from "../helpers/evaluators-helper";
 import { columns } from "../helpers/evaluators-helper";
+import { useLocation } from "react-router-dom";
 
-const Evaluators = ({ documentId }) => {
+const Evaluators = () => {
   const { t } = useTranslation();
   const formRef = useRef(null);
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const documentId = queryParams.get("id");
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isMultipleLoading, setIsMultipleLoading] = useState(false);
@@ -69,11 +73,9 @@ const Evaluators = ({ documentId }) => {
   };
 
   useEffect(() => {
-    if (evaluators.length === 0) {
-      getEvaluators(setEvaluators, documentId);
-    }
+    getEvaluators(setEvaluators, documentId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [documentId]);
 
   return (
     <VStack

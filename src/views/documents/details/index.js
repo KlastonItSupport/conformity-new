@@ -24,8 +24,9 @@ import { useLocation } from "react-router-dom";
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
   const { getDocumentDetails } = useContext(DetailsDocumentsContext);
+  const queryParams = new URLSearchParams(location.search);
+  const documentId = queryParams.get("id");
 
   const routeTreePaths = [
     {
@@ -60,13 +61,11 @@ const DocumentsDetailsPage = () => {
   );
 
   useEffect(() => {
-    const documentId = queryParams.get("id");
-
     if (documentId) {
       getDocumentDetails(documentId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [documentId]);
   return (
     <>
       <NavBar />
@@ -82,8 +81,8 @@ const DocumentsDetailsPage = () => {
                 }
               />
               <Revisions />
-              <Evaluators documentId={queryParams.get("id")} />
-              <RelatedDocuments />
+              <Evaluators documentId={documentId} />
+              <RelatedDocuments documentId={documentId} />
               <DepartamentPermissions />
             </Container>
           </VStack>
@@ -97,8 +96,8 @@ const DocumentsDetailsPage = () => {
                 }
               />
               <Revisions />
-              <Evaluators documentId={queryParams.get("id")} />
-              <RelatedDocuments />
+              <Evaluators documentId={documentId} />
+              <RelatedDocuments documentId={documentId} />
               <DepartamentPermissions />
               <Container padding={"0 0 30px 0"}></Container>
             </Box>

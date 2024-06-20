@@ -16,7 +16,8 @@ const NavigationLinks = ({ routeTree, padding }) => {
         return (
           <Link
             color={route?.isCurrent ? "secondaryGray.600" : "primary.100"}
-            href={route.path}
+            _hover={{ cursor: route?.isCurrent ? "default" : "pointer" }}
+            href={route?.isCurrent ? null : route.path}
             key={index + route.path}
           >
             <span>{isNotLast && "/ "}</span>
