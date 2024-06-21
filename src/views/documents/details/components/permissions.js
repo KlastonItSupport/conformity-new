@@ -8,15 +8,23 @@ import {
 import { Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
-import { sleep } from "helpers/sleep";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import {
+  columns,
+  removeDepartamentsPermissions,
+  removeMultipleDepartamentsPermissions,
+} from "../helpers/departament-permissions-helper";
 
-const Permissions = () => {
+const Permissions = ({
+  departamentsPermissions,
+  setDepartamentsPermissions,
+}) => {
   const { t } = useTranslation();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [selecteds, setSelecteds] = useState([]);
+  const [deleteItem, setDeleteItem] = useState(null);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -24,23 +32,28 @@ const Permissions = () => {
     onClose: onDeleteModalClose,
   } = useDisclosure();
 
-  const onDeleteClick = (item) => {
-    onDeleteModalOpen();
-  };
-
   const {
-    formState: { errors },
-  } = useForm({});
+    isOpen: isDeleteMultipleModalOpen,
+    onOpen: onDeleteMultipleModalOpen,
+    onClose: onDeleteMultipleModalClose,
+  } = useDisclosure();
 
   const [tableIcons, setTableIcons] = useState([
     {
       icon: <Trash size={20} />,
-      onClickRow: (e) => onDeleteClick(e),
-      onClickHeader: (selecteds) => {},
+      onClickRow: (e) => onDeleteClick(e.id),
+      onClickHeader: (selecteds) => {
+        setSelecteds(selecteds);
+        onDeleteMultipleModalOpen();
+      },
       isDisabled: false,
       shouldShow: true,
     },
   ]);
+  const onDeleteClick = async (item) => {
+    onDeleteModalOpen();
+    setDeleteItem(item);
+  };
 
   return (
     <VStack
@@ -62,26 +75,25 @@ const Permissions = () => {
       </HStack>
       <Container w={"100%"} maxW={"null"} p={"0px"}>
         <CustomTable
-          data={[
-            {
-              departamentName: "Tecnologia",
-              docId: "Autorizado",
-            },
-          ]}
+          data={departamentsPermissions}
           deskWidth={"100%"}
-          columns={[
-            { header: t("Departamento"), access: "departamentName" },
-            { header: t("Autorizado"), access: "authorized" },
-          ]}
+          columns={columns}
           title={t("Permissões")}
           actionButtons={[<Trash size={20} cursor={"pointer"} color="black" />]}
           icons={tableIcons}
           onChangeSearchInput={(e) => {}}
           searchInputValue={() => {}}
-          onCheckItems={(show) => {}}
           paddingOnTitle={false}
           showSearchInput={false}
           hasMinHg={false}
+          onCheckItems={(show) => {
+            setTableIcons(
+              tableIcons.map((icon) => {
+                icon.isDisabled = show;
+                return icon;
+              })
+            );
+          }}
         />
       </Container>
       <DeleteModal
@@ -91,9 +103,30 @@ const Permissions = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await sleep(1500);
+          await removeDepartamentsPermissions(
+            deleteItem,
+            departamentsPermissions,
+            setDepartamentsPermissions
+          );
           setIsDeleteLoading(false);
           onDeleteModalClose();
+        }}
+        isLoading={isDeleteLoading}
+      />
+      <DeleteModal
+        title={t("Excluir Permissoes")}
+        subtitle={t("Tem certeza de que deseja excluir estas permissoes?")}
+        isOpen={isDeleteMultipleModalOpen}
+        onClose={onDeleteMultipleModalClose}
+        onConfirm={async () => {
+          setIsDeleteLoading(true);
+          await removeMultipleDepartamentsPermissions(
+            selecteds,
+            departamentsPermissions,
+            setDepartamentsPermissions
+          );
+          setIsDeleteLoading(false);
+          onDeleteMultipleModalClose();
         }}
         isLoading={isDeleteLoading}
       />

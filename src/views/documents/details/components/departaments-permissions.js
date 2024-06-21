@@ -1,25 +1,62 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import { SelectDropDown } from "components/select-drop-down";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import Permissions from "./permissions";
+import { yupResolver } from "@hookform/resolvers/yup";
 
-const DepartamentPermissions = () => {
+import * as Yup from "yup";
+import {
+  addDepartamentsPermissions,
+  getDepartamentPermissions,
+} from "../helpers/departament-permissions-helper";
+import { DepartamentContext } from "providers/departament";
+
+const schema = Yup.object().shape({
+  departaments: Yup.array(),
+});
+
+const DepartamentPermissions = ({ documentId }) => {
   const { t } = useTranslation();
-  const { control } = useForm({});
+  const [departaments, setDepartaments] = useState([]);
+  const [departamentsPermissions, setDepartamentsPermissions] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { getDepartaments } = useContext(DepartamentContext);
 
-  const options = [
-    {
-      value: "it",
-      label: "IT Departament",
-    },
-    {
-      value: "dp",
-      label: "Departamento Pessoal",
-    },
-  ];
+  const { handleSubmit, control, reset } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    await addDepartamentsPermissions(
+      documentId,
+      data.departaments,
+      departamentsPermissions,
+      setDepartamentsPermissions
+    );
+
+    reset({ departaments: [] });
+    setIsLoading(false);
+  };
+
+  const onInit = async () => {
+    const departaments = await getDepartaments();
+    await getDepartamentPermissions(documentId, setDepartamentsPermissions);
+
+    const formattedDepartaments = departaments.map((departament) => ({
+      label: departament.name,
+      value: departament.id,
+    }));
+
+    setDepartaments(formattedDepartaments);
+  };
+  useEffect(() => {
+    onInit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <VStack
@@ -29,6 +66,8 @@ const DepartamentPermissions = () => {
       border={"1px solid #ddd"}
       alignItems={"start"}
       mt={"20px"}
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
     >
       <HStack
         justifyContent={"space-between"}
@@ -52,6 +91,7 @@ const DepartamentPermissions = () => {
           width="100px"
           padding={"5px"}
           h="40px"
+          isLoading={isLoading}
         />
       </HStack>
       <Text
@@ -62,16 +102,19 @@ const DepartamentPermissions = () => {
       >
         Departamentos com Permissões
       </Text>
-      <SelectDropDown
-        options={options}
-        label={t("Liberar departamento")}
-        defaultValue={{ label: "Padrão", value: "default" }}
-        // error={errors.users}
-        control={control}
-        name={"users"}
-        placeholder={t("Clique ou digite para adicionar o usuário")}
+      {departaments.length > 0 && (
+        <SelectDropDown
+          options={departaments}
+          label={t("Liberar departamento")}
+          control={control}
+          name={"departaments"}
+          placeholder={t("Clique ou digite para adicionar o usuário")}
+        />
+      )}
+      <Permissions
+        departamentsPermissions={departamentsPermissions}
+        setDepartamentsPermissions={setDepartamentsPermissions}
       />
-      <Permissions />
     </VStack>
   );
 };

@@ -83,7 +83,7 @@ const DocumentsDetailsPage = () => {
               <Revisions />
               <Evaluators documentId={documentId} />
               <RelatedDocuments documentId={documentId} />
-              <DepartamentPermissions />
+              <DepartamentPermissions documentId={documentId} />
             </Container>
           </VStack>
         ) : (
@@ -98,7 +98,7 @@ const DocumentsDetailsPage = () => {
               <Revisions />
               <Evaluators documentId={documentId} />
               <RelatedDocuments documentId={documentId} />
-              <DepartamentPermissions />
+              <DepartamentPermissions documentId={documentId} />
               <Container padding={"0 0 30px 0"}></Container>
             </Box>
           </HStack>
