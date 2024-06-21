@@ -11,11 +11,12 @@ import { BellRinging, Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
 import { ExtrasDocuments } from "components/components";
 import { DeleteModal } from "components/components";
+import moment from "moment";
 import { DetailsDocumentsContext } from "providers/details-documents";
 import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentsDetails = () => {
+const DocumentsDetails = ({ document }) => {
   const { t } = useTranslation();
   const formRef = useRef(null);
   const { additionalDocuments, deleteAdditionalDocument } = useContext(
@@ -120,29 +121,49 @@ const DocumentsDetails = () => {
           Adicionar
         </Text>
       </HStack>
-      <Container m={"0px"} p={"0"} border={"1px solid #ddd"}>
-        {additionalDocuments.map((document, index) =>
-          docInfo(document.name, index !== 0, document.link, document.id)
+      <Container
+        m={"0px"}
+        p={"0"}
+        border={additionalDocuments.length > 0 ? "1px solid #ddd" : null}
+      >
+        {additionalDocuments.length > 0 ? (
+          additionalDocuments.map((document, index) =>
+            docInfo(document.name, index !== 0, document.link, document.id)
+          )
+        ) : (
+          <Text>Ainda não há documentos adicionados</Text>
         )}
       </Container>
     </>
   );
 
+  const defaultDataFormatter = (value) => {
+    return moment(value).format("DD/MM/YYYY");
+  };
   const info = (
     <>
       <Text fontSize="20px" fontWeight={"500"} color={"header.100"}>
         Informações:
       </Text>
       <Container m={"0px"} p={"0"} border={"1px solid #ddd"}>
-        {infoItem("Autor:", "Gustavo", false)}
-        {infoItem("Categoria:", "PROCEDIMENTOS")}
-        {infoItem("DEPARTAMENTO:", "QUALIDADE")}
-        {infoItem("DATA DE INCLUSÃO (Sistema):", "22/11/2023")}
-        {infoItem("DATA DE REVISÃO (Documento):", "23/11/2023")}
+        {infoItem("Autor:", document.owner, false)}
+        {infoItem("Categoria:", document?.categoryName)}
+        {infoItem("DEPARTAMENTO:", document?.departamentName)}
+        {infoItem(
+          "DATA DE INCLUSÃO (Sistema):",
+          defaultDataFormatter(document?.inclusionDate)
+        )}
+        {infoItem(
+          "DATA DE REVISÃO (Documento):",
+          defaultDataFormatter(document?.revisionDate)
+        )}
         {infoItem("DATA DE CRIAÇÃO (Documento):", "23/11/2023")}
-        {infoItem("VALIDADE:", "23/11/2023")}
+        {infoItem(
+          "VALIDADE:",
+          `${document?.validity} ${document?.validity > 1 ? "Meses" : "Mês"}`
+        )}
         {infoItem("DATA DE ENVIO:", "23/11/2023")}
-        {infoItem("EMPRESA:", "23/11/2023")}
+        {infoItem("EMPRESA:", document?.companyName)}
       </Container>
     </>
   );

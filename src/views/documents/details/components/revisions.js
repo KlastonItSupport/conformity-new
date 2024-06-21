@@ -31,6 +31,7 @@ const Revisions = () => {
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isAddLoading, setIsAddLoading] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [edit, setEdit] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -210,6 +211,7 @@ const Revisions = () => {
               editRevision(data, edit, revisions, setRevisions)
             }
             defaultValues={edit}
+            setLoading={setIsEditLoading}
           />
         }
         formRef={formRef}
@@ -232,6 +234,7 @@ const Revisions = () => {
             submitFunc={(data) =>
               addRevision(data, user.id, documentId, revisions, setRevisions)
             }
+            setLoading={setIsAddLoading}
           />
         }
         formRef={formRefAdd}
@@ -239,6 +242,7 @@ const Revisions = () => {
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="xl"
+        isLoading={isAddLoading}
       />
     </>
   );

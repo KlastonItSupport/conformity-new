@@ -2,14 +2,14 @@
 import React, { forwardRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import "./style.css";
-const TextEditor = forwardRef(({ value, onChange, ref }) => {
+const TextEditor = forwardRef(({ value, onChange, menubar = true, ref }) => {
   const handleEditorChange = (content) => {
     onChange(content);
   };
 
   const editorConfig = {
     height: 300,
-    menubar: true,
+    menubar: menubar,
     language: "pt_BR",
     branding: false,
     plugins: [

@@ -2,13 +2,16 @@ import { HStack, Text, VStack, useDisclosure } from "@chakra-ui/react";
 import { NotePencil } from "@phosphor-icons/react";
 import { DocumentDescriptionForm } from "components/components";
 import { ModalForm } from "components/components";
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import HtmlParser from "react-html-parser";
+import { DetailsDocumentsContext } from "providers/details-documents";
 
-const Description = ({ description }) => {
+const Description = () => {
   const formRef = useRef(null);
   const { t } = useTranslation();
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const { description } = useContext(DetailsDocumentsContext);
 
   const {
     isOpen: isEditModalOpen,
@@ -31,7 +34,7 @@ const Description = ({ description }) => {
         </Text>
         <NotePencil cursor={"pointer"} size={20} onClick={onEditModalOpen} />
       </HStack>
-      <Text>{description}</Text>
+      <Text>{HtmlParser(description)}</Text>
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}

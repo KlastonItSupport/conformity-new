@@ -7,6 +7,7 @@ import { FormInput } from "components/components";
 import { CalendarCustom } from "components/calendar";
 import { Box } from "@chakra-ui/react";
 import moment from "moment";
+import { sleep } from "helpers/sleep";
 
 const RevisionsForm = ({
   onClose,
@@ -14,6 +15,7 @@ const RevisionsForm = ({
   event = "edit",
   submitFunc,
   defaultValues,
+  setLoading,
 }) => {
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
 
@@ -27,12 +29,19 @@ const RevisionsForm = ({
   });
 
   const onSubmit = async (data) => {
+    setLoading(true);
+    await sleep(250);
+
     if (event === "add") {
       submitFunc(data);
+
+      setLoading(false);
       onClose();
       return;
     }
-    submitFunc(data);
+
+    setLoading(false);
+    await submitFunc(data);
     onClose();
   };
 

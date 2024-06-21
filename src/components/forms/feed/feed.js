@@ -3,6 +3,7 @@ import { FormTextArea } from "components/components";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { feedSchema } from "./schema";
+import { sleep } from "helpers/sleep";
 
 const FeedDescriptionForm = ({
   formRef,
@@ -21,6 +22,7 @@ const FeedDescriptionForm = ({
 
   const onSubmit = async (data) => {
     setIsLoading(true);
+    await sleep(250);
     await handleEdit(data);
     setIsLoading(false);
     onClose();

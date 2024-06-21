@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { NavBar } from "components/navbar";
 import NavigationLinks from "components/navigationLinks";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
   DepartamentPermissions,
@@ -20,12 +20,17 @@ import {
 import Feed from "components/feed";
 import { DetailsDocumentsContext } from "providers/details-documents";
 import { useLocation } from "react-router-dom";
+import { AuthContext } from "providers/auth";
 
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { getDocumentDetails } = useContext(DetailsDocumentsContext);
+  const { getDocumentDetails, documentsDetails } = useContext(
+    DetailsDocumentsContext
+  );
+  const { getUserAccessRule } = useContext(AuthContext);
   const queryParams = new URLSearchParams(location.search);
+  const showFeed = useRef(null);
   const documentId = queryParams.get("id");
 
   const routeTreePaths = [
@@ -47,25 +52,36 @@ const DocumentsDetailsPage = () => {
 
   const leftContainer = (
     <Container
-      w={isMobile ? "100%" : "100%"}
+      w={isMobile ? "100%" : "32%"}
       h={"100%"}
       m={"0"}
       mr={isMobile ? null : "20px"}
       p={isMobile ? "0px" : 0}
       maxW={"95%"}
     >
-      <DocumentsDetails />
+      {documentsDetails && documentsDetails.document && (
+        <DocumentsDetails document={documentsDetails.document} />
+      )}
       <Container padding={"0 0 30px 0"}></Container>
-      <Feed moduleId={1} externalId={queryParams.get("id")} />
+      {showFeed.current && (
+        <Feed moduleId={1} externalId={queryParams.get("id")} />
+      )}
     </Container>
   );
 
   useEffect(() => {
     if (documentId) {
       getDocumentDetails(documentId);
+      getUserAccessRule().then((rules) => {
+        showFeed.current = rules.isAdmin || rules.isSuperUser;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);
+
+  useEffect(() => {
+    console.log(documentsDetails);
+  }, [documentsDetails]);
   return (
     <>
       <NavBar />
@@ -75,11 +91,7 @@ const DocumentsDetailsPage = () => {
           <VStack w={"100%"} h={"100%"} paddingX={"10px"}>
             {leftContainer}
             <Container h={"100%"} p={0} m={"0"} maxW={"none"}>
-              <Description
-                description={
-                  "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
-                }
-              />
+              {documentsDetails && documentsDetails.document && <Description />}
               <Revisions />
               <Evaluators documentId={documentId} />
               <RelatedDocuments documentId={documentId} />
@@ -90,11 +102,7 @@ const DocumentsDetailsPage = () => {
           <HStack w={"95vw"} h={"100%"} alignItems={"start"}>
             {leftContainer}
             <Box h={"100%"} overflow={"auto"}>
-              <Description
-                description={
-                  "is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
-                }
-              />
+              {documentsDetails && documentsDetails.document && <Description />}
               <Revisions />
               <Evaluators documentId={documentId} />
               <RelatedDocuments documentId={documentId} />

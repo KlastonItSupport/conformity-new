@@ -9,6 +9,7 @@ const DetailsDocumentsProvider = ({ children }) => {
   const { getToken } = useContext(AuthContext);
   const [documentsDetails, setDocumentsDetails] = useState();
   const [additionalDocuments, setAdditionalDocuments] = useState([]);
+  const [description, setDescription] = useState("");
   //   const location = useLocation();
 
   const getDocumentDetails = async (id) => {
@@ -19,6 +20,7 @@ const DetailsDocumentsProvider = ({ children }) => {
       if (response.status === 200) {
         setDocumentsDetails(response.data);
         setAdditionalDocuments(response.data.additionalDocuments);
+        setDescription(response.data.document.description);
         return response.data;
       }
     } catch (error) {}
@@ -60,6 +62,8 @@ const DetailsDocumentsProvider = ({ children }) => {
         additionalDocuments,
         deleteAdditionalDocument,
         createAdditionalDocument,
+        description,
+        setDescription,
       }}
     >
       {children}
