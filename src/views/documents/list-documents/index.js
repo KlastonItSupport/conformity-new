@@ -92,7 +92,6 @@ const ListDocumentsPage = () => {
       icon: <NotePencil size={20} />,
       onClickRow: (item) => {
         setEditSelected(item);
-        console.log("item", item);
         onEditModalOpen();
       },
       onClickHeader: () => {},
@@ -117,7 +116,6 @@ const ListDocumentsPage = () => {
       departamentId: queryParams.get("departamentId"),
       category: queryParams.get("category"),
     });
-    console.log("documents", documents);
 
     setDocuments(documents.items);
   };

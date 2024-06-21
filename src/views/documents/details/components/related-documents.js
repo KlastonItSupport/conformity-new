@@ -85,13 +85,7 @@ const RelatedDocuments = ({ documentId }) => {
     getCompanyDocuments(setCompanyDocuments, documentId, getToken());
   }, []);
 
-  useEffect(() => {
-    console.log("relatedDocuments", relatedDocuments);
-  }, [relatedDocuments]);
 
-  useEffect(() => {
-    console.log("selecteds", selecteds);
-  }, [selecteds]);
 
   return (
     <VStack
