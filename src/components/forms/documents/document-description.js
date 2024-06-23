@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { documentDescriptionSchema } from "./schemas/description.schema";
 import TextEditor from "components/text-editor-mce";
@@ -9,7 +9,12 @@ import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
 import { DetailsDocumentsContext } from "providers/details-documents";
 
-const DocumentDescriptionForm = ({ formRef, onClose, initialDescription }) => {
+const DocumentDescriptionForm = ({
+  formRef,
+  onClose,
+  initialDescription,
+  setIsLoading,
+}) => {
   const { handleSubmit } = useForm({
     resolver: yupResolver(documentDescriptionSchema),
   });
@@ -19,6 +24,8 @@ const DocumentDescriptionForm = ({ formRef, onClose, initialDescription }) => {
   const richTextRef = useRef(null);
   const { getToken } = useContext(AuthContext);
   const { description, setDescription } = useContext(DetailsDocumentsContext);
+  const [provisionalDescription, setProvisionalDescription] =
+    useState(description);
 
   const editDescription = async (description) => {
     try {
@@ -39,13 +46,18 @@ const DocumentDescriptionForm = ({ formRef, onClose, initialDescription }) => {
   };
 
   const onSubmit = async (data) => {
-    editDescription(description);
+    setIsLoading(true);
+
+    await editDescription(provisionalDescription);
+    setDescription(provisionalDescription);
+
+    setIsLoading(false);
     onClose();
   };
 
   useEffect(() => {
     if (initialDescription) {
-      setDescription(initialDescription);
+      setProvisionalDescription(initialDescription);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -57,8 +69,8 @@ const DocumentDescriptionForm = ({ formRef, onClose, initialDescription }) => {
       ref={formRef}
     >
       <TextEditor
-        value={description}
-        onChange={setDescription}
+        value={provisionalDescription}
+        onChange={setProvisionalDescription}
         ref={richTextRef}
         menubar={false}
       />

@@ -43,6 +43,7 @@ const Description = () => {
           <DocumentDescriptionForm
             formRef={formRef}
             onClose={onEditModalClose}
+            setIsLoading={setIsEditLoading}
           />
         }
         formRef={formRef}
