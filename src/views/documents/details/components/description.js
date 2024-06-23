@@ -51,7 +51,7 @@ const Description = () => {
         description={t("Tem certeza de que deseja Editar esta Descrição?")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
-        modalSize="xl"
+        modalSize="5xl"
         isLoading={isEditLoading}
       />
     </VStack>
