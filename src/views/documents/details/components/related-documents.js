@@ -67,8 +67,12 @@ const RelatedDocuments = ({ documentId }) => {
     },
     {
       icon: <MagnifyingGlass size={20} />,
-      onClickRow: (item) =>
-        window.open(`/documents/details?id=${item.id}`, "_blank"),
+      onClickRow: (item) => {
+        window.open(
+          `/documents/details?id=${item.relatedDocumentId}`,
+          "_blank"
+        );
+      },
       onClickHeader: (selecteds) => {},
       isDisabled: false,
       shouldShow: false,
@@ -84,8 +88,6 @@ const RelatedDocuments = ({ documentId }) => {
     getRelatedDocuments(setRelatedDocuments, documentId);
     getCompanyDocuments(setCompanyDocuments, documentId, getToken());
   }, []);
-
-
 
   return (
     <VStack
