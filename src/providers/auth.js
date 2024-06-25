@@ -1,5 +1,5 @@
 import { api } from "api/api";
-import { createContext, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import moment from "moment";
 
 import { toast } from "react-toastify";
@@ -13,6 +13,7 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(getUserInfo());
   const [permissions, setPermissions] = useState();
   const userAccessRule = useRef();
+  const [userPermissions, setUserPermissions] = useState();
 
   const signIn = async (data, history) => {
     try {
@@ -101,6 +102,7 @@ const AuthProvider = ({ children }) => {
       `/permissions/get-user-permissions/${user.id}`
     );
 
+    setUserPermissions(response.data);
     return response.data;
   };
 
@@ -134,6 +136,8 @@ const AuthProvider = ({ children }) => {
         setPermissions,
         getUserAccessRule,
         userAccessRule,
+        userPermissions,
+        setUserPermissions,
       }}
     >
       {children}

@@ -22,6 +22,7 @@ import { DocumentContext } from "providers/document";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
+import { AuthContext } from "providers/auth";
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
@@ -44,6 +45,8 @@ const ListDocumentsPage = () => {
     setEditSelected,
     pagination,
   } = useContext(DocumentContext);
+  const { getUserPermission, userPermissions } = useContext(AuthContext);
+
   const formRef = useRef(null);
 
   const routeTreePaths = [
@@ -70,42 +73,77 @@ const ListDocumentsPage = () => {
     onClose: onEditModalClose,
   } = useDisclosure();
 
-  const [tableIcons, setTableIcons] = useState([
-    {
-      icon: <MagnifyingGlass size={20} />,
-      onClickRow: (item) => history(`/documents/details?id=${item.id}`),
-      onClickHeader: () => {},
-      isDisabled: false,
-      shouldShow: false,
-    },
-    {
-      icon: <Trash size={20} />,
-      onClickRow: (item) => {
-        setDeleteId(item.id);
-        onDeleteModalOpen();
-      },
-      onClickHeader: () => {},
-      isDisabled: false,
-      shouldShow: true,
-    },
-    {
-      icon: <NotePencil size={20} />,
-      onClickRow: (item) => {
-        setEditSelected(item);
-        onEditModalOpen();
-      },
-      onClickHeader: () => {},
-      isDisabled: false,
-      shouldShow: false,
-    },
-    {
-      icon: <ClockCounterClockwise size={20} />,
-      onClickRow: (item) => {},
-      onClickHeader: () => {},
-      isDisabled: false,
-      shouldShow: false,
-    },
-  ]);
+  useEffect(() => {
+    getDocuments(
+      searchParams.get("page") ?? 1,
+      searchParams.get("search") ?? "",
+      handlingSearchParams()
+    ).then((data) => setDocuments(data.items));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const updateIcons = () => {
+      const deleteIcon = userPermissions?.documents?.canDelete
+        ? {
+            icon: <Trash size={20} />,
+            onClickRow: (item) => {
+              setDeleteId(item.id);
+              onDeleteModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: true,
+          }
+        : null;
+
+      const searchIcon = userPermissions?.documents?.canRead
+        ? {
+            icon: <MagnifyingGlass size={20} />,
+            onClickRow: (item) => history(`/documents/details?id=${item.id}`),
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            notShow: true,
+          }
+        : null;
+
+      const editIcon = userPermissions?.documents?.canEdit
+        ? {
+            icon: <NotePencil size={20} />,
+            onClickRow: (item) => {
+              setEditSelected(item);
+              onEditModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+          }
+        : null;
+
+      const remindersIcon = userPermissions?.documents?.canRead
+        ? {
+            icon: <ClockCounterClockwise size={20} />,
+            onClickRow: (item) => {},
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+          }
+        : null;
+
+      const icons = [searchIcon, deleteIcon, editIcon, remindersIcon].filter(
+        (icon) => icon !== null
+      );
+
+      setTableIcons(icons);
+    };
+
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPermissions]); // Atualiza os ícones quando userPermissions muda
+
+  const [tableIcons, setTableIcons] = useState([]);
 
   const updateData = async (page) => {
     searchParams.set("page", page);
@@ -150,20 +188,13 @@ const ListDocumentsPage = () => {
 
     return params;
   };
-  useEffect(() => {
-    getDocuments(
-      searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      handlingSearchParams()
-    ).then((data) => setDocuments(data.items));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
   return (
     <>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <ActionsButtons />
+        <ActionsButtons canAdd={userPermissions?.documents?.canAdd} />
         <Filters />
         <CustomTable
           data={documents}
@@ -207,10 +238,12 @@ const ListDocumentsPage = () => {
         onConfirm={async () => {
           setIsDeleteLoading(true);
 
-          await deleteDocument(deleteId);
-          setDocuments(
-            documents.filter((document) => document.id !== deleteId)
-          );
+          const response = await deleteDocument(deleteId);
+          if (response) {
+            setDocuments(
+              documents.filter((document) => document.id !== deleteId)
+            );
+          }
 
           setIsDeleteLoading(false);
           onDeleteModalClose();

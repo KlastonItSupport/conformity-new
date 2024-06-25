@@ -6,7 +6,7 @@ import { useBreakpoint } from "hooks/usebreakpoint";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const ActionsButtons = () => {
+const ActionsButtons = ({ canAdd }) => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const formRef = useRef(null);
@@ -18,7 +18,7 @@ const ActionsButtons = () => {
     onClose: onAddModalClose,
   } = useDisclosure();
 
-  const addButton = (
+  const addButton = canAdd && (
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"

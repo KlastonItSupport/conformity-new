@@ -74,6 +74,7 @@ const DocumentProvider = ({ children }) => {
       }
     } catch (error) {
       toast.error("Erro ao excluir documento");
+      return false;
     }
   };
 

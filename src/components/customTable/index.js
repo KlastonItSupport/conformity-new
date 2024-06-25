@@ -237,15 +237,18 @@ const TableCustom = ({
             })}
             <Td border={"1px solid #ddd"}>
               <Box display={"flex"}>
-                {icons.map((icon, index) => (
-                  <Box
-                    cursor={"pointer"}
-                    key={index + "x"}
-                    onClick={() => icon.onClickRow(item)}
-                  >
-                    {icon.icon}
-                  </Box>
-                ))}
+                {icons.map(
+                  (icon, index) =>
+                    icon && (
+                      <Box
+                        cursor={"pointer"}
+                        key={index + "x"}
+                        onClick={() => icon.onClickRow(item)}
+                      >
+                        {icon.icon}
+                      </Box>
+                    )
+                )}
               </Box>
             </Td>
           </Tr>
@@ -336,28 +339,36 @@ const TableCustom = ({
 
               <Th border={"1px solid #ddd"}>
                 <Box display={"flex"}>
-                  {icons.map((icon, index) => (
-                    <Box
-                      key={index + "actionbuttons"}
-                      onClick={() =>
-                        shouldShowHeaderIcon(icon)
-                          ? icon.onClickHeader(
-                              selecteds.filter((selected) => selected.checked)
-                            )
-                          : () => {}
-                      }
-                      cursor={
-                        shouldShowHeaderIcon(icon) ? "pointer" : "not-allowed"
-                      }
-                      color={
-                        shouldShowHeaderIcon(icon)
-                          ? "black"
-                          : "secondaryGray.500"
-                      }
-                    >
-                      {icon.icon}
-                    </Box>
-                  ))}
+                  {icons.map(
+                    (icon, index) =>
+                      icon &&
+                      icon.icon && (
+                        <Box
+                          key={index + "actionbuttons"}
+                          onClick={() =>
+                            shouldShowHeaderIcon(icon)
+                              ? icon.onClickHeader(
+                                  selecteds.filter(
+                                    (selected) => selected.checked
+                                  )
+                                )
+                              : () => {}
+                          }
+                          cursor={
+                            shouldShowHeaderIcon(icon)
+                              ? "pointer"
+                              : "not-allowed"
+                          }
+                          color={
+                            shouldShowHeaderIcon(icon)
+                              ? "black"
+                              : "secondaryGray.500"
+                          }
+                        >
+                          {icon.icon}
+                        </Box>
+                      )
+                  )}
                 </Box>
               </Th>
             </Tr>
