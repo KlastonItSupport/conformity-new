@@ -118,6 +118,9 @@ const TableCustom = ({
           (newDirection === "asc" ? 1 : -1)
         );
       }
+      if (typeof a[column] === "number" && typeof b[column] === "number") {
+        return (a[column] - b[column]) * (newDirection === "asc" ? 1 : -1);
+      }
 
       if (columns[index].sortFunc) {
         return columns[index].sortFunc(
