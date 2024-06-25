@@ -34,7 +34,12 @@ const RelatedDocuments = ({ documentId }) => {
 
   const [companyDocuments, setCompanyDocuments] = useState([]);
   const [relatedDocuments, setRelatedDocuments] = useState([]);
-  const { getToken } = useContext(AuthContext);
+  const {
+    getToken,
+    checkPermissionForAction,
+    userPermissions,
+    userAccessRule,
+  } = useContext(AuthContext);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -89,6 +94,44 @@ const RelatedDocuments = ({ documentId }) => {
     getCompanyDocuments(setCompanyDocuments, documentId, getToken());
   }, []);
 
+  useEffect(() => {
+    const updateIcons = () => {
+      const icons = [
+        checkPermissionForAction("documents", "canDelete")
+          ? {
+              icon: <Trash size={20} />,
+              onClickRow: (e) => onDeleteClick(e),
+              onClickHeader: (selecteds) => {
+                setSelecteds(selecteds);
+                onDeleteMultipleModalOpen();
+              },
+              isDisabled: false,
+              shouldShow: true,
+            }
+          : null,
+
+        checkPermissionForAction("documents", "canRead")
+          ? {
+              icon: <MagnifyingGlass size={20} />,
+              onClickRow: (item) => {
+                window.open(
+                  `/documents/details?id=${item.relatedDocumentId}`,
+                  "_blank"
+                );
+              },
+              onClickHeader: (selecteds) => {},
+              isDisabled: false,
+              shouldShow: false,
+            }
+          : null,
+      ].filter((icon) => icon !== null);
+
+      setTableIcons(icons);
+    };
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userAccessRule, userPermissions]);
+
   return (
     <VStack
       bgColor={"#FFFFFF"}
@@ -121,6 +164,7 @@ const RelatedDocuments = ({ documentId }) => {
           width="100px"
           padding={"5px"}
           h="40px"
+          disabled={!checkPermissionForAction("documents", "canAdd")}
         />
       </HStack>
       <Container w={"100%"} maxW={"null"} p={"0px"}>

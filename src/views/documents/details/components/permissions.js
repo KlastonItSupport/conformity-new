@@ -8,7 +8,7 @@ import {
 import { Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   columns,
@@ -19,6 +19,7 @@ import {
 const Permissions = ({
   departamentsPermissions,
   setDepartamentsPermissions,
+  canDelete,
 }) => {
   const { t } = useTranslation();
 
@@ -55,6 +56,28 @@ const Permissions = ({
     setDeleteItem(item);
   };
 
+  useEffect(() => {
+    const updateIcons = () => {
+      const icons = [
+        canDelete
+          ? {
+              icon: <Trash size={20} />,
+              onClickRow: (e) => onDeleteClick(e.id),
+              onClickHeader: (selecteds) => {
+                setSelecteds(selecteds);
+                onDeleteMultipleModalOpen();
+              },
+              isDisabled: false,
+              shouldShow: true,
+            }
+          : null,
+      ].filter((icon) => icon !== null);
+
+      setTableIcons(icons);
+    };
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canDelete]);
   return (
     <VStack
       bgColor={"#FFFFFF"}

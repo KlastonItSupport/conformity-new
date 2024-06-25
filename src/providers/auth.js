@@ -128,7 +128,7 @@ const AuthProvider = ({ children }) => {
     }
 
     if (userPermissions) {
-      const permission = userPermissions[module];
+      const permission = userPermissions[module][action];
       return permission;
     }
     return false;

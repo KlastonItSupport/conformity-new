@@ -13,6 +13,7 @@ import {
   getDepartamentPermissions,
 } from "../helpers/departament-permissions-helper";
 import { DepartamentContext } from "providers/departament";
+import { AuthContext } from "providers/auth";
 
 const schema = Yup.object().shape({
   departaments: Yup.array(),
@@ -24,6 +25,7 @@ const DepartamentPermissions = ({ documentId }) => {
   const [departamentsPermissions, setDepartamentsPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { getDepartaments } = useContext(DepartamentContext);
+  const { checkPermissionForAction } = useContext(AuthContext);
 
   const { handleSubmit, control, reset } = useForm({
     resolver: yupResolver(schema),
@@ -92,13 +94,13 @@ const DepartamentPermissions = ({ documentId }) => {
           padding={"5px"}
           h="40px"
           isLoading={isLoading}
+          disabled={!checkPermissionForAction("documents", "canAdd")}
         />
       </HStack>
       <Text
         fontSize={{ lg: "24px", md: "32px", sm: "24px" }}
         color={"navy.700"}
         fontWeight={"bold"}
-        // paddingBottom={isMobile ? "10px" : "0"}
       >
         Departamentos com Permissões
       </Text>
@@ -114,6 +116,7 @@ const DepartamentPermissions = ({ documentId }) => {
       <Permissions
         departamentsPermissions={departamentsPermissions}
         setDepartamentsPermissions={setDepartamentsPermissions}
+        canDelete={checkPermissionForAction("documents", "canDelete")}
       />
     </VStack>
   );

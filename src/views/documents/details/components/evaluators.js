@@ -11,7 +11,7 @@ import { ModalForm } from "components/components";
 import { AddEvaluatorForm } from "components/components";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   createEvaluator,
@@ -21,6 +21,7 @@ import {
 } from "../helpers/evaluators-helper";
 import { columns } from "../helpers/evaluators-helper";
 import { useLocation } from "react-router-dom";
+import { AuthContext } from "providers/auth";
 
 const Evaluators = () => {
   const { t } = useTranslation();
@@ -35,6 +36,9 @@ const Evaluators = () => {
   const [evaluators, setEvaluators] = useState([]);
   const [deleteId, setDeleteId] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
+
+  const { checkPermissionForAction, userPermissions, userAccessRule } =
+    useContext(AuthContext);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -77,6 +81,29 @@ const Evaluators = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);
 
+  useEffect(() => {
+    const updateIcons = () => {
+      const icons = [
+        checkPermissionForAction("documents", "canDelete")
+          ? {
+              icon: <Trash size={20} />,
+              onClickRow: (e) => onDeleteClick(e),
+              onClickHeader: (selecteds) => {
+                setSelectedItems(selecteds);
+                onDeleteMultipleModalOpen();
+              },
+              isDisabled: false,
+              shouldShow: true,
+            }
+          : null,
+      ].filter((icon) => icon !== null);
+
+      setTableIcons(icons);
+    };
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPermissions, userAccessRule]);
+
   return (
     <VStack
       bgColor={"#FFFFFF"}
@@ -109,6 +136,7 @@ const Evaluators = () => {
             width="100px"
             padding={"5px"}
             h="40px"
+            disabled={!checkPermissionForAction("documents", "canAdd")}
           />
           <ButtonPrimary
             fontSize="sm"
@@ -125,6 +153,7 @@ const Evaluators = () => {
             width="140px"
             padding={"5px"}
             h="40px"
+            disabled={!checkPermissionForAction("documents", "canAdd")}
           />
         </HStack>
       </HStack>

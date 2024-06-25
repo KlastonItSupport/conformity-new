@@ -25,10 +25,11 @@ import { AuthContext } from "providers/auth";
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { getDocumentDetails, documentsDetails, userAccessRule } = useContext(
+  const { getDocumentDetails, documentsDetails } = useContext(
     DetailsDocumentsContext
   );
-  const { getUserAccessRule, userPermissions } = useContext(AuthContext);
+  const { getUserAccessRule, userPermissions, checkPermissionForAction } =
+    useContext(AuthContext);
   const queryParams = new URLSearchParams(location.search);
   const showFeed = useRef(null);
   const documentId = queryParams.get("id");
@@ -49,6 +50,9 @@ const DocumentsDetailsPage = () => {
     },
   ];
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const canAdd = checkPermissionForAction("documents", "canAdd");
+  const canDelete = checkPermissionForAction("documents", "canDelete");
+  const canEdit = checkPermissionForAction("documents", "canEdit");
 
   const leftContainer = (
     <Container
@@ -63,12 +67,19 @@ const DocumentsDetailsPage = () => {
         <DocumentsDetails
           userPermissions={userPermissions}
           document={documentsDetails.document}
-          userAccessRule={userAccessRule}
+          canAdd={canAdd}
+          canDelete={canDelete}
         />
       )}
       <Container padding={"0 0 30px 0"}></Container>
       {showFeed.current && (
-        <Feed moduleId={1} externalId={queryParams.get("id")} />
+        <Feed
+          moduleId={1}
+          externalId={queryParams.get("id")}
+          canAdd={canAdd}
+          canDelete={canDelete}
+          canEdit={canEdit}
+        />
       )}
     </Container>
   );

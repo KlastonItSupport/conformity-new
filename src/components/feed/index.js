@@ -10,7 +10,13 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
 
-const Feed = ({ moduleId, externalId }) => {
+const Feed = ({
+  moduleId,
+  externalId,
+  canAdd = true,
+  canDelete = true,
+  canEdit = true,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const { user } = useContext(AuthContext);
@@ -112,6 +118,7 @@ const Feed = ({ moduleId, externalId }) => {
           h="40px"
           type="submit"
           isLoading={isLoading}
+          disabled={!canAdd}
         />
       </VStack>
 
@@ -123,6 +130,8 @@ const Feed = ({ moduleId, externalId }) => {
           id={item.id}
           onDelete={deleteFeedItem}
           onEdit={updateFeedItem}
+          canEdit={canEdit}
+          canDelete={canDelete}
         />
       ))}
     </>

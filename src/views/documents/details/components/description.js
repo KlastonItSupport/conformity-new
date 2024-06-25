@@ -6,12 +6,14 @@ import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import HtmlParser from "react-html-parser";
 import { DetailsDocumentsContext } from "providers/details-documents";
+import { AuthContext } from "providers/auth";
 
 const Description = () => {
   const formRef = useRef(null);
   const { t } = useTranslation();
   const [isEditLoading, setIsEditLoading] = useState(false);
   const { description } = useContext(DetailsDocumentsContext);
+  const { checkPermissionForAction } = useContext(AuthContext);
 
   const {
     isOpen: isEditModalOpen,
@@ -32,7 +34,9 @@ const Description = () => {
         <Text fontSize={"20px"} color={"header.100"}>
           DESCRIÇÃO DO DOCUMENTO
         </Text>
-        <NotePencil cursor={"pointer"} size={20} onClick={onEditModalOpen} />
+        {checkPermissionForAction("documents", "canEdit") && (
+          <NotePencil cursor={"pointer"} size={20} onClick={onEditModalOpen} />
+        )}
       </HStack>
       <Text>{HtmlParser(description)}</Text>
       <ModalForm

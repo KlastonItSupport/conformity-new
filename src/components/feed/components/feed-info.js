@@ -3,12 +3,20 @@ import { NotePencil, Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
 import { FeedDescriptionForm } from "components/components";
 import { DeleteModal } from "components/components";
-import { sleep } from "helpers/sleep";
 import moment from "moment";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const FeedInfo = ({ author, date, text, onDelete, onEdit, id }) => {
+const FeedInfo = ({
+  author,
+  date,
+  text,
+  onDelete,
+  onEdit,
+  id,
+  canEdit,
+  canDelete,
+}) => {
   const { t } = useTranslation();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
@@ -54,20 +62,24 @@ const FeedInfo = ({ author, date, text, onDelete, onEdit, id }) => {
             </Text>
           </VStack>
           <HStack bgColor={""} align={"start"} justifyContent={"flex-end"}>
-            <NotePencil
-              size={16}
-              weight="fill"
-              color={"#0075df"}
-              cursor={"pointer"}
-              onClick={onEditModalOpen}
-            />
-            <Trash
-              size={16}
-              color="#0086FF"
-              weight="fill"
-              cursor={"pointer"}
-              onClick={onDeleteModalOpen}
-            />
+            {canEdit && (
+              <NotePencil
+                size={16}
+                weight="fill"
+                color={"#0075df"}
+                cursor={"pointer"}
+                onClick={onEditModalOpen}
+              />
+            )}
+            {canDelete && (
+              <Trash
+                size={16}
+                color="#0086FF"
+                weight="fill"
+                cursor={"pointer"}
+                onClick={onDeleteModalOpen}
+              />
+            )}
           </HStack>
         </HStack>
         <Divider color={"#ddd"} />

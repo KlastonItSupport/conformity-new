@@ -37,7 +37,8 @@ const Revisions = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedIsLoading, setSelectedIsLoading] = useState(false);
 
-  const { user } = useContext(AuthContext);
+  const { user, checkPermissionForAction, userPermissions, userAccessRule } =
+    useContext(AuthContext);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -103,6 +104,38 @@ const Revisions = () => {
   ]);
 
   useEffect(() => {
+    const updateIcons = () => {
+      const icons = [
+        checkPermissionForAction("documents", "canEdit")
+          ? {
+              icon: <NotePencil size={20} />,
+              onClickRow: (e) => onEditClick(e),
+
+              isDisabled: false,
+              shouldShow: false,
+            }
+          : null,
+        checkPermissionForAction("documents", "canDelete")
+          ? {
+              icon: <Trash size={20} />,
+              onClickRow: (e) => onDeleteClick(e),
+              onClickHeader: (selecteds) => {
+                setSelectedItems(selecteds);
+                onMultipleDeleteModalOpen();
+              },
+              isDisabled: false,
+              shouldShow: true,
+            }
+          : null,
+      ].filter((icon) => icon !== null);
+
+      setTableIcons(icons);
+    };
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPermissions, userAccessRule]);
+
+  useEffect(() => {
     getRevision(documentId, setRevisions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -140,6 +173,7 @@ const Revisions = () => {
             width="100px"
             padding={"5px"}
             h="40px"
+            disabled={!checkPermissionForAction("documents", "canAdd")}
           />
         </HStack>
         <Container w={"100%"} maxW={"null"} p={"0px"} overflow={"hidden"}>

@@ -16,7 +16,7 @@ import { DetailsDocumentsContext } from "providers/details-documents";
 import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentsDetails = ({ document }) => {
+const DocumentsDetails = ({ document, canAdd, canDelete }) => {
   const { t } = useTranslation();
   const formRef = useRef(null);
   const { additionalDocuments, deleteAdditionalDocument } = useContext(
@@ -92,16 +92,19 @@ const DocumentsDetails = ({ document }) => {
             color={"#0075df"}
             cursor={"pointer"}
           />
-          <Trash
-            size={16}
-            color="#0086FF"
-            weight="fill"
-            cursor={"pointer"}
-            onClick={() => {
-              setDeleteAdditionalDocumentId(id);
-              onDeleteModalOpen();
-            }}
-          />
+
+          {canDelete && (
+            <Trash
+              size={16}
+              color="#0086FF"
+              weight="fill"
+              cursor={"pointer"}
+              onClick={() => {
+                setDeleteAdditionalDocumentId(id);
+                onDeleteModalOpen();
+              }}
+            />
+          )}
         </HStack>
       </HStack>
     );
@@ -112,14 +115,16 @@ const DocumentsDetails = ({ document }) => {
         <Text fontSize="20px" fontWeight={"500"} color={"header.100"}>
           Documento:
         </Text>
-        <Text
-          cursor={"pointer"}
-          color={"#0075df"}
-          _hover={{ textDecoration: "underline" }}
-          onClick={onEditModalOpen}
-        >
-          Adicionar
-        </Text>
+        {canAdd && (
+          <Text
+            cursor={"pointer"}
+            color={"#0075df"}
+            _hover={{ textDecoration: "underline" }}
+            onClick={onEditModalOpen}
+          >
+            Adicionar
+          </Text>
+        )}
       </HStack>
       <Container
         m={"0px"}
