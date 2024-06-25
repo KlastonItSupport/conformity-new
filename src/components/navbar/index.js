@@ -54,11 +54,11 @@ export const NavBar = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const checkingPermission = (type) => {
-    if (userAccessRule.current.isAdmin) {
+    if (userAccessRule?.isAdmin) {
       return true;
     }
 
-    if (userAccessRule.current.isSuperUser && type !== "admin") {
+    if (userAccessRule?.isSuperUser && type !== "admin") {
       return true;
     }
 

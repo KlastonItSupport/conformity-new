@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
   const languageKey = "@Conformity:language";
   const [user, setUser] = useState(getUserInfo());
   const [permissions, setPermissions] = useState();
-  const userAccessRule = useRef();
+  const [userAccessRule, setUserAccessRule] = useState();
   const [userPermissions, setUserPermissions] = useState();
 
   const signIn = async (data, history) => {
@@ -108,7 +108,8 @@ const AuthProvider = ({ children }) => {
 
   const getUserAccessRule = async () => {
     const response = await api.get(`/users/access-rule/${user.id}`);
-    userAccessRule.current = response.data;
+    setUserAccessRule(response.data);
+
     return response.data;
   };
 
@@ -118,6 +119,19 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem(languageKey);
 
     history("/");
+  };
+
+  const checkPermissionForAction = (module, action) => {
+    if (!userAccessRule) return false;
+    if (userAccessRule?.isAdmin || userAccessRule?.isSuperUser) {
+      return true;
+    }
+
+    if (userPermissions) {
+      const permission = userPermissions[module];
+      return permission;
+    }
+    return false;
   };
 
   return (
@@ -138,6 +152,7 @@ const AuthProvider = ({ children }) => {
         userAccessRule,
         userPermissions,
         setUserPermissions,
+        checkPermissionForAction,
       }}
     >
       {children}

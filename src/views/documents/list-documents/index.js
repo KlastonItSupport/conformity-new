@@ -45,7 +45,8 @@ const ListDocumentsPage = () => {
     setEditSelected,
     pagination,
   } = useContext(DocumentContext);
-  const { getUserPermission, userPermissions } = useContext(AuthContext);
+  const { userPermissions, userAccessRule, checkPermissionForAction } =
+    useContext(AuthContext);
 
   const formRef = useRef(null);
 
@@ -85,7 +86,7 @@ const ListDocumentsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = userPermissions?.documents?.canDelete
+      const deleteIcon = checkPermissionForAction("documents", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -98,7 +99,7 @@ const ListDocumentsPage = () => {
           }
         : null;
 
-      const searchIcon = userPermissions?.documents?.canRead
+      const searchIcon = checkPermissionForAction("documents", "canRead")
         ? {
             icon: <MagnifyingGlass size={20} />,
             onClickRow: (item) => history(`/documents/details?id=${item.id}`),
@@ -109,7 +110,7 @@ const ListDocumentsPage = () => {
           }
         : null;
 
-      const editIcon = userPermissions?.documents?.canEdit
+      const editIcon = checkPermissionForAction("documents", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -122,7 +123,7 @@ const ListDocumentsPage = () => {
           }
         : null;
 
-      const remindersIcon = userPermissions?.documents?.canRead
+      const remindersIcon = checkPermissionForAction("documents", "canRead")
         ? {
             icon: <ClockCounterClockwise size={20} />,
             onClickRow: (item) => {},
@@ -141,7 +142,7 @@ const ListDocumentsPage = () => {
 
     updateIcons();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userPermissions]); // Atualiza os ícones quando userPermissions muda
+  }, [userPermissions, userAccessRule]); // Atualiza os ícones quando userPermissions muda
 
   const [tableIcons, setTableIcons] = useState([]);
 
@@ -194,7 +195,9 @@ const ListDocumentsPage = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <ActionsButtons canAdd={userPermissions?.documents?.canAdd} />
+        <ActionsButtons
+          canAdd={checkPermissionForAction("documents", "canAdd")}
+        />
         <Filters />
         <CustomTable
           data={documents}

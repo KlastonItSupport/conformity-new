@@ -25,10 +25,10 @@ import { AuthContext } from "providers/auth";
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { getDocumentDetails, documentsDetails } = useContext(
+  const { getDocumentDetails, documentsDetails, userAccessRule } = useContext(
     DetailsDocumentsContext
   );
-  const { getUserAccessRule } = useContext(AuthContext);
+  const { getUserAccessRule, userPermissions } = useContext(AuthContext);
   const queryParams = new URLSearchParams(location.search);
   const showFeed = useRef(null);
   const documentId = queryParams.get("id");
@@ -60,7 +60,11 @@ const DocumentsDetailsPage = () => {
       maxW={"95%"}
     >
       {documentsDetails && documentsDetails.document && (
-        <DocumentsDetails document={documentsDetails.document} />
+        <DocumentsDetails
+          userPermissions={userPermissions}
+          document={documentsDetails.document}
+          userAccessRule={userAccessRule}
+        />
       )}
       <Container padding={"0 0 30px 0"}></Container>
       {showFeed.current && (
@@ -79,9 +83,6 @@ const DocumentsDetailsPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [documentId]);
 
-  useEffect(() => {
-    console.log(documentsDetails);
-  }, [documentsDetails]);
   return (
     <>
       <NavBar />
