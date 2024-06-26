@@ -1,5 +1,6 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
+import { toast } from "react-toastify";
 
 const { createContext, useContext, useState, useEffect } = require("react");
 
@@ -9,6 +10,9 @@ const CategoryProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
   const [createCategoryIsLoading, setCreateCategoryIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [editIsLoading, setEditIsLoading] = useState(false);
+  const [pagination, setPagination] = useState(null);
 
   const createCategory = async (data) => {
     const userInfo = getUserInfo();
@@ -35,6 +39,68 @@ const CategoryProvider = ({ children }) => {
     return response.data;
   };
 
+  const getCategoriesPaginated = async (
+    page = 1,
+    search = "",
+    pageSize = 10
+  ) => {
+    const response = await api.get(
+      `/categories?page=${page}&search=${search}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
+
+    setPagination(response.data.pages);
+    return response.data.items;
+  };
+
+  const deleteCategory = async (id) => {
+    const response = await api.delete(`categories/${id}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+
+    if (response.status === 200) {
+      setCategoriesList(
+        categoriesList.filter((category) => category.id !== id)
+      );
+      toast.success("Categoria excluída com sucesso!");
+    }
+  };
+
+  const deleteMultipleCategories = async (selectedItems) => {
+    const deletePromises = selectedItems.map((selected) =>
+      selected.id !== "checkall" ? deleteCategory(selected.id) : () => {}
+    );
+    await Promise.all(deletePromises);
+
+    setCategoriesList(
+      categoriesList.filter(
+        (category) =>
+          !selectedItems.some((selected) => selected.id === category.id)
+      )
+    );
+
+    toast.success("Categorias excluídas com sucesso!");
+  };
+
+  const editCategory = async (id, data) => {
+    const response = await api.patch(`categories/${id}`, data, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+
+    if (response.status === 200) {
+      setCategoriesList(
+        categoriesList.map((category) => {
+          if (category.id === id) {
+            return { ...category, ...data };
+          }
+          return category;
+        })
+      );
+    }
+  };
+
   useEffect(() => {
     getCategories().then((categoryRes) => {
       setCategories(
@@ -55,6 +121,16 @@ const CategoryProvider = ({ children }) => {
         setCreateCategoryIsLoading,
         categories,
         setCategories,
+        deleteCategory,
+        categoriesList,
+        setCategoriesList,
+        editCategory,
+        setEditIsLoading,
+        editIsLoading,
+        getCategoriesPaginated,
+        pagination,
+        setPagination,
+        deleteMultipleCategories,
       }}
     >
       {children}

@@ -24,6 +24,7 @@ import { DocumentProvider } from "providers/document";
 import { CategoryProvider } from "providers/category";
 import { DepartamentProvider } from "providers/departament";
 import { DetailsDocumentsProvider } from "providers/details-documents";
+import CategoriesPage from "views/documents/categories";
 
 const routes = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const routes = createBrowserRouter([
   {
     path: "/documents",
     element: <ListDocumentsPage />,
+  },
+  {
+    path: "/categories",
+    element: <CategoriesPage />,
   },
 ]);
 

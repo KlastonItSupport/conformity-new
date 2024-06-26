@@ -6,9 +6,13 @@ import { FormInput } from "components/components";
 import { categorySchema } from "./schemas/create-category.schema";
 import { CategoryContext } from "providers/category";
 
-const CategoryForm = ({ formRef, onClose }) => {
-  const { createCategory, setCreateCategoryIsLoading } =
-    useContext(CategoryContext);
+const CategoryForm = ({ formRef, onClose, event = "add", id }) => {
+  const {
+    createCategory,
+    setCreateCategoryIsLoading,
+    editCategory,
+    setEditIsLoading,
+  } = useContext(CategoryContext);
 
   const {
     handleSubmit,
@@ -19,10 +23,19 @@ const CategoryForm = ({ formRef, onClose }) => {
   });
 
   const onSubmit = async (data) => {
-    setCreateCategoryIsLoading(true);
-    await createCategory(data);
-    setCreateCategoryIsLoading(false);
+    if (event === "add") {
+      setCreateCategoryIsLoading(true);
+      const response = await createCategory(data);
+      setCreateCategoryIsLoading(false);
+      onClose(response);
+      return;
+    }
+    setEditIsLoading(true);
+
+    await editCategory(id, data);
     onClose();
+
+    setEditIsLoading(false);
   };
 
   return (

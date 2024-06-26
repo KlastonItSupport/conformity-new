@@ -32,6 +32,7 @@ const TableCustom = ({
   paddingOnTitle = true,
   showSearchInput = true,
   hasMinHg = true,
+  iconsHasMaxW = false,
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -208,7 +209,7 @@ const TableCustom = ({
             bgColor={isEvenNumber ? "#F5F5F5" : "white"}
             _hover={{ bgColor: "#ebebeb" }}
           >
-            <Td border={"1px solid #ddd"} height={"15px"}>
+            <Td border={"1px solid #ddd"} height={"15px"} w={"20px"}>
               <Checkbox
                 size="lg"
                 _checked={{
@@ -238,7 +239,7 @@ const TableCustom = ({
                 )
               );
             })}
-            <Td border={"1px solid #ddd"}>
+            <Td border={"1px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
               <Box display={"flex"}>
                 {icons.map(
                   (icon, index) =>
