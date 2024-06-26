@@ -93,7 +93,9 @@ const CategoriesPage = () => {
     getCategoriesPaginated(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""
-    );
+    ).then((categories) => {
+      setCategoriesList(categories);
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
