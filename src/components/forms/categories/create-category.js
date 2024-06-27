@@ -6,7 +6,7 @@ import { FormInput } from "components/components";
 import { categorySchema } from "./schemas/create-category.schema";
 import { CategoryContext } from "providers/category";
 
-const CategoryForm = ({ formRef, onClose, event = "add", id }) => {
+const CategoryForm = ({ formRef, onClose, event = "add", id, formValues }) => {
   const {
     createCategory,
     setCreateCategoryIsLoading,
@@ -47,6 +47,7 @@ const CategoryForm = ({ formRef, onClose, event = "add", id }) => {
       <FormInput
         label={"Nome * "}
         {...register("name")}
+        defaultValue={formValues?.name}
         error={errors.name?.message}
       />
     </form>

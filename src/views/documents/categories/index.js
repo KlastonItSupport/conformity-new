@@ -186,6 +186,7 @@ const CategoriesPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             width="150px"
+            disabled={!checkPermissionForAction("documents", "canAdd")}
           />
         </HStack>
 
@@ -266,6 +267,7 @@ const CategoriesPage = () => {
             onClose={onEditModalClose}
             event="edit"
             id={editSelected.id}
+            formValues={editSelected}
           />
         }
         formRef={categoryRef}
