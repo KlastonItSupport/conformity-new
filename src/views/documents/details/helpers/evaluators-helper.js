@@ -57,6 +57,7 @@ const formatApproved = (data) => {
   if (data === 1) return "PENDENTE";
   if (data === 2) return "APROVADO";
   if (data === 3) return "CANCELADO";
+  if (data) return "PENDENTE";
 };
 
 const formatReviewed = (data) => {
@@ -64,6 +65,7 @@ const formatReviewed = (data) => {
   if (data === 1) return "PENDENTE";
   if (data === 2) return "REVISADO";
   if (data === 3) return "CANCELADO";
+  if (data) return "PENDENTE";
 };
 
 const formatEditAndDelete = (data) => (data ? "SIM" : "NÃO");
