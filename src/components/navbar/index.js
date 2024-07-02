@@ -108,6 +108,10 @@ export const NavBar = () => {
               src: "categories",
               label: "Categorias",
             },
+            {
+              src: "analysis",
+              label: "Para Análise",
+            },
           ]}
           key={"admin-documents"}
         />

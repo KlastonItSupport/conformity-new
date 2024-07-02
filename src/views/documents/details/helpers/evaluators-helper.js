@@ -52,8 +52,19 @@ export const deleteMultipleEvaluators = async (
   onMultipleDeleteModalClose();
 };
 
-const formatApprovedAndReviewed = (data) =>
-  !data || data === 0 ? "-" : "PENDENTE";
+const formatApproved = (data) => {
+  if (data === 0 || !data) return "-";
+  if (data === 1) return "PENDENTE";
+  if (data === 2) return "APROVADO";
+  if (data === 3) return "CANCELADO";
+};
+
+const formatReviewed = (data) => {
+  if (data === 0 || !data) return "-";
+  if (data === 1) return "PENDENTE";
+  if (data === 2) return "REVISADO";
+  if (data === 3) return "CANCELADO";
+};
 
 const formatEditAndDelete = (data) => (data ? "SIM" : "NÃO");
 
@@ -66,12 +77,12 @@ export const columns = [
   {
     header: "Revisado",
     access: "reviewed",
-    formatData: formatApprovedAndReviewed,
+    formatData: formatReviewed,
   },
   {
     header: "Aprovado?",
     access: "approved",
-    formatData: formatApprovedAndReviewed,
+    formatData: formatApproved,
   },
   { header: "Editar?", access: "edited", formatData: formatEditAndDelete },
   { header: "Deletar?", access: "deleted", formatData: formatEditAndDelete },

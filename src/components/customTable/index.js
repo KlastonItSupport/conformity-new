@@ -243,11 +243,13 @@ const TableCustom = ({
               <Box display={"flex"}>
                 {icons.map(
                   (icon, index) =>
-                    icon && (
+                    icon &&
+                    iconCondition(icon, item) && (
                       <Box
                         cursor={"pointer"}
                         key={index + "x"}
                         onClick={() => icon.onClickRow(item)}
+                        title={icon.title ?? null}
                       >
                         {icon.icon}
                       </Box>
@@ -287,6 +289,11 @@ const TableCustom = ({
   const shouldShowHeaderIcon = (icon) => {
     if (!icon.shouldShow) return false;
     return icon.isDisabled;
+  };
+
+  const iconCondition = (icon, item) => {
+    if (icon && !icon.condition) return true;
+    return icon.condition(item);
   };
   return (
     <Box

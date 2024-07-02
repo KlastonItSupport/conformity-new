@@ -25,6 +25,8 @@ import { CategoryProvider } from "providers/category";
 import { DepartamentProvider } from "providers/departament";
 import { DetailsDocumentsProvider } from "providers/details-documents";
 import CategoriesPage from "views/documents/categories";
+import AnalysisPage from "views/documents/analysis";
+import { AnalysisProvider } from "providers/analysis";
 
 const routes = createBrowserRouter([
   {
@@ -63,6 +65,10 @@ const routes = createBrowserRouter([
     path: "/categories",
     element: <CategoriesPage />,
   },
+  {
+    path: "/analysis",
+    element: <AnalysisPage />,
+  },
 ]);
 
 ReactDOM.render(
@@ -71,20 +77,22 @@ ReactDOM.render(
       <UserProvider>
         <GroupProvider>
           <DocumentProvider>
-            <DetailsDocumentsProvider>
-              <CategoryProvider>
-                <DepartamentProvider>
-                  <ChakraProvider theme={theme}>
-                    <ToastContainer />
-                    <React.StrictMode>
-                      <ThemeEditorProvider>
-                        <RouterProvider router={routes} />
-                      </ThemeEditorProvider>
-                    </React.StrictMode>
-                  </ChakraProvider>
-                </DepartamentProvider>
-              </CategoryProvider>
-            </DetailsDocumentsProvider>
+            <AnalysisProvider>
+              <DetailsDocumentsProvider>
+                <CategoryProvider>
+                  <DepartamentProvider>
+                    <ChakraProvider theme={theme}>
+                      <ToastContainer />
+                      <React.StrictMode>
+                        <ThemeEditorProvider>
+                          <RouterProvider router={routes} />
+                        </ThemeEditorProvider>
+                      </React.StrictMode>
+                    </ChakraProvider>
+                  </DepartamentProvider>
+                </CategoryProvider>
+              </DetailsDocumentsProvider>
+            </AnalysisProvider>
           </DocumentProvider>
         </GroupProvider>
       </UserProvider>
