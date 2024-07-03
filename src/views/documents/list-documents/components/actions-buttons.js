@@ -5,11 +5,13 @@ import DocumentForm from "components/forms/documents/create-document/create-docu
 import { useBreakpoint } from "hooks/usebreakpoint";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const ActionsButtons = ({ canAdd }) => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const formRef = useRef(null);
+  const navigate = useNavigate();
   const [createDocumentIsLoading, setCreateDocumentIsLoading] = useState(false);
 
   const {
@@ -63,6 +65,7 @@ const ActionsButtons = ({ canAdd }) => {
       _active={{ bgColor: "primary.200" }}
       label={"Revisões"}
       width="150px"
+      onClick={() => navigate("/revisions")}
     />
   );
 

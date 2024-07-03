@@ -27,6 +27,7 @@ import { DetailsDocumentsProvider } from "providers/details-documents";
 import CategoriesPage from "views/documents/categories";
 import AnalysisPage from "views/documents/analysis";
 import { AnalysisProvider } from "providers/analysis";
+import RevisionsPage from "views/documents/revisions";
 
 const routes = createBrowserRouter([
   {
@@ -68,6 +69,10 @@ const routes = createBrowserRouter([
   {
     path: "/analysis",
     element: <AnalysisPage />,
+  },
+  {
+    path: "/revisions",
+    element: <RevisionsPage />,
   },
 ]);
 

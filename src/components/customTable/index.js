@@ -81,11 +81,11 @@ const TableCustom = ({
       selected.checked ? selected : undefined
     );
     if (checkedItems.length >= 1) {
-      onCheckItems(true);
+      if (onCheckItems) onCheckItems(true);
       return;
     }
 
-    onCheckItems(false);
+    if (onCheckItems) onCheckItems(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selecteds]);
 
@@ -241,20 +241,21 @@ const TableCustom = ({
             })}
             <Td border={"1px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
               <Box display={"flex"}>
-                {icons.map(
-                  (icon, index) =>
-                    icon &&
-                    iconCondition(icon, item) && (
-                      <Box
-                        cursor={"pointer"}
-                        key={index + "x"}
-                        onClick={() => icon.onClickRow(item)}
-                        title={icon.title ?? null}
-                      >
-                        {icon.icon}
-                      </Box>
-                    )
-                )}
+                {icons &&
+                  icons.map(
+                    (icon, index) =>
+                      icon &&
+                      iconCondition(icon, item) && (
+                        <Box
+                          cursor={"pointer"}
+                          key={index + "x"}
+                          onClick={() => icon.onClickRow(item)}
+                          title={icon.title ?? null}
+                        >
+                          {icon.icon}
+                        </Box>
+                      )
+                  )}
               </Box>
             </Td>
           </Tr>
@@ -350,36 +351,37 @@ const TableCustom = ({
 
               <Th border={"1px solid #ddd"}>
                 <Box display={"flex"}>
-                  {icons.map(
-                    (icon, index) =>
-                      icon &&
-                      icon.icon && (
-                        <Box
-                          key={index + "actionbuttons"}
-                          onClick={() =>
-                            shouldShowHeaderIcon(icon)
-                              ? icon.onClickHeader(
-                                  selecteds.filter(
-                                    (selected) => selected.checked
+                  {icons &&
+                    icons.map(
+                      (icon, index) =>
+                        icon &&
+                        icon.icon && (
+                          <Box
+                            key={index + "actionbuttons"}
+                            onClick={() =>
+                              shouldShowHeaderIcon(icon)
+                                ? icon.onClickHeader(
+                                    selecteds.filter(
+                                      (selected) => selected.checked
+                                    )
                                   )
-                                )
-                              : () => {}
-                          }
-                          cursor={
-                            shouldShowHeaderIcon(icon)
-                              ? "pointer"
-                              : "not-allowed"
-                          }
-                          color={
-                            shouldShowHeaderIcon(icon)
-                              ? "black"
-                              : "secondaryGray.500"
-                          }
-                        >
-                          {icon.icon}
-                        </Box>
-                      )
-                  )}
+                                : () => {}
+                            }
+                            cursor={
+                              shouldShowHeaderIcon(icon)
+                                ? "pointer"
+                                : "not-allowed"
+                            }
+                            color={
+                              shouldShowHeaderIcon(icon)
+                                ? "black"
+                                : "secondaryGray.500"
+                            }
+                          >
+                            {icon.icon}
+                          </Box>
+                        )
+                    )}
                 </Box>
               </Th>
             </Tr>
