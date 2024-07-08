@@ -12,9 +12,11 @@ import {
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export function ItemMenu({ icon, itemsList, label }) {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const navigate = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
 
   return isDesktop ? (
@@ -45,7 +47,7 @@ export function ItemMenu({ icon, itemsList, label }) {
       <MenuList onMouseEnter={onOpen} onMouseLeave={onClose}>
         {itemsList.map((item, index) => (
           <MenuItem key={index}>
-            <Link href={item.src}>{item.label}</Link>
+            <Text onClick={() => navigate(item.src)}>{item.label} as</Text>
           </MenuItem>
         ))}
       </MenuList>
