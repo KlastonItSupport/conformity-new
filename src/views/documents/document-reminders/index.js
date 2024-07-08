@@ -37,7 +37,12 @@ const DocumentRemindersPage = () => {
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const { getToken } = useContext(AuthContext);
+  const {
+    getToken,
+    userPermissions,
+    checkPermissionForAction,
+    userAccessRule,
+  } = useContext(AuthContext);
 
   const [reminders, setReminders] = useState([]);
   const [pagination, setPagination] = useState();
@@ -91,44 +96,6 @@ const DocumentRemindersPage = () => {
     onClose: onFormAddModalClose,
   } = useDisclosure();
 
-  const [tableIcons, setTableIcons] = useState([
-    {
-      icon: <Trash size={20} />,
-      onClickRow: (e) => {
-        setDeleteId(e.id);
-        onDeleteModalOpen();
-      },
-      onClickHeader: (selecteds) => {
-        setSelectedItems(selecteds);
-        onDeleteMultipleModalOpen();
-      },
-      isDisabled: true,
-      shouldShow: true,
-    },
-    {
-      icon: <NotePencil size={20} />,
-      onClickRow: (e) => {
-        setEditSelectedItem(e);
-        onFormModalOpen();
-      },
-      onClickHeader: (selecteds) => {},
-      isDisabled: false,
-      shouldShow: true,
-    },
-  ]);
-  useEffect(() => {
-    getDocumentReminders(
-      getToken(),
-      id,
-      searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? ""
-    ).then((analysisDocuments) => {
-      setReminders(analysisDocuments.items);
-      setPagination(analysisDocuments.pages);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
@@ -160,6 +127,61 @@ const DocumentRemindersPage = () => {
       setPagination(reminders.pages);
     }
   }, 500);
+
+  const [tableIcons, setTableIcons] = useState([]);
+
+  useEffect(() => {
+    getDocumentReminders(
+      getToken(),
+      id,
+      searchParams.get("page") ?? 1,
+      searchParams.get("search") ?? ""
+    ).then((analysisDocuments) => {
+      setReminders(analysisDocuments.items);
+      setPagination(analysisDocuments.pages);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const updateIcons = () => {
+      const deleteIcon = checkPermissionForAction("documents", "canDelete")
+        ? {
+            icon: <Trash size={20} />,
+            onClickRow: (e) => {
+              setDeleteId(e.id);
+              onDeleteModalOpen();
+            },
+            onClickHeader: (selecteds) => {
+              setSelectedItems(selecteds);
+              onDeleteMultipleModalOpen();
+            },
+            isDisabled: true,
+            shouldShow: true,
+          }
+        : null;
+
+      const editIcon = checkPermissionForAction("documents", "canEdit")
+        ? {
+            icon: <NotePencil size={20} />,
+            onClickRow: (e) => {
+              setEditSelectedItem(e);
+              onFormModalOpen();
+            },
+            onClickHeader: (selecteds) => {},
+            isDisabled: false,
+            shouldShow: true,
+          }
+        : null;
+
+      const icons = [deleteIcon, editIcon].filter((icon) => icon !== null);
+
+      setTableIcons(icons);
+    };
+
+    updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userPermissions, userAccessRule]);
 
   return (
     <>
