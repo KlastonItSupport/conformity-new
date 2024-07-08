@@ -47,7 +47,7 @@ export function ItemMenu({ icon, itemsList, label }) {
       <MenuList onMouseEnter={onOpen} onMouseLeave={onClose}>
         {itemsList.map((item, index) => (
           <MenuItem key={index}>
-            <Text onClick={() => navigate(item.src)}>{item.label} as</Text>
+            <Text onClick={() => navigate(item.src)}>{item.label} </Text>
           </MenuItem>
         ))}
       </MenuList>
