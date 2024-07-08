@@ -13,7 +13,6 @@ const ReminderForm = ({
   formRef,
   onClose,
   formValues,
-  isLoading,
   event = "add",
   onAdd,
   onEdit,

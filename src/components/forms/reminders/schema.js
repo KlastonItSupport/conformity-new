@@ -10,10 +10,11 @@ const reminderSchema = Yup.object().shape({
 
   weekDay: Yup.string().when("frequency", {
     is: "SEMANAL" || "MENSAL" || "ANUAL",
-    then: Yup.string().oneOf(
-      ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"],
-      i18n.t("Dia da semana inválido")
-    ),
+    then: () =>
+      Yup.string().oneOf(
+        ["SEGUNDA", "TERÇA", "QUARTA", "QUINTA", "SEXTA", "SÁBADO", "DOMINGO"],
+        i18n.t("Dia da semana inválido")
+      ),
     otherwise: () => Yup.string().nullable(),
   }),
   dataEnd: Yup.string().matches(
