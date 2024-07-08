@@ -53,7 +53,7 @@ const DocumentRemindersPage = () => {
   const editFormRef = useRef();
   const AddFormRef = useRef();
   const id = queryParams.get("id");
-  const name = reminders.length > 0 ? reminders[0].documentName : "";
+  const name = queryParams.get("name");
 
   const routeTreePaths = [
     {

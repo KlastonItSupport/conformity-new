@@ -156,7 +156,10 @@ const DocumentsDetails = ({ document, canAdd, canDelete, documentId }) => {
           color={"#0075df"}
           _hover={{ textDecoration: "underline" }}
           onClick={() =>
-            window.open(`/documents/reminders?id=${documentId}`, "_blank")
+            window.open(
+              `/documents/reminders?id=${documentId}&name=${document.name}`,
+              "_blank"
+            )
           }
         >
           Lembretes
