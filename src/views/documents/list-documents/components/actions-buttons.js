@@ -82,6 +82,7 @@ const ActionsButtons = ({ canAdd }) => {
       _active={{ bgColor: "primary.200" }}
       label={"Lembretes"}
       width="150px"
+      onClick={() => navigate("/reminders")}
     />
   );
   return (

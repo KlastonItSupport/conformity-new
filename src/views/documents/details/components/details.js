@@ -16,7 +16,7 @@ import { DetailsDocumentsContext } from "providers/details-documents";
 import React, { useContext, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentsDetails = ({ document, canAdd, canDelete }) => {
+const DocumentsDetails = ({ document, canAdd, canDelete, documentId }) => {
   const { t } = useTranslation();
   const formRef = useRef(null);
   const { additionalDocuments, deleteAdditionalDocument } = useContext(
@@ -147,9 +147,21 @@ const DocumentsDetails = ({ document, canAdd, canDelete }) => {
   };
   const info = (
     <>
-      <Text fontSize="20px" fontWeight={"500"} color={"header.100"}>
-        Informações:
-      </Text>
+      <HStack justify={"space-between"} w={"100%"} py={"10px"}>
+        <Text fontSize="20px" fontWeight={"500"} color={"header.100"}>
+          Informações:
+        </Text>
+        <Text
+          cursor={"pointer"}
+          color={"#0075df"}
+          _hover={{ textDecoration: "underline" }}
+          onClick={() =>
+            window.open(`/documents/reminders?id=${documentId}`, "_blank")
+          }
+        >
+          Lembretes
+        </Text>
+      </HStack>
       <Container m={"0px"} p={"0"} border={"1px solid #ddd"}>
         {infoItem("Autor:", document.owner, false)}
         {infoItem("Categoria:", document?.categoryName)}

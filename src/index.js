@@ -28,6 +28,7 @@ import CategoriesPage from "views/documents/categories";
 import AnalysisPage from "views/documents/analysis";
 import { AnalysisProvider } from "providers/analysis";
 import RevisionsPage from "views/documents/revisions";
+import DocumentRemindersPage from "views/documents/document-reminders";
 
 const routes = createBrowserRouter([
   {
@@ -73,6 +74,10 @@ const routes = createBrowserRouter([
   {
     path: "/revisions",
     element: <RevisionsPage />,
+  },
+  {
+    path: "/documents/reminders",
+    element: <DocumentRemindersPage />,
   },
 ]);
 

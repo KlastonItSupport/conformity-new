@@ -32,7 +32,6 @@ const AddEvaluatorForm = ({ onClose, formRef, onAddEvaluator, documentId }) => {
 
   const onSubmit = async (data) => {
     const formattedData = { ...data, ...checkBoxSelected, documentId };
-    console.log("formattedData", formattedData);
     await onAddEvaluator(formattedData);
     onClose();
   };
@@ -51,6 +50,7 @@ const AddEvaluatorForm = ({ onClose, formRef, onAddEvaluator, documentId }) => {
 
   useEffect(() => {
     getCompanyUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const buildCheckBoxes = (key, label) => {

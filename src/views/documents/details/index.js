@@ -69,6 +69,7 @@ const DocumentsDetailsPage = () => {
           document={documentsDetails.document}
           canAdd={canAdd}
           canDelete={canDelete}
+          documentId={documentId}
         />
       )}
       <Container padding={"0 0 30px 0"}></Container>
