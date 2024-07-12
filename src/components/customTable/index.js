@@ -233,7 +233,7 @@ const TableCustom = ({
                     key={column + index}
                   >
                     {column.formatData
-                      ? column.formatData(item[column.access])
+                      ? column.formatData(item[column.access], item)
                       : item[column.access]}
                   </Td>
                 )

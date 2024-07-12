@@ -148,6 +148,6 @@ export const columns = [
   {
     header: i18n.t("Data de revisão"),
     access: "revisionDate",
-    formatData: (data) => moment(data).format("DD/MM/YYYY"),
+    formatData: (data) => moment.utc(data).format("DD/MM/YYYY"),
   },
 ];

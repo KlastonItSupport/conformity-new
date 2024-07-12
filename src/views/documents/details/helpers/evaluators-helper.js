@@ -52,7 +52,8 @@ export const deleteMultipleEvaluators = async (
   onMultipleDeleteModalClose();
 };
 
-const formatApproved = (data) => {
+const formatApproved = (data, item) => {
+  if (item.cancelled) return "CANCELADO";
   if (data === 0 || !data) return "-";
   if (data === 1) return "PENDENTE";
   if (data === 2) return "APROVADO";
@@ -60,7 +61,8 @@ const formatApproved = (data) => {
   if (data) return "PENDENTE";
 };
 
-const formatReviewed = (data) => {
+const formatReviewed = (data, item) => {
+  if (item.cancelled) return "CANCELADO";
   if (data === 0 || !data) return "-";
   if (data === 1) return "PENDENTE";
   if (data === 2) return "REVISADO";

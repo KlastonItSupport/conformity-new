@@ -143,7 +143,7 @@ const DocumentsDetails = ({ document, canAdd, canDelete, documentId }) => {
   );
 
   const defaultDataFormatter = (value) => {
-    return moment(value).format("DD/MM/YYYY");
+    return moment.utc(value).format("DD/MM/YYYY");
   };
   const info = (
     <>
@@ -177,12 +177,15 @@ const DocumentsDetails = ({ document, canAdd, canDelete, documentId }) => {
           "DATA DE REVISÃO (Documento):",
           defaultDataFormatter(document?.revisionDate)
         )}
-        {infoItem("DATA DE CRIAÇÃO (Documento):", "23/11/2023")}
+        {infoItem(
+          "DATA DE CRIAÇÃO (Documento):",
+          defaultDataFormatter(document?.physicalDocumentCreatedDate)
+        )}
         {infoItem(
           "VALIDADE:",
           `${document?.validity} ${document?.validity > 1 ? "Meses" : "Mês"}`
         )}
-        {infoItem("DATA DE ENVIO:", "23/11/2023")}
+        {infoItem("DATA DE ENVIO:", defaultDataFormatter(document?.createdAt))}
         {infoItem("EMPRESA:", document?.companyName)}
       </Container>
     </>

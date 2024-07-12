@@ -49,6 +49,7 @@ const DocumentProvider = ({ children }) => {
   const createDocument = async (data) => {
     const files = await handlingMultipleFilesToBase64(data.document);
     data.document = files;
+    delete data.project;
     try {
       const response = await api.post("documents", data, {
         headers: { Authorization: `Bearer ${getToken()}` },
