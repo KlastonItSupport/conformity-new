@@ -86,13 +86,6 @@ const DocumentsDetails = ({ document, canAdd, canDelete, documentId }) => {
           {label}
         </Link>
         <HStack>
-          <BellRinging
-            size={16}
-            weight="fill"
-            color={"#0075df"}
-            cursor={"pointer"}
-          />
-
           {canDelete && (
             <Trash
               size={16}

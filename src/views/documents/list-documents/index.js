@@ -126,7 +126,8 @@ const ListDocumentsPage = () => {
       const remindersIcon = checkPermissionForAction("documents", "canRead")
         ? {
             icon: <ClockCounterClockwise size={20} />,
-            onClickRow: (item) => {},
+            onClickRow: (item) =>
+              history(`/documents/reminders?id=${item.id}&name=${item.name}`),
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
