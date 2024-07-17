@@ -124,8 +124,8 @@ export const NavBar = () => {
           icon={<CheckFat size={28} />}
           itemsList={[
             {
-              src: "/",
-              label: "N/A",
+              src: "/tasks",
+              label: "Tasks",
             },
           ]}
           key={"admin-tasks"}

@@ -6,7 +6,6 @@ import { FormInput } from "components/components";
 import SelectInput from "components/select";
 import { useQuery } from "hooks/query";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import { set } from "lodash";
 import moment from "moment";
 import { CategoryContext } from "providers/category";
 import { DepartamentContext } from "providers/departament";
