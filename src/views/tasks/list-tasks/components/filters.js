@@ -6,7 +6,7 @@ import { notSelectedCleaning } from "helpers/not-selected-cleaning";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { DepartamentContext } from "providers/departament";
 import { TasksContext } from "providers/tasks";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 
@@ -29,6 +29,7 @@ const Filters = ({
   setDepartaments,
 }) => {
   const { isMobile } = useBreakpoint();
+  const [isLoading, setIsLoading] = useState(false);
   const { getOrigins, getClassifications, getTypes, getTasks, setTasks } =
     useContext(TasksContext);
   const { getDepartaments } = useContext(DepartamentContext);
@@ -196,9 +197,12 @@ const Filters = ({
 
   const onSubmit = async (data) => {
     notSelectedCleaning(data);
+    setIsLoading(true);
+
     const tasks = await getTasks(1, "", data);
 
     setTasks(tasks.items);
+    setIsLoading(false);
   };
   return isMobile ? (
     <VStack w={"100%"} paddingX={"20px"} as="form">
@@ -255,6 +259,7 @@ const Filters = ({
         width="150px"
         mt={"35px !important"}
         type="submit"
+        isLoading={isLoading}
       />
     </HStack>
   );
