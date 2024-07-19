@@ -6,7 +6,7 @@ import { departamentSchema } from "./schemas/create-departament.schema";
 import { FormInput } from "components/components";
 import { DepartamentContext } from "providers/departament";
 
-const DepartamentForm = ({ formRef, onClose }) => {
+const DepartamentForm = ({ formRef, onClose, setLoading }) => {
   const {
     handleSubmit,
     register,
@@ -20,9 +20,13 @@ const DepartamentForm = ({ formRef, onClose }) => {
 
   const onSubmit = async (data) => {
     setCreateDepartamentIsLoading(true);
-    await createDepartament(data);
+    if (setLoading) setLoading(true);
+
+    const departament = await createDepartament(data);
+
     setCreateDepartamentIsLoading(false);
-    onClose();
+    if (setLoading) setLoading(false);
+    onClose(departament);
   };
 
   return (

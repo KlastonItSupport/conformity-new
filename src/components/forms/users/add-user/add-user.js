@@ -18,7 +18,7 @@ import { Plus } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
 import { GroupForm } from "components/forms/groups/group";
 
-export const AddUserForm = ({ formRef, onCloseModal }) => {
+export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
   const { createUser } = useContext(UserContext);
   const { getGroups, createGroupIsLoading } = useContext(GroupContext);
   const [groupOptions, setGroupOptions] = useState([]);
@@ -39,11 +39,13 @@ export const AddUserForm = ({ formRef, onCloseModal }) => {
   } = useDisclosure();
 
   const onSubmit = async (data) => {
+    if (setLoading) setLoading(true);
     const cretedSuccessfully = await createUser(data);
 
     if (cretedSuccessfully) {
-      onCloseModal();
+      onCloseModal(cretedSuccessfully);
     }
+    if (setLoading) setLoading(false);
   };
 
   const fetchGroupData = async () => {

@@ -63,6 +63,7 @@ const TextEditor = forwardRef(({ value, onChange, menubar = true, ref }) => {
       apiKey={process.env.REACT_APP_TINYMCE_API_KEY}
       init={editorConfig}
       ref={ref}
+      style={{ width: "100%" }}
     />
   );
 });

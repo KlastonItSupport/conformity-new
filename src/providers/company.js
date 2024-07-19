@@ -102,12 +102,15 @@ const CompanyProvider = ({ children }) => {
     }
   };
 
-  const getCompanyUsers = async () => {
+  const getCompanyUsers = async (shouldSetUsers = true) => {
     const response = await api.get("/companies/get-users", {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setUsers(response.data);
+    if (shouldSetUsers) {
+      setUsers(response.data);
+    }
+    return response.data;
   };
 
   return (

@@ -1,10 +1,9 @@
 import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import {
   ChatCircle,
-  ClockCounterClockwise,
   FilePdf,
   MagnifyingGlass,
   NotePencil,
@@ -20,12 +19,9 @@ import {
 } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
-// import Filters from "./components/filters";
-// import ActionsButtons from "./components/actions-buttons";
 import { DeleteModal } from "components/components";
 
 import { ModalForm } from "components/components";
-import { DocumentContext } from "providers/document";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
@@ -33,6 +29,7 @@ import { AuthContext } from "providers/auth";
 import Filters from "./components/filters";
 import { ButtonPrimary } from "components/button-primary";
 import TaskForm from "components/forms/tasks/task-form";
+import { TasksContext } from "providers/tasks";
 
 const ListTasksPage = () => {
   const { t } = useTranslation();
@@ -41,22 +38,30 @@ const ListTasksPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
 
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
+  const [editSelected, setEditSelected] = useState(null);
+  const [selecteds, setSelecteds] = useState([]);
 
-  const {
-    documents,
-    setDocuments,
-    getDocuments,
-    deleteDocument,
-    deleteId,
-    setDeleteId,
-    editSelected,
-    setEditSelected,
-    pagination,
-  } = useContext(DocumentContext);
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
+
+  const {
+    getTasks,
+    tasks,
+    setTasks,
+    pagination,
+    deleteTask,
+    deleteMultipleTasks,
+    origins,
+    setOrigins,
+    classifications,
+    setClassifications,
+    types,
+    setTypes,
+    departaments,
+    setDepartaments,
+  } = useContext(TasksContext);
 
   const formRef = useRef(null);
 
@@ -79,6 +84,12 @@ const ListTasksPage = () => {
   } = useDisclosure();
 
   const {
+    isOpen: isDeleteMultipleModalOpen,
+    onOpen: onDeleteMultipleModalOpen,
+    onClose: onDeleteMultipleModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isEditModalOpen,
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
@@ -91,11 +102,11 @@ const ListTasksPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getDocuments(
+    getTasks(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       handlingSearchParams()
-    ).then((data) => setDocuments(data.items));
+    ).then((data) => setTasks(data.items));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -109,7 +120,10 @@ const ListTasksPage = () => {
               setDeleteId(item.id);
               onDeleteModalOpen();
             },
-            onClickHeader: () => {},
+            onClickHeader: (selecteds) => {
+              setSelecteds(selecteds);
+              onDeleteMultipleModalOpen();
+            },
             isDisabled: false,
             shouldShow: true,
           }
@@ -131,7 +145,6 @@ const ListTasksPage = () => {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
               setEditSelected(item);
-              console.log(item);
               onEditModalOpen();
             },
             onClickHeader: () => {},
@@ -175,14 +188,9 @@ const ListTasksPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const documents = await getDocuments(page, queryParams.get("search"), {
-      initialDate: queryParams.get("initialDate"),
-      finalDate: queryParams.get("finalDate"),
-      departamentId: queryParams.get("departamentId"),
-      category: queryParams.get("category"),
-    });
+    const tasks = await getTasks(page, queryParams.get("search"));
 
-    setDocuments(documents.items);
+    setTasks(tasks.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -191,9 +199,9 @@ const ListTasksPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const documents = await getDocuments(1, inputValue);
+      const documents = await getTasks(1, inputValue);
 
-      setDocuments(documents.items);
+      setTasks(documents.items);
     }
   }, 500);
 
@@ -248,17 +256,22 @@ const ListTasksPage = () => {
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
             label={"Detalhamento"}
-            // onClick={onAddModalOpen}
             width="150px"
             disabled={!checkPermissionForAction("documents", "canAdd")}
           />
         </HStack>
-        {/* <ActionsButtons
-          canAdd={checkPermissionForAction("documents", "canAdd")}
-        /> */}
-        <Filters />
+        <Filters
+          origins={origins}
+          classifications={classifications}
+          types={types}
+          departaments={departaments}
+          setOrigins={setOrigins}
+          setClassifications={setClassifications}
+          setTypes={setTypes}
+          setDepartaments={setDepartaments}
+        />
         <CustomTable
-          data={mockedData}
+          data={tasks}
           columns={columns}
           title={t("Tasks")}
           icons={tableIcons}
@@ -280,7 +293,7 @@ const ListTasksPage = () => {
         >
           {pagination && (
             <Pagination
-              data={mockedData}
+              data={tasks}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -297,19 +310,32 @@ const ListTasksPage = () => {
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
-          setIsDeleteLoading(true);
+          setIsLoading(true);
 
-          const response = await deleteDocument(deleteId);
+          const response = await deleteTask(deleteId);
           if (response) {
-            setDocuments(
-              documents.filter((document) => document.id !== deleteId)
-            );
+            setTasks(tasks.filter((document) => document.id !== deleteId));
           }
 
-          setIsDeleteLoading(false);
+          setIsLoading(false);
           onDeleteModalClose();
         }}
-        isLoading={isDeleteLoading}
+        isLoading={isLoading}
+      />
+      <DeleteModal
+        title={t("Excluir Tarefas")}
+        subtitle={t("Tem certeza de que deseja excluir estas Tarefas?")}
+        isOpen={isDeleteMultipleModalOpen}
+        onClose={onDeleteMultipleModalClose}
+        onConfirm={async () => {
+          setIsLoading(true);
+
+          await deleteMultipleTasks(selecteds);
+
+          setIsLoading(false);
+          onDeleteMultipleModalClose();
+        }}
+        isLoading={isLoading}
       />
       <ModalForm
         isOpen={isAddModalOpen}
@@ -317,8 +343,16 @@ const ListTasksPage = () => {
         form={
           <TaskForm
             formRef={formRef}
-            onClose={onAddModalClose}
-            setIsLoading={setIsEditLoading}
+            onCloseModal={onAddModalClose}
+            setLoading={setIsLoading}
+            origins={origins}
+            classifications={classifications}
+            types={types}
+            departaments={departaments}
+            setOrigins={setOrigins}
+            setClassifications={setClassifications}
+            setTypes={setTypes}
+            setDepartaments={setDepartaments}
           />
         }
         formRef={formRef}
@@ -326,7 +360,7 @@ const ListTasksPage = () => {
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
         modalSize="2xl"
-        isLoading={isEditLoading}
+        isLoading={isLoading}
       />
       <ModalForm
         isOpen={isEditModalOpen}
@@ -334,9 +368,9 @@ const ListTasksPage = () => {
         form={
           <TaskForm
             formRef={formRef}
-            onClose={onEditModalClose}
+            onCloseModal={onEditModalClose}
             formValues={editSelected}
-            setIsLoading={setIsEditLoading}
+            setLoading={setIsLoading}
             event="edit"
           />
         }
@@ -345,7 +379,7 @@ const ListTasksPage = () => {
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
         modalSize="2xl"
-        isLoading={isEditLoading}
+        isLoading={isLoading}
       />
     </>
   );

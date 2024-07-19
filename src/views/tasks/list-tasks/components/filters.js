@@ -2,51 +2,81 @@ import { HStack, VStack } from "@chakra-ui/react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import SelectInput from "components/select";
-import { useQuery } from "hooks/query";
+import { notSelectedCleaning } from "helpers/not-selected-cleaning";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import { CategoryContext } from "providers/category";
 import { DepartamentContext } from "providers/departament";
-import { DocumentContext } from "providers/document";
-import React, { useState, useContext } from "react";
+import { TasksContext } from "providers/tasks";
+import React, { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useSearchParams } from "react-router-dom";
 import * as Yup from "yup";
 
 export const filtersSchema = Yup.object().shape({
-  initialDate: Yup.string().matches(
-    /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
-    "Formato inválido. Use o formato dd/mm/yyyy"
-  ),
-  endDate: Yup.string().matches(
-    /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
-    "Formato inválido. Use o formato dd/mm/yyyy"
-  ),
-  departamentId: Yup.string(),
-  categoryId: Yup.string(),
-  author: Yup.string(),
+  origin: Yup.string(),
+  type: Yup.string(),
+  classification: Yup.string(),
+  status: Yup.string(),
+  departament: Yup.string(),
 });
 
-const Filters = () => {
-  const [isShowingCalendarInitial, setIsShowingCalendarInitial] =
-    useState(false);
-  const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const queryParams = useQuery();
-
-  const { departaments } = useContext(DepartamentContext);
-  const { categories } = useContext(CategoryContext);
-  const { getDocuments, setDocuments } = useContext(DocumentContext);
-
-  const [formDefaultValues, setFormDefaultValues] = useState({});
-
+const Filters = ({
+  origins,
+  classifications,
+  types,
+  departaments,
+  setOrigins,
+  setClassifications,
+  setTypes,
+  setDepartaments,
+}) => {
   const { isMobile } = useBreakpoint();
-
+  const { getOrigins, getClassifications, getTypes, getTasks, setTasks } =
+    useContext(TasksContext);
+  const { getDepartaments } = useContext(DepartamentContext);
   const {
     handleSubmit,
     register,
     formState: { errors },
-    setValue,
   } = useForm(filtersSchema);
+
+  const handlingSelects = async () => {
+    const origins = getOrigins();
+    const classifications = getClassifications();
+    const types = getTypes();
+    const departaments = getDepartaments();
+
+    await Promise.all([origins, classifications, types, departaments]).then(
+      (data) => {
+        setOrigins(data[0]);
+
+        setOrigins(
+          data[0].map((item) => {
+            return { label: item.name, value: item.id };
+          })
+        );
+        setClassifications(
+          data[1].map((item) => {
+            return { label: item.name, value: item.id };
+          })
+        );
+        setTypes(
+          data[2].map((item) => {
+            return { label: item.name, value: item.id };
+          })
+        );
+
+        setDepartaments(
+          data[3].map((item) => {
+            return { label: item.name, value: item.id };
+          })
+        );
+      }
+    );
+  };
+
+  useEffect(() => {
+    // setFormDefaultValues(queryParams);
+    handlingSelects();
+  }, []);
 
   const statusInput = (
     <VStack w={"100%"} align={"start"}>
@@ -61,15 +91,15 @@ const Filters = () => {
         options={[
           {
             label: "Aberta",
-            value: "open",
+            value: "Aberta",
           },
           {
             label: "Fechada",
-            value: "closed",
+            value: "Fechada",
           },
           {
             label: "Reaberta",
-            value: "reopened",
+            value: "Reaberta",
           },
         ]}
       />
@@ -86,20 +116,7 @@ const Filters = () => {
           label: "Selecione uma origem",
           value: "not-selected",
         }}
-        options={[
-          {
-            label: "Aberta",
-            value: "open",
-          },
-          {
-            label: "Fechada",
-            value: "closed",
-          },
-          {
-            label: "Reaberta",
-            value: "reopened",
-          },
-        ]}
+        options={origins}
       />
     </VStack>
   );
@@ -114,20 +131,7 @@ const Filters = () => {
           label: "Selecione uma classificação",
           value: "not-selected",
         }}
-        options={[
-          {
-            label: "Aberta",
-            value: "open",
-          },
-          {
-            label: "Fechada",
-            value: "closed",
-          },
-          {
-            label: "Reaberta",
-            value: "reopened",
-          },
-        ]}
+        options={classifications}
       />
     </VStack>
   );
@@ -166,12 +170,11 @@ const Filters = () => {
         label="Tipo"
         {...register("type")}
         errors={errors.type}
-        options={[
-          {
-            label: "Selecione um tipo",
-            value: "not-selected",
-          },
-        ]}
+        options={types}
+        defaultValue={{
+          label: "Selecione um tipo",
+          value: "not-selected",
+        }}
       />
     </VStack>
   );
@@ -179,20 +182,24 @@ const Filters = () => {
   const departamentInput = (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
-        label="Deppartamento"
+        label="Departamento"
         {...register("departament")}
         errors={errors.departament}
-        options={[
-          {
-            label: "Selecione um tipo",
-            value: "not-selected",
-          },
-        ]}
+        options={departaments}
+        defaultValue={{
+          label: "Selecione um tipo",
+          value: "not-selected",
+        }}
       />
     </VStack>
   );
 
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    notSelectedCleaning(data);
+    const tasks = await getTasks(1, "", data);
+
+    setTasks(tasks.items);
+  };
   return isMobile ? (
     <VStack w={"100%"} paddingX={"20px"} as="form">
       {statusInput}
