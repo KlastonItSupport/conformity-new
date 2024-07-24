@@ -58,6 +58,9 @@ export const globalStyles = {
     gray: {
       100: "#FAFCFE",
     },
+    green: {
+      100: "#E9F8F5",
+    },
   },
   styles: {
     global: (props) => ({

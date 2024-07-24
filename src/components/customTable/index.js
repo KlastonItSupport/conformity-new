@@ -33,6 +33,7 @@ const TableCustom = ({
   showSearchInput = true,
   hasMinHg = true,
   iconsHasMaxW = false,
+  cellPadding = "16px",
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -231,6 +232,7 @@ const TableCustom = ({
                     height={"15px"}
                     border={"1px solid #ddd"}
                     key={column + index}
+                    padding={cellPadding}
                   >
                     {column.formatData
                       ? column.formatData(item[column.access], item)
@@ -239,25 +241,27 @@ const TableCustom = ({
                 )
               );
             })}
-            <Td border={"1px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
-              <Box display={"flex"}>
-                {icons &&
-                  icons.map(
-                    (icon, index) =>
-                      icon &&
-                      iconCondition(icon, item) && (
-                        <Box
-                          cursor={"pointer"}
-                          key={index + "x"}
-                          onClick={() => icon.onClickRow(item)}
-                          title={icon.title ?? null}
-                        >
-                          {icon.icon}
-                        </Box>
-                      )
-                  )}
-              </Box>
-            </Td>
+            {icons && (
+              <Td border={"1px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
+                <Box display={"flex"}>
+                  {icons &&
+                    icons.map(
+                      (icon, index) =>
+                        icon &&
+                        iconCondition(icon, item) && (
+                          <Box
+                            cursor={"pointer"}
+                            key={index + "x"}
+                            onClick={() => icon.onClickRow(item)}
+                            title={icon.title ?? null}
+                          >
+                            {icon.icon}
+                          </Box>
+                        )
+                    )}
+                </Box>
+              </Td>
+            )}
           </Tr>
         );
       })
@@ -348,42 +352,43 @@ const TableCustom = ({
                 />
               </Th>
               {renderTableHeader()}
-
-              <Th border={"1px solid #ddd"}>
-                <Box display={"flex"}>
-                  {icons &&
-                    icons.map(
-                      (icon, index) =>
-                        icon &&
-                        icon.icon && (
-                          <Box
-                            key={index + "actionbuttons"}
-                            onClick={() =>
-                              shouldShowHeaderIcon(icon)
-                                ? icon.onClickHeader(
-                                    selecteds.filter(
-                                      (selected) => selected.checked
+              {icons && (
+                <Th border={"1px solid #ddd"}>
+                  <Box display={"flex"}>
+                    {icons &&
+                      icons.map(
+                        (icon, index) =>
+                          icon &&
+                          icon.icon && (
+                            <Box
+                              key={index + "actionbuttons"}
+                              onClick={() =>
+                                shouldShowHeaderIcon(icon)
+                                  ? icon.onClickHeader(
+                                      selecteds.filter(
+                                        (selected) => selected.checked
+                                      )
                                     )
-                                  )
-                                : () => {}
-                            }
-                            cursor={
-                              shouldShowHeaderIcon(icon)
-                                ? "pointer"
-                                : "not-allowed"
-                            }
-                            color={
-                              shouldShowHeaderIcon(icon)
-                                ? "black"
-                                : "secondaryGray.500"
-                            }
-                          >
-                            {icon.icon}
-                          </Box>
-                        )
-                    )}
-                </Box>
-              </Th>
+                                  : () => {}
+                              }
+                              cursor={
+                                shouldShowHeaderIcon(icon)
+                                  ? "pointer"
+                                  : "not-allowed"
+                              }
+                              color={
+                                shouldShowHeaderIcon(icon)
+                                  ? "black"
+                                  : "secondaryGray.500"
+                              }
+                            >
+                              {icon.icon}
+                            </Box>
+                          )
+                      )}
+                  </Box>
+                </Th>
+              )}
             </Tr>
           </Thead>
           <Tbody>{renderTableRows()}</Tbody>

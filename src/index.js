@@ -31,6 +31,7 @@ import RevisionsPage from "views/documents/revisions";
 import DocumentRemindersPage from "views/documents/document-reminders";
 import ListTasksPage from "views/tasks/list-tasks";
 import { TasksProvider } from "providers/tasks";
+import TaskDetailsPage from "views/tasks/details";
 
 const routes = createBrowserRouter([
   {
@@ -84,6 +85,11 @@ const routes = createBrowserRouter([
   {
     path: "/tasks",
     element: <ListTasksPage />,
+  },
+
+  {
+    path: "/tasks/details",
+    element: <TaskDetailsPage />,
   },
 ]);
 

@@ -388,7 +388,7 @@ const TaskForm = ({
           />
         }
         formRef={userRef}
-        title={t("Criar Departamento")}
+        title={t("Criar Usuário")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
         isLoading={isLoading}
