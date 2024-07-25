@@ -1,5 +1,5 @@
 import { Box, HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
-import { Check, MagnifyingGlass, Minus, Plus } from "@phosphor-icons/react";
+import { Check, MagnifyingGlass, Minus, Plus, X } from "@phosphor-icons/react";
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar";
@@ -9,6 +9,7 @@ import { sleep } from "helpers/sleep";
 import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
 import TaskForm from "components/forms/tasks/task-form";
+import { DeleteModal } from "components/components";
 
 const RelatedTasks = ({ relatedTasks }) => {
   const [isShowing, setIsShowing] = useState(false);
@@ -29,6 +30,12 @@ const RelatedTasks = ({ relatedTasks }) => {
     onClose: onAddModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: onDeleteModalOpen,
+    onClose: onDeleteModalClose,
+  } = useDisclosure();
+
   const taskIcons = (details) => (
     <HStack>
       <Box w={"60px"} h={"60px"} mr={"20px"}>
@@ -41,6 +48,7 @@ const RelatedTasks = ({ relatedTasks }) => {
           })}
         />
       </Box>
+      <MagnifyingGlass cursor={"pointer"} size={20} />,
       <Check
         size={20}
         cursor={"pointer"}
@@ -49,7 +57,7 @@ const RelatedTasks = ({ relatedTasks }) => {
           onAlertModalOpen();
         }}
       />
-      <MagnifyingGlass cursor={"pointer"} size={20} />,
+      <X size={20} cursor={"pointer"} onClick={onDeleteModalOpen} />
     </HStack>
   );
   const task = (taskInfo) => (
@@ -175,6 +183,19 @@ const RelatedTasks = ({ relatedTasks }) => {
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
         modalSize="2xl"
+        isLoading={loading}
+      />
+      <DeleteModal
+        title={t("Desrelacionar Tarefa")}
+        subtitle={t("Tem certeza de que deseja desrelacionar esta tarefa?")}
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+        onConfirm={async () => {
+          setLoading(true);
+          await sleep(500);
+          setLoading(false);
+          onDeleteModalClose();
+        }}
         isLoading={loading}
       />
     </>

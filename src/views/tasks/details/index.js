@@ -138,8 +138,8 @@ const TaskDetailsPage = () => {
         ]}
       />
       <NonConformityTreatment canDelete={canDelete} canEdit={canEdit} />
-      <RemindersTable canDelete={canDelete} canEdit={canEdit} />
       <PrevisionHistory />
+      <RemindersTable canDelete={canDelete} canEdit={canEdit} />
     </Container>
   );
 
