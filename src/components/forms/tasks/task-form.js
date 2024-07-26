@@ -85,10 +85,8 @@ const TaskForm = ({
       departaments,
       companyUsers,
     ]).then((data) => {
-      setOrigins(data[0]);
-
       setOrigins(
-        data[0].map((item) => {
+        data[0].items.map((item) => {
           return { label: item.name, value: item.id };
         })
       );
