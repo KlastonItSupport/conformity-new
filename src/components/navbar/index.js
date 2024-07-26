@@ -127,6 +127,10 @@ export const NavBar = () => {
               src: "/tasks",
               label: "Tasks",
             },
+            {
+              src: "/tasks/origins",
+              label: "Origens",
+            },
           ]}
           key={"admin-tasks"}
         />

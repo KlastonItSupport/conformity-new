@@ -136,16 +136,79 @@ const TasksProvider = ({ children }) => {
     } catch (error) {}
   };
 
-  const getOrigins = async () => {
+  const getOrigins = async (page = 1, search = "") => {
     try {
-      const response = await api.get("/origins", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const response = await api.get(
+        `/origins?page=${page}&search=${search}&pageSize=10`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
 
       if (response.status === 200) {
         return response.data;
       }
     } catch (error) {}
+  };
+
+  const deleteOrigin = async (id) => {
+    try {
+      const response = await api.delete(`/origins/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 200) {
+        toast.success("Origem excluída com sucesso");
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao deletar origem");
+    }
+  };
+
+  const deleteMultipleOrigins = async (selectedItems, setOrigins, origins) => {
+    const deletePromises = selectedItems.map((selected) =>
+      selected.id !== "checkall" ? deleteOrigin(selected.id) : () => {}
+    );
+    await Promise.all(deletePromises);
+
+    setOrigins(
+      origins.filter(
+        (origin) => !selectedItems.some((selected) => selected.id === origin.id)
+      )
+    );
+
+    toast.success("Origens excluídas com sucesso!");
+  };
+
+  const createOrigins = async (data) => {
+    try {
+      const response = await api.post("/origins", data, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 201) {
+        toast.success("Origem criada com sucesso");
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao criar origem");
+    }
+  };
+
+  const editOrigins = async (data) => {
+    try {
+      const response = await api.patch(`/origins/${data.id}`, data, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 200) {
+        toast.success("Origem editada com sucesso");
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao editar origem");
+    }
   };
   return (
     <TasksContext.Provider
@@ -162,6 +225,10 @@ const TasksProvider = ({ children }) => {
         deleteMultipleTasks,
         editTask,
         origins,
+        deleteOrigin,
+        deleteMultipleOrigins,
+        createOrigins,
+        editOrigins,
         setOrigins,
         classifications,
         setClassifications,
