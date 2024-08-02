@@ -20,7 +20,9 @@ import RemindersTable from "./components/reminders.table";
 import PrevisionHistory from "./components/prevision-history";
 import Attachments from "./components/attachments";
 import EvaluatorsTasks from "./components/evaluators";
-import RelatedTasks from "./components/related-tasks";
+import RelatedTasks from "./components/subtasks";
+import HtmlParser from "react-html-parser";
+import { DetailsTaskContext } from "providers/details-task";
 
 const TaskDetailsPage = () => {
   const { t } = useTranslation();
@@ -28,42 +30,20 @@ const TaskDetailsPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const [canDelete, setCanDelete] = useState(false);
   const [canEdit, setCanEdit] = useState(false);
+  const [canAdd, setCanAdd] = useState(false);
   const { checkPermissionForAction, userAccessRule } = useContext(AuthContext);
-  const relatedTasks = [
-    {
-      id: 1,
-      responsable: "João da Silva",
-      title: "Implantação Iso 9001",
-      origin: "AUDITORIA INTERNA",
-      classification: "Auditorias ",
-      type: "FORNECEDOR",
-      createdAt: "2022-10-10",
-      status: "Aberta",
-      progress: 40,
-    },
-    {
-      id: 2,
-      responsable: "Bruno Santos",
-      title: "Abordagem de Conformidade",
-      origin: "AUDITORIA INTERNA",
-      classification: "Auditorias ",
-      type: "FORNECEDOR",
-      createdAt: "2022-10-10",
-      status: "Fechada",
-      progress: 60,
-    },
-    {
-      id: 3,
-      responsable: "Maria da Silva",
-      title: "Implantação Iso 9001",
-      origin: "AUDITORIA INTERNA",
-      classification: "Auditorias ",
-      type: "FORNECEDOR",
-      createdAt: "2022-10-10",
-      status: "Fechada",
-      progress: 100,
-    },
-  ];
+  const {
+    getSpecificTask,
+    handleTaskStatus,
+    getAdditionalDocuments,
+    onAddAttachments,
+    deleteAttachment,
+    changeTaskPrevision,
+    getPrevisionsHistory,
+  } = useContext(DetailsTaskContext);
+  const taskId = queryParams.get("id");
+  const [task, setTask] = useState(null);
+  const [previsionsList, setPrevisionsList] = useState([]);
 
   const routeTreePaths = [
     {
@@ -82,8 +62,6 @@ const TaskDetailsPage = () => {
   ];
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const taskTitle = "Implantação Iso 9001";
-
   const leftContainer = (
     <Container
       w={isMobile ? "95%" : "65%"}
@@ -94,56 +72,55 @@ const TaskDetailsPage = () => {
       p={"0px"}
       mr={"15px"}
     >
-      <Header
-        code={931}
-        author={"João da Silva"}
-        project={"Iso 9001"}
-        origin={"AUDITORIA INTERNA"}
-        classification={"Auditorias "}
-        type={"FORNECEDOR"}
-        datePrevision={"2022-10-10"}
-        status={"Fechada"}
+      {task && (
+        <Header
+          task={task}
+          setTask={setTask}
+          handleStatusChange={handleTaskStatus}
+          changeTaskPrevision={changeTaskPrevision}
+          setPrevisionsList={(newPrevision) =>
+            setPrevisionsList([...previsionsList, newPrevision])
+          }
+          canEdit={canEdit}
+        />
+      )}
+      <RelatedTasks
+        taskId={taskId}
+        canDelete={canDelete}
+        canEdit={canEdit}
+        canAdd={canAdd}
       />
-      <RelatedTasks relatedTasks={relatedTasks} />
-      <EvaluatorsTasks
-        onAddEvaluator={() => {}}
-        onDeleteEvaluator={() => {}}
-        evaluators={[
-          {
-            id: 1,
-            name: "João da Silva",
-            picture:
-              "https://www.cnnbrasil.com.br/wp-content/uploads/sites/12/2023/07/IMG_4032.jpg?w=732&h=412&crop=1",
-          },
-          {
-            id: 2,
-            name: "Bruno Santos",
-            picture:
-              "https://www.agendartecultura.com.br/wp-content/uploads/2022/12/meneson.jpg",
-          },
-          {
-            id: 3,
-            name: "Maria da Silva",
-            picture:
-              "https://img.freepik.com/fotos-gratis/estilo-de-vida-beleza-e-moda-conceito-de-emocoes-de-pessoas-jovem-gerente-de-escritorio-feminino-asiatico-ceo-com-expressao-satisfeita-em-pe-sobre-um-fundo-branco-sorrindo-com-os-bracos-cruzados-sobre-o-peito_1258-59329.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1721606400&semt=sph",
-          },
-        ]}
-      />
+      <EvaluatorsTasks taskId={taskId} canAdd={canAdd} canDelete={canDelete} />
       <Attachments
-        attachments={[
-          { name: "ISO9001.pdf", url: "" },
-          { name: "Normas-Atualizadas.pdf", url: "" },
-          { name: "Contratos.png", url: "" },
-          { name: "Imagem.png", url: "" },
-        ]}
+        taskId={taskId}
+        getAdditionalDocuments={getAdditionalDocuments}
+        onAddAttachments={onAddAttachments}
+        onDeleteAttachment={deleteAttachment}
+        canAdd={canAdd}
+        canDelete={canDelete}
       />
-      <NonConformityTreatment canDelete={canDelete} canEdit={canEdit} />
-      <PrevisionHistory />
-      <RemindersTable canDelete={canDelete} canEdit={canEdit} />
+      <NonConformityTreatment
+        canDelete={canDelete}
+        canEdit={canEdit}
+        canAdd={canAdd}
+        taskId={taskId}
+      />
+      <PrevisionHistory
+        getPrevisionHistory={getPrevisionsHistory}
+        taskId={taskId}
+        previsionsList={previsionsList}
+        setPrevisionsList={setPrevisionsList}
+      />
+      <RemindersTable
+        canDelete={canDelete}
+        canEdit={canEdit}
+        canAdd={canAdd}
+        taskId={taskId}
+      />
     </Container>
   );
 
-  const rightContainer = (
+  const rightContainer = task && (
     <Container
       w={isMobile ? "95%" : "35%"}
       h={"100%"}
@@ -155,42 +132,53 @@ const TaskDetailsPage = () => {
       <Container
         m={"0px"}
         p={"0"}
-        border={"1px solid #ddd"}
         minH={"200px"}
-        bgColor={"white"}
         margin={"0 0px 40px 0px"}
         padding={"23px"}
+        border={"1px solid #ddd"}
+        bgColor={"white"}
       >
         <Text fontSize={"20px"} color={"header.100"}>
-          Título: {taskTitle}
+          Título: {task.title}
         </Text>
         <Text
           fontSize={"16px"}
           color={"header.100"}
           mb={isMobile ? "20px" : "0"}
+          bgColor={"white"}
         >
-          Iso 9001 é um padrão de qualidade de produtos e serviços que
-          estabelece as normas e regulamentações para a qualidade de produtos e
-          serviços de alto nível, com foco em garantir que produtos e serviços
-          sejam confiáveis, confiáveis e seguros.
+          {HtmlParser(task.description)}
         </Text>
       </Container>
       <Box mb={isMobile ? "20px" : "0"}>
         <Feed
           moduleId={2}
           externalId={queryParams.get("id")}
-          canAdd={true}
-          canDelete={true}
-          canEdit={true}
+          canAdd={canAdd}
+          canDelete={canDelete}
+          canEdit={canEdit}
         />
       </Box>
     </Container>
   );
 
+  const onLoad = async () => {
+    const task = await getSpecificTask(queryParams.get("id"));
+
+    setTask(task);
+  };
+
+  useEffect(() => {
+    onLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     setCanDelete(checkPermissionForAction("tasks", "canDelete"));
     setCanEdit(checkPermissionForAction("tasks", "canEdit"));
+    setCanAdd(checkPermissionForAction("tasks", "canAdd"));
   }, [checkPermissionForAction, userAccessRule]);
+
   return isMobile ? (
     <VStack w={"100%"} h={"100%"} marginTop={"100px"} spacing={0}>
       <NavBar />

@@ -1,5 +1,5 @@
 import { CustomTable } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ToggleArrow from "../toggle-arrow";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
@@ -8,18 +8,9 @@ import { useDisclosure } from "@chakra-ui/react";
 import RootCauseForm from "./forms/root-cause-form";
 import { DeleteModal } from "components/components";
 import { sleep } from "helpers/sleep";
-
-export const mockedData = [
-  {
-    rootCause: "Causa raiz a ser tratada",
-  },
-  {
-    rootCause: "Tratar causa raiz",
-  },
-  {
-    rootCause: "Análise de causa raiz",
-  },
-];
+import { api } from "api/api";
+import { toast } from "react-toastify";
+import { AuthContext } from "providers/auth";
 
 export const columns = [
   {
@@ -28,7 +19,7 @@ export const columns = [
   },
 ];
 
-const RootCauseTable = ({ canDelete, canEdit }) => {
+const RootCauseTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const [tableIcons, setTableIcons] = useState([]);
 
   const { t } = useTranslation();
@@ -36,6 +27,8 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [rootCauses, setRootCauses] = useState([]);
+  const { getToken } = useContext(AuthContext);
   const formRef = useRef(null);
 
   const {
@@ -61,6 +54,67 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+
+  const onAdd = async (data) => {
+    const res = await api.post(
+      `tasks-details/root-cause`,
+      {
+        ...data,
+        taskId,
+      },
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Análise de causa raiz criada com sucesso!");
+      setRootCauses([...rootCauses, res.data]);
+    }
+  };
+
+  const getRootCauses = async () => {
+    const res = await api.get(`tasks-details/root-cause/${taskId}`);
+    setRootCauses(res.data);
+  };
+
+  const onDelete = async (id) => {
+    const res = await api.delete(`tasks-details/root-cause/${id}`);
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz excluída com sucesso!");
+      setRootCauses([...rootCauses.filter((item) => item.id !== id)]);
+    }
+  };
+
+  const onEdit = async (data) => {
+    const res = await api.patch(
+      `tasks-details/root-cause/${editSelected.id}`,
+      data
+    );
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz atualizada com sucesso!");
+      const rootCausesCopy = [...rootCauses];
+      const index = rootCausesCopy.findIndex(
+        (item) => item.id === editSelected.id
+      );
+      rootCausesCopy[index] = { ...res.data };
+      setRootCauses(rootCausesCopy);
+    }
+  };
+
+  const deleteMultiple = async (selected) => {
+    const idsToDelete = selected
+      .filter((item) => item.id !== "checkall")
+      .map((item) => item.id);
+
+    await Promise.all(idsToDelete.map(async (id) => await onDelete(id)));
+
+    setRootCauses((prev) =>
+      prev.filter((item) => !idsToDelete.includes(item.id))
+    );
+  };
 
   useEffect(() => {
     const updateIcons = () => {
@@ -101,9 +155,13 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
     updateIcons();
   }, [canDelete, canEdit]);
 
+  useEffect(() => {
+    getRootCauses();
+  }, []);
+
   const rootCauseTable = (
     <CustomTable
-      data={mockedData}
+      data={rootCauses}
       columns={columns}
       showSearchInput={false}
       hasMinHg={false}
@@ -125,6 +183,7 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
         table={rootCauseTable}
         columns={columns}
         onAdd={onAddModalOpen}
+        canAdd={canAdd}
       />
       <ModalForm
         isOpen={isAddModalOpen}
@@ -134,6 +193,7 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
             formRef={formRef}
             onClose={onAddModalClose}
             setIsLoading={setIsLoading}
+            onAdd={onAdd}
           />
         }
         formRef={formRef}
@@ -153,6 +213,8 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
             onClose={onEditModalClose}
             setIsLoading={setIsLoading}
             formValues={editSelected}
+            onEdit={onEdit}
+            event="edit"
           />
         }
         formRef={formRef}
@@ -172,7 +234,7 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
-          // await onDelete(id);
+          await onDelete(deleteSelected.id);
           setIsLoading(false);
           onDeleteModalClose();
         }}
@@ -188,9 +250,9 @@ const RootCauseTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
-          // await onDelete(id);
+          await deleteMultiple(selected);
           setIsLoading(false);
-          onDeleteModalClose();
+          onDeleteMultipleModalClose();
         }}
         isLoading={isLoading}
       />

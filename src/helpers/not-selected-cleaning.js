@@ -1,5 +1,5 @@
 export const notSelectedCleaning = (data) => {
-  const notSelected = "not-selected";
+  const notSelected = "not-selected" || "checkall";
   const keys = Object.keys(data);
 
   keys.forEach((key) => {

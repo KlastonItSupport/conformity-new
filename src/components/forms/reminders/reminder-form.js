@@ -15,6 +15,7 @@ const ReminderForm = ({
   formValues,
   event = "add",
   onAdd,
+  module = "documentos",
   onEdit,
   id,
 }) => {
@@ -65,7 +66,7 @@ const ReminderForm = ({
       onAdd({
         ...data,
         dataEnd,
-        module: "documentos",
+        module,
         key: id,
         ...formatDays(days),
       });
@@ -78,7 +79,7 @@ const ReminderForm = ({
       ...data,
       id,
       dataEnd,
-      module: "documentos",
+      module,
       key: id,
       ...formatDays(days),
     });

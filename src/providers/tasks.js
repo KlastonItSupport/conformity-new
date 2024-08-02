@@ -29,6 +29,20 @@ const TasksProvider = ({ children }) => {
     return filtersParam ? `${filtersParam}` : "";
   };
 
+  const getSpecificTask = async (id) => {
+    try {
+      const response = await api.get(`/tasks/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao obter documento");
+    }
+  };
+
   const getTasks = async (page = 1, search = "", filterParams = {}) => {
     try {
       const searchParam = `search=${search ?? ""}&pageSize=10`;
@@ -238,6 +252,7 @@ const TasksProvider = ({ children }) => {
         setDepartaments,
         responsables,
         setResponsables,
+        getSpecificTask,
       }}
     >
       {children}

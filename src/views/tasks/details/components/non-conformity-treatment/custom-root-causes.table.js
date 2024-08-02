@@ -1,6 +1,6 @@
 import { CustomTable } from "components/components";
 import moment from "moment";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ToggleArrow from "../toggle-arrow";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { useDisclosure, VStack } from "@chakra-ui/react";
@@ -9,27 +9,10 @@ import CustomRootCauseForm from "./forms/custom-root-cause-form";
 import { useTranslation } from "react-i18next";
 import { DeleteModal } from "components/components";
 import { sleep } from "helpers/sleep";
-
-export const mockedData = [
-  {
-    responsable: "João da Silva",
-    why: "Este documento é importante para a nossa equipe",
-    answer: "Sim",
-    date: "2022-10-10",
-  },
-  {
-    responsable: "Bruno Santos",
-    why: "Este documento é importante para a nossa equipe",
-    answer: "Sim",
-    date: "2022-10-10",
-  },
-  {
-    responsable: "Maria da Silva",
-    why: "Este documento é importante para a nossa equipe",
-    answer: "Sim",
-    date: "2022-10-10",
-  },
-];
+import { api } from "api/api";
+import { toast } from "react-toastify";
+import { AuthContext } from "providers/auth";
+import { use } from "i18next";
 
 export const columns = [
   {
@@ -51,7 +34,7 @@ export const columns = [
   },
 ];
 
-const CustomRootCausesTable = ({ canDelete, canEdit }) => {
+const CustomRootCausesTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const formRef = useRef(null);
   const { t } = useTranslation();
   const [tableIcons, setTableIcons] = useState([]);
@@ -59,6 +42,71 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [customRootCauses, setCustomRootCauses] = useState([]);
+  const { getToken } = useContext(AuthContext);
+
+  const getCustomRootCauses = async () => {
+    const res = await api.get(`tasks-details/root-cause-analysis/${taskId}`);
+    setCustomRootCauses(res.data);
+  };
+
+  const onDelete = async (id) => {
+    const res = await api.delete(`tasks-details/root-cause-analysis/${id}`);
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz excluída com sucesso!");
+      setCustomRootCauses([
+        ...customRootCauses.filter((item) => item.id !== id),
+      ]);
+    }
+  };
+
+  const deleteMultiple = async (selected) => {
+    const idsToDelete = selected
+      .filter((item) => item.id !== "checkall")
+      .map((item) => item.id);
+
+    await Promise.all(idsToDelete.map(async (id) => await onDelete(id)));
+
+    setCustomRootCauses((prev) =>
+      prev.filter((item) => !idsToDelete.includes(item.id))
+    );
+  };
+
+  const onEdit = async (data) => {
+    const res = await api.patch(
+      `tasks-details/root-cause-analysis/${editSelected.id}`,
+      data
+    );
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz atualizada com sucesso!");
+      const customRootCausesCopy = [...customRootCauses];
+      const index = customRootCausesCopy.findIndex(
+        (item) => item.id === editSelected.id
+      );
+      customRootCausesCopy[index] = { ...res.data };
+      setCustomRootCauses(customRootCausesCopy);
+    }
+  };
+
+  const onAdd = async (data) => {
+    const res = await api.post(
+      `tasks-details/root-cause-analysis`,
+      {
+        ...data,
+        taskId,
+      },
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Análise de causa raiz criada com sucesso!");
+      setCustomRootCauses([...customRootCauses, res.data]);
+    }
+  };
 
   const {
     isOpen: isAddModalOpen,
@@ -121,11 +169,16 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
     };
 
     updateIcons();
-  }, [canDelete, canEdit]);
+  }, []);
+  // }, [userPermissions, userAccessRule]);
+
+  useEffect(() => {
+    getCustomRootCauses();
+  }, []);
 
   const customRootCausesTable = (
     <CustomTable
-      data={mockedData}
+      data={customRootCauses}
       columns={columns}
       showSearchInput={false}
       icons={tableIcons}
@@ -149,6 +202,7 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
           table={customRootCausesTable}
           columns={columns}
           onAdd={onAddModalOpen}
+          canAdd={canAdd}
         />
       </VStack>
       <ModalForm
@@ -159,6 +213,7 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
             formRef={formRef}
             onClose={onAddModalClose}
             setIsLoading={setIsLoading}
+            onAdd={onAdd}
           />
         }
         formRef={formRef}
@@ -177,6 +232,8 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
             onClose={onEditModalClose}
             setIsLoading={setIsLoading}
             formValues={editSelected}
+            onEdit={onEdit}
+            event="edit"
           />
         }
         formRef={formRef}
@@ -196,7 +253,7 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
-          // await onDelete(id);
+          await onDelete(deleteSelected.id);
           setIsLoading(false);
           onDeleteModalClose();
         }}
@@ -204,7 +261,7 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
       />
 
       <DeleteModal
-        title={t("Excluir Análise de causa raiz")}
+        title={t("Excluir Análises de causa raiz")}
         subtitle={t(
           "Tem certeza de que deseja excluir estas Análises de causa raiz?"
         )}
@@ -213,6 +270,7 @@ const CustomRootCausesTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
+          await deleteMultiple(selected);
           setIsLoading(false);
           onDeleteMultipleModalClose();
         }}

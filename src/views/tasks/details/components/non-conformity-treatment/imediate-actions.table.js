@@ -1,39 +1,26 @@
 // Data (Prazo)	Responsável	Ação
 import { CustomTable } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ToggleArrow from "../toggle-arrow";
-import moment from "moment";
+import moment from "moment-timezone";
+
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { useTranslation } from "react-i18next";
 import { useDisclosure } from "@chakra-ui/react";
 import { ModalForm } from "components/components";
 import ImediateActionsForm from "./forms/imediate-actions-form";
 import { DeleteModal } from "components/components";
-import { sleep } from "helpers/sleep";
-
-export const mockedData = [
-  {
-    data: "2022-10-10",
-    responsable: "João da Silva",
-    action: "Este documento é importante para a nossa equipe",
-  },
-  {
-    data: "2022-10-10",
-    responsable: "Bruno Santos",
-    action: "Este documento é importante para a nossa equipe",
-  },
-  {
-    data: "2022-10-10",
-    responsable: "Maria da Silva",
-    action: "Este documento é importante para a nossa equipe",
-  },
-];
+import { api } from "api/api";
+import { toast } from "react-toastify";
+import { AuthContext } from "providers/auth";
 
 export const columns = [
   {
     header: "Data (Prazo)",
-    access: "data",
-    formatData: (data) => moment.utc(data).format("DD/MM/YYYY"),
+    access: "date",
+    formatData: (data) => {
+      return moment.utc(data).format("DD/MM/YYYY");
+    },
   },
   {
     header: "Responsável",
@@ -45,12 +32,14 @@ export const columns = [
   },
 ];
 
-const ImediateActionsTable = ({ canDelete, canEdit }) => {
+const ImediateActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [deleteSelected, setDeleteSelected] = useState(null);
+  const [immediateActions, setImmediateActions] = useState([]);
   const [editSelected, setEditSelected] = useState(null);
+  const { getToken } = useContext(AuthContext);
   const { t } = useTranslation();
   const formRef = useRef(null);
 
@@ -76,6 +65,69 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
     onOpen: onDeleteMultipleModalOpen,
     onClose: onDeleteMultipleModalClose,
   } = useDisclosure();
+
+  const onAdd = async (data) => {
+    const res = await api.post(
+      `tasks-details/immediate-actions`,
+      {
+        ...data,
+        taskId,
+      },
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Ação imediata criada com sucesso!");
+      setImmediateActions([...immediateActions, res.data]);
+    }
+  };
+
+  const onEdit = async (data) => {
+    const res = await api.patch(
+      `tasks-details/immediate-actions/${editSelected.id}`,
+      data
+    );
+
+    if (res.status === 200) {
+      toast.success("Ação imediata atualizada com sucesso!");
+      const immediateActionsCopy = [...immediateActions];
+      const index = immediateActionsCopy.findIndex(
+        (item) => item.id === editSelected.id
+      );
+      immediateActionsCopy[index] = { ...res.data };
+      setImmediateActions(immediateActionsCopy);
+    }
+  };
+
+  const getImmediateActions = async () => {
+    const res = await api.get(`tasks-details/immediate-actions/${taskId}`);
+    setImmediateActions(res.data);
+  };
+
+  const deleteItem = async (id) => {
+    const res = await api.delete(`tasks-details/immediate-actions/${id}`);
+
+    if (res.status === 200) {
+      toast.success("Ação imediata excluída com sucesso!");
+      setImmediateActions([
+        ...immediateActions.filter((item) => item.id !== id),
+      ]);
+    }
+  };
+
+  const deleteMultiple = async (selected) => {
+    const idsToDelete = selected
+      .filter((item) => item.id !== "checkall")
+      .map((item) => item.id);
+
+    await Promise.all(idsToDelete.map(async (id) => await deleteItem(id)));
+
+    setImmediateActions((prev) =>
+      prev.filter((item) => !idsToDelete.includes(item.id))
+    );
+  };
 
   useEffect(() => {
     const updateIcons = () => {
@@ -116,9 +168,13 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
     updateIcons();
   }, [canDelete, canEdit]);
 
+  useEffect(() => {
+    getImmediateActions();
+  }, []);
+
   const imeadiateActionsTable = (
     <CustomTable
-      data={mockedData}
+      data={immediateActions}
       columns={columns}
       showSearchInput={false}
       hasMinHg={false}
@@ -140,6 +196,7 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
         table={imeadiateActionsTable}
         columns={columns}
         onAdd={onAddModalOpen}
+        canAdd={canAdd}
       />
       <ModalForm
         isOpen={isAddModalOpen}
@@ -149,6 +206,7 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
             formRef={formRef}
             onClose={onAddModalClose}
             setIsLoading={setIsLoading}
+            onAdd={onAdd}
           />
         }
         formRef={formRef}
@@ -166,6 +224,8 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
             formRef={formRef}
             onClose={onEditModalClose}
             setIsLoading={setIsLoading}
+            event="edit"
+            onEdit={onEdit}
             formValues={editSelected}
           />
         }
@@ -183,8 +243,7 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsLoading(true);
-          await sleep(200);
-          // await onDelete(id);
+          await deleteItem(deleteSelected.id);
           setIsLoading(false);
           onDeleteModalClose();
         }}
@@ -198,7 +257,7 @@ const ImediateActionsTable = ({ canDelete, canEdit }) => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsLoading(true);
-          await sleep(200);
+          await deleteMultiple(selected);
           setIsLoading(false);
           onDeleteMultipleModalClose();
         }}

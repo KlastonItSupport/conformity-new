@@ -4,12 +4,19 @@ import { ButtonPrimary } from "components/button-primary";
 import { DeleteModal } from "components/components";
 import { ModalForm } from "components/components";
 import TaskEvaluator from "components/forms/tasks/task-evaluator/task-evaluator";
-import React, { useRef } from "react";
+import { DetailsTaskContext } from "providers/details-task";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import undefinedPic from "assets/img/undefined-pic.png";
 
-const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
+const EvaluatorsTasks = ({ taskId, canAdd, canDelete }) => {
   const { t } = useTranslation();
   const addEvaluatorFormRef = useRef();
+  const { getEvaluators, deleteEvaluator, addEvaluator } =
+    useContext(DetailsTaskContext);
+  const [evaluatorsList, setEvaluatorsList] = useState([]);
+  const [deleteSelected, setDeleteSelected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     isOpen: isAddEvaluatorModalOpen,
     onOpen: onAddEvaluatorModalOpen,
@@ -22,6 +29,12 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
     onClose: onDeleteModalClose,
   } = useDisclosure();
 
+  useEffect(() => {
+    getEvaluators(taskId).then((evaluators) => {
+      setEvaluatorsList(evaluators);
+    });
+  }, []);
+
   const evaluatorBox = (evaluator) => {
     return (
       <HStack
@@ -32,7 +45,7 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
       >
         <HStack>
           <Image
-            src={evaluator.picture}
+            src={evaluator.user?.profilePic ?? undefinedPic}
             width={"40px"}
             height={"40px"}
             border={"2px solid"}
@@ -41,15 +54,22 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
             padding={"2px"}
           />
           <Text fontSize={"16px"} color={"header.100"}>
-            {evaluator.name}
+            {evaluator.user?.name}
           </Text>
         </HStack>
         <Trash
           size={24}
-          cursor={"pointer"}
-          color="#0086FF"
           weight="fill"
-          onClick={() => onDeleteModalOpen()}
+          color={canDelete ? "#0086FF" : "#ddd"}
+          cursor={canDelete ? "pointer" : "not-allowed"}
+          onClick={
+            canDelete
+              ? () => {
+                  setDeleteSelected(evaluator);
+                  onDeleteModalOpen();
+                }
+              : null
+          }
         />
       </HStack>
     );
@@ -81,9 +101,10 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
             h="40px"
             type="submit"
             onClick={onAddEvaluatorModalOpen}
+            disabled={!canAdd}
           />
         </HStack>
-        {evaluators.map((evaluator) => evaluatorBox(evaluator))}
+        {evaluatorsList.map((evaluator) => evaluatorBox(evaluator))}
       </VStack>
       <ModalForm
         isOpen={isAddEvaluatorModalOpen}
@@ -91,13 +112,22 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
         form={
           <TaskEvaluator
             formRef={addEvaluatorFormRef}
-            onClose={onAddEvaluatorModalClose}
+            onClose={async (usersIds) => {
+              const response = await addEvaluator(taskId, usersIds);
+
+              if (response) {
+                setEvaluatorsList([...evaluatorsList, ...response]);
+              }
+              onAddEvaluatorModalClose();
+            }}
+            setLoading={setIsLoading}
           />
         }
         formRef={addEvaluatorFormRef}
         title={t("Adicionar Avaliador")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
+        isLoading={isLoading}
       />
       <DeleteModal
         title={t("Excluir Avaliador")}
@@ -105,8 +135,21 @@ const EvaluatorsTasks = ({ evaluators, onAddEvaluator, onDeleteEvaluator }) => {
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
+          setIsLoading(true);
+          const evaluator = await deleteEvaluator(deleteSelected.id);
+
+          if (evaluator) {
+            setEvaluatorsList(
+              evaluatorsList.filter(
+                (evaluator) => evaluator.id !== deleteSelected.id
+              )
+            );
+          }
+
+          setIsLoading(false);
           onDeleteModalClose();
         }}
+        isLoading={isLoading}
       />
     </>
   );

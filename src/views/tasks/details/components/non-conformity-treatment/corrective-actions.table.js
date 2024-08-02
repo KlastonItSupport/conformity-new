@@ -1,6 +1,6 @@
 // Data (Prazo)	Responsável	Ação	Resultado
 import { CustomTable } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ToggleArrow from "../toggle-arrow";
 import moment from "moment";
 import { NotePencil, Trash } from "@phosphor-icons/react";
@@ -10,32 +10,15 @@ import { useTranslation } from "react-i18next";
 import CorrectiveActionsForm from "./forms/corrective-actions-form";
 import { DeleteModal } from "components/components";
 import { sleep } from "helpers/sleep";
-
-export const mockedData = [
-  {
-    data: "2022-10-10",
-    responsable: "João da Silva",
-    action: "Este documento é importante para a nossa equipe",
-    result: "Sim",
-  },
-  {
-    data: "2022-10-10",
-    responsable: "Bruno Santos",
-    action: "Este documento é importante para a nossa equipe",
-    result: "Sim",
-  },
-  {
-    data: "2022-10-10",
-    responsable: "Maria da Silva",
-    action: "Este documento é importante para a nossa equipe",
-    result: "Sim",
-  },
-];
+import { get } from "lodash";
+import { api } from "api/api";
+import { toast } from "react-toastify";
+import { AuthContext } from "providers/auth";
 
 export const columns = [
   {
     header: "Data (Prazo)",
-    access: "data",
+    access: "date",
     formatData: (data) => moment.utc(data).format("DD/MM/YYYY"),
   },
   {
@@ -52,11 +35,13 @@ export const columns = [
   },
 ];
 
-const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
+const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [deleteSelected, setDeleteSelected] = useState(null);
+  const [çorretiveActions, setCorrectiveActions] = useState([]);
+  const { getToken } = useContext(AuthContext);
   const [editSelected, setEditSelected] = useState(null);
   const { t } = useTranslation();
   const formRef = useRef(null);
@@ -84,6 +69,70 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
     onOpen: onDeleteMultipleModalOpen,
     onClose: onDeleteMultipleModalClose,
   } = useDisclosure();
+
+  const getCorrectiveActions = async (id) => {
+    const res = await api.get(`tasks-details/corrective-actions/${id}`);
+    setCorrectiveActions(res.data);
+  };
+
+  const deleteCorrectiveAction = async (id) => {
+    const res = await api.delete(`tasks-details/corrective-actions/${id}`);
+
+    if (res.status === 200) {
+      toast.success("Ação corretiva excluída com sucesso!");
+      setCorrectiveActions([
+        ...çorretiveActions.filter((item) => item.id !== id),
+      ]);
+    }
+  };
+
+  const addCorrectiveAction = async (data) => {
+    const res = await api.post(
+      `tasks-details/corrective-actions`,
+      { ...data, taskId },
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Ação corretiva adicionada com sucesso!");
+      setCorrectiveActions([...çorretiveActions, res.data]);
+    }
+  };
+
+  const editCorrectiveAction = async (data) => {
+    const res = await api.patch(
+      `tasks-details/corrective-actions/${editSelected.id}`,
+      data
+    );
+
+    if (res.status === 200) {
+      toast.success("Ação corretiva atualizada com sucesso!");
+      const correctiveActionsCopy = [...çorretiveActions];
+      const index = correctiveActionsCopy.findIndex(
+        (item) => item.id === editSelected.id
+      );
+      correctiveActionsCopy[index] = { ...res.data };
+      setCorrectiveActions(correctiveActionsCopy);
+    }
+  };
+
+  const deleteMultiple = async (selected) => {
+    const idsToDelete = selected
+      .filter((item) => item.id !== "checkall")
+      .map((item) => item.id);
+
+    await Promise.all(
+      idsToDelete.map(async (id) => await deleteCorrectiveAction(id))
+    );
+
+    setCorrectiveActions((prev) =>
+      prev.filter((item) => !idsToDelete.includes(item.id))
+    );
+  };
 
   useEffect(() => {
     const updateIcons = () => {
@@ -124,9 +173,13 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
     updateIcons();
   }, [canDelete, canEdit]);
 
+  useEffect(() => {
+    getCorrectiveActions(taskId);
+  }, []);
+
   const correctiveActionsTable = (
     <CustomTable
-      data={mockedData}
+      data={çorretiveActions}
       columns={columns}
       showSearchInput={false}
       hasMinHg={false}
@@ -148,6 +201,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
         table={correctiveActionsTable}
         columns={columns}
         onAdd={onAddModalOpen}
+        canAdd={canAdd}
       />
       <ModalForm
         isOpen={isAddModalOpen}
@@ -156,6 +210,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
           <CorrectiveActionsForm
             formRef={formRef}
             onClose={onAddModalClose}
+            onAdd={addCorrectiveAction}
             setIsLoading={setIsLoading}
           />
         }
@@ -175,6 +230,8 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
             onClose={onEditModalClose}
             setIsLoading={setIsLoading}
             formValues={editSelected}
+            onEdit={editCorrectiveAction}
+            event="edit"
           />
         }
         formRef={formRef}
@@ -192,7 +249,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
-          // await onDelete(id);
+          await deleteCorrectiveAction(deleteSelected.id);
           setIsLoading(false);
           onDeleteModalClose();
         }}
@@ -209,6 +266,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
+          await deleteMultiple(selected);
           setIsLoading(false);
           onDeleteMultipleModalClose();
         }}

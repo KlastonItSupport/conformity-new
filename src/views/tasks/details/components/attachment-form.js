@@ -28,7 +28,7 @@ const AttachmentForm = ({ formRef, onClose, setIsLoading }) => {
     const fileTreated = await handlingMultipleFilesToBase64(data.documents);
 
     setIsLoading(false);
-    onClose();
+    onClose(fileTreated);
   };
   return (
     <form

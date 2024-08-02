@@ -1,7 +1,7 @@
 import { Divider, Text, VStack } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import { FormTextArea } from "components/components";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import FeedInfo from "./components/feed-info";
 import { api } from "api/api";
 import { FeedSchema } from "./schema";
@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
+import TextEditor from "components/text-editor-mce";
 
 const Feed = ({
   moduleId,
@@ -20,6 +21,8 @@ const Feed = ({
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
   const { user } = useContext(AuthContext);
+  const richTextRef = useRef(null);
+  const [description, setDescription] = useState("");
 
   const {
     handleSubmit,
@@ -95,11 +98,17 @@ const Feed = ({
         <Text fontSize={"20px"} color={"header.100"}>
           Feed
         </Text>
-        <Divider color={"#ddd"} />
-        <FormTextArea
+        {/* <FormTextArea
           {...register("text")}
           error={errors.text?.message}
           label={"Adicionar informação neste Documento"}
+        />
+         */}
+        <TextEditor
+          value={description}
+          onChange={setDescription}
+          ref={richTextRef}
+          menubar={false}
         />
 
         <ButtonPrimary

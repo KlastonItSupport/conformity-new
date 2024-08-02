@@ -20,11 +20,11 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { columns } from "./helpers/table-helper";
 import {
-  createDocumentReminder,
-  deleteDocumentReminder,
+  createReminder,
+  deleteReminder,
   deleteMultipleDocumentReminders,
-  getDocumentReminders,
-  updateDocumentReminder,
+  getReminders,
+  updateReminder,
 } from "./helpers/helper";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
@@ -99,7 +99,7 @@ const DocumentRemindersPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const reminders = await getDocumentReminders(
+    const reminders = await getReminders(
       getToken(),
       id,
       page,
@@ -116,7 +116,7 @@ const DocumentRemindersPage = () => {
 
       setSearchParams(searchParams);
 
-      const reminders = await getDocumentReminders(
+      const reminders = await getReminders(
         getToken(),
         id,
         queryParams.get("page") ?? 1,
@@ -131,7 +131,7 @@ const DocumentRemindersPage = () => {
   const [tableIcons, setTableIcons] = useState([]);
 
   useEffect(() => {
-    getDocumentReminders(
+    getReminders(
       getToken(),
       id,
       searchParams.get("page") ?? 1,
@@ -240,12 +240,7 @@ const DocumentRemindersPage = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setModalLoading(true);
-          await deleteDocumentReminder(
-            deleteId,
-            getToken(),
-            setReminders,
-            reminders
-          );
+          await deleteReminder(deleteId, getToken(), setReminders, reminders);
           setModalLoading(false);
           onDeleteModalClose();
         }}
@@ -282,12 +277,7 @@ const DocumentRemindersPage = () => {
             id={editSelectedItem?.id ?? ""}
             onEdit={async (data) => {
               setModalLoading(true);
-              await updateDocumentReminder(
-                data,
-                getToken(),
-                setReminders,
-                reminders
-              );
+              await updateReminder(data, getToken(), setReminders, reminders);
               setModalLoading(false);
               onFormModalClose();
             }}
@@ -309,7 +299,7 @@ const DocumentRemindersPage = () => {
             onClose={onFormModalClose}
             onAdd={async (data) => {
               setModalLoading(true);
-              const reminder = await createDocumentReminder(data, getToken());
+              const reminder = await createReminder(data, getToken());
               setReminders([...reminders, reminder]);
               setModalLoading(false);
               onFormAddModalClose();

@@ -1,17 +1,18 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { sleep } from "helpers/sleep";
 import * as Yup from "yup";
 import { FormInput } from "components/components";
-import moment from "moment";
+import moment from "moment-timezone";
+
 import { CalendarCustom } from "components/calendar";
 import { Box } from "@chakra-ui/react";
+import { FormTextArea } from "components/components";
 
 export const schema = Yup.object().shape({
   action: Yup.string().required("Ação obrigatória"),
   responsable: Yup.string().required("Responsável obrigatório"),
-  data: Yup.string().required("Data obrigatória"),
+  date: Yup.string().required("Data obrigatória"),
 });
 
 const ImediateActionsForm = ({
@@ -19,6 +20,9 @@ const ImediateActionsForm = ({
   onClose,
   setIsLoading,
   formValues,
+  onAdd,
+  onEdit,
+  event = "add",
 }) => {
   const dateRef = useRef(null);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
@@ -33,17 +37,27 @@ const ImediateActionsForm = ({
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    await sleep(250);
+    const date = moment
+      .tz(data.date, "DD/MM/YYYY", "America/Sao_Paulo")
+      .format("YYYY-MM-DD");
+
+    if (event === "edit") {
+      await onEdit({ ...data, date });
+    } else {
+      await onAdd({ ...data, date });
+    }
+
     setIsLoading(false);
     onClose();
   };
+
   return (
     <form
       style={{ width: "100%", padding: "" }}
       onSubmit={handleSubmit(onSubmit)}
       ref={formRef}
     >
-      <FormInput
+      <FormTextArea
         label={"Ação imediata ou bloqueio"}
         {...register("action")}
         error={errors.action?.message}
@@ -75,10 +89,10 @@ const ImediateActionsForm = ({
           onChange={(e) => {
             if (e.target.value.length === 10) setIsShowingCalendar(false);
           }}
-          {...register("data")}
-          error={errors.data?.message}
+          {...register("date")}
+          error={errors.date?.message}
           defaultValue={moment
-            .utc(formValues?.data ?? new Date())
+            .utc(formValues?.date ?? new Date())
             .format("DD/MM/YYYY")}
         />
         {isShowingCalendar && (
@@ -91,7 +105,7 @@ const ImediateActionsForm = ({
 
                 const formattedDate = `${day}/${month}/${year}`;
 
-                setValue("data", formattedDate);
+                setValue("date", formattedDate);
                 setIsShowingCalendar(!isShowingCalendar);
               }}
             />

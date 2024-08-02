@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import moment from "moment";
 import { CustomTable } from "components/components";
 import { HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
@@ -8,6 +8,12 @@ import ReminderForm from "components/forms/reminders/reminder-form";
 import { useTranslation } from "react-i18next";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
+import { getReminders } from "views/documents/document-reminders/helpers/helper";
+import { AuthContext } from "providers/auth";
+import { createReminder } from "views/documents/document-reminders/helpers/helper";
+import { deleteReminder } from "views/documents/document-reminders/helpers/helper";
+import { updateReminder } from "views/documents/document-reminders/helpers/helper";
+import { deleteMultipleDocumentReminders } from "views/documents/document-reminders/helpers/helper";
 
 export const columns = [
   {
@@ -29,28 +35,7 @@ export const columns = [
   },
 ];
 
-const mockedData = [
-  {
-    frequency: "Semanal",
-    status: "Ativo",
-    dataEnd: "2022-10-10",
-    hour: "10:00",
-  },
-  {
-    frequency: "Mensal",
-    status: "Ativo",
-    dataEnd: "2022-10-10",
-    hour: "10:00",
-  },
-  {
-    frequency: "Mensal",
-    status: "Active",
-    dataEnd: "2022-10-10",
-    hour: "10:00",
-  },
-];
-
-const RemindersTable = ({ canDelete, canEdit }) => {
+const RemindersTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const { t } = useTranslation();
   const formRef = useRef();
   const editFormRef = useRef();
@@ -58,7 +43,9 @@ const RemindersTable = ({ canDelete, canEdit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [deleteSelected, setDeleteSelected] = useState(null);
+  const [reminders, setReminders] = useState([]);
   const [editSelected, setEditSelected] = useState(null);
+  const { getToken } = useContext(AuthContext);
 
   const {
     isOpen: isFormAddModalOpen,
@@ -94,7 +81,7 @@ const RemindersTable = ({ canDelete, canEdit }) => {
               onDeleteModalOpen();
             },
             onClickHeader: (selecteds) => {
-              setEditSelected(selecteds);
+              setSelected(selecteds);
               onDeleteMultipleModalOpen();
             },
             isDisabled: false,
@@ -123,7 +110,12 @@ const RemindersTable = ({ canDelete, canEdit }) => {
     updateIcons();
   }, [canDelete, canEdit]);
 
-  useEffect(() => {}, [editSelected]);
+  useEffect(() => {
+    getReminders(getToken(), taskId).then((analysisDocuments) => {
+      setReminders(analysisDocuments.items);
+      // setPagination(analysisDocuments.pages);
+    });
+  }, []);
   return (
     <>
       <VStack
@@ -152,11 +144,12 @@ const RemindersTable = ({ canDelete, canEdit }) => {
             h="40px"
             type="submit"
             onClick={onFormAddModalOpen}
+            disabled={!canAdd}
           />
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={reminders}
           columns={columns}
           showSearchInput={false}
           iconsHasMaxW={true}
@@ -181,15 +174,22 @@ const RemindersTable = ({ canDelete, canEdit }) => {
           <ReminderForm
             formRef={formRef}
             onClose={onFormAddModalClose}
-            onAdd={async (data) => {}}
-            id={1}
+            onAdd={async (data) => {
+              setIsLoading(true);
+              const reminder = await createReminder(data, getToken());
+              setReminders([...reminders, reminder]);
+              setIsLoading(false);
+              onFormAddModalClose();
+            }}
+            module="tasks"
+            id={taskId}
           />
         }
         formRef={formRef}
         title={t("Criar Lembrete")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
-        isLoading={false}
+        isLoading={isLoading}
         modalSize="2xl"
       />
       <ModalForm
@@ -201,16 +201,11 @@ const RemindersTable = ({ canDelete, canEdit }) => {
             onClose={onEditModalClose}
             formValues={editSelected}
             event="edit"
-            id={2}
+            id={editSelected?.id ?? ""}
             onEdit={async (data) => {
-              // setModalLoading(true);
-              // await updateDocumentReminder(
-              //   data,
-              //   getToken(),
-              //   setReminders,
-              //   reminders
-              // );
-              // setModalLoading(false);
+              setIsLoading(true);
+              await updateReminder(data, getToken(), setReminders, reminders);
+              setIsLoading(false);
               onEditModalClose();
             }}
           />
@@ -219,7 +214,7 @@ const RemindersTable = ({ canDelete, canEdit }) => {
         title={t("Editar Lembrete")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
-        isLoading={false}
+        isLoading={isLoading}
         modalSize="2xl"
       />
       <DeleteModal
@@ -228,9 +223,17 @@ const RemindersTable = ({ canDelete, canEdit }) => {
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
+          setIsLoading(true);
+          await deleteReminder(
+            deleteSelected.id,
+            getToken(),
+            setReminders,
+            reminders
+          );
+          setIsLoading(false);
           onDeleteModalClose();
         }}
-        isLoading={false}
+        isLoading={isLoading}
       />
       <DeleteModal
         title={t("Excluir Lembretes")}
@@ -238,9 +241,18 @@ const RemindersTable = ({ canDelete, canEdit }) => {
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
+          setIsLoading(true);
+          await deleteMultipleDocumentReminders(
+            selected,
+            getToken(),
+            setReminders,
+            reminders,
+            false
+          );
+          setIsLoading(false);
           onDeleteMultipleModalClose();
         }}
-        isLoading={false}
+        isLoading={isLoading}
       />
     </>
   );

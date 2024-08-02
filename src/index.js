@@ -33,6 +33,7 @@ import ListTasksPage from "views/tasks/list-tasks";
 import { TasksProvider } from "providers/tasks";
 import TaskDetailsPage from "views/tasks/details";
 import OriginsPage from "views/tasks/origins";
+import { DetailsTaskProvider } from "providers/details-task";
 
 const routes = createBrowserRouter([
   {
@@ -109,14 +110,16 @@ ReactDOM.render(
                 <CategoryProvider>
                   <DepartamentProvider>
                     <TasksProvider>
-                      <ChakraProvider theme={theme}>
-                        <ToastContainer />
-                        <React.StrictMode>
-                          <ThemeEditorProvider>
-                            <RouterProvider router={routes} />
-                          </ThemeEditorProvider>
-                        </React.StrictMode>
-                      </ChakraProvider>
+                      <DetailsTaskProvider>
+                        <ChakraProvider theme={theme}>
+                          <ToastContainer />
+                          <React.StrictMode>
+                            <ThemeEditorProvider>
+                              <RouterProvider router={routes} />
+                            </ThemeEditorProvider>
+                          </React.StrictMode>
+                        </ChakraProvider>
+                      </DetailsTaskProvider>
                     </TasksProvider>
                   </DepartamentProvider>
                 </CategoryProvider>

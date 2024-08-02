@@ -1,5 +1,5 @@
 import { CustomTable } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ToggleArrow from "../toggle-arrow";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
@@ -8,36 +8,9 @@ import { useDisclosure } from "@chakra-ui/react";
 import IshikawaForm from "./forms/ishikawa-form";
 import { DeleteModal } from "components/components";
 import { sleep } from "helpers/sleep";
-
-export const mockedData = [
-  {
-    responsable: "João da Silva",
-    method: "Este documento é importante para a nossa equipe",
-    workHand: "Não",
-    measure: "Medida",
-    environment: "Meio amb",
-    machine: "Maq",
-    material: "Sim",
-  },
-  {
-    responsable: "Bruno Santos",
-    method: "Este documento é importante para a nossa equipe",
-    workHand: "Sim",
-    measure: "Sim",
-    environment: "Sim",
-    machine: "Sim",
-    material: "Sim",
-  },
-  {
-    responsable: "Maria da Silva",
-    method: "Este documento é importante para a nossa equipe",
-    workHand: "Sim",
-    measure: "Sim",
-    environment: "Sim",
-    machine: "Sim",
-    material: "Sim",
-  },
-];
+import { api } from "api/api";
+import { toast } from "react-toastify";
+import { AuthContext } from "providers/auth";
 
 export const columns = [
   {
@@ -55,7 +28,6 @@ export const columns = [
   {
     header: "Material",
     access: "material",
-    // formatData: (data) => moment.utc(data).format("DD/MM/YYYY"),
   },
   {
     header: "Mão de obra",
@@ -71,12 +43,14 @@ export const columns = [
   },
 ];
 
-const IshikawaTable = ({ canDelete, canEdit }) => {
+const IshikawaTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
   const [selected, setSelected] = useState([]);
+  const [ishikawa, setIshikawa] = useState([]);
+  const { getToken } = useContext(AuthContext);
   const formRef = useRef(null);
   const { t } = useTranslation();
 
@@ -102,6 +76,66 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+
+  const getIshikawa = async (id) => {
+    const res = await api.get(`tasks-details/ishikawa/${id}`);
+    setIshikawa(res.data);
+  };
+
+  const deleteItem = async (id) => {
+    const res = await api.delete(`tasks-details/ishikawa/${id}`);
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz excluída com sucesso!");
+      setIshikawa([...ishikawa.filter((item) => item.id !== id)]);
+    }
+  };
+
+  const deleteMultiple = async (selected) => {
+    const idsToDelete = selected
+      .filter((item) => item.id !== "checkall")
+      .map((item) => item.id);
+
+    await Promise.all(idsToDelete.map(async (id) => await deleteItem(id)));
+
+    setIshikawa((prev) =>
+      prev.filter((item) => !idsToDelete.includes(item.id))
+    );
+  };
+
+  const addIshikawa = async (data) => {
+    const res = await api.post(
+      `tasks-details/ishikawa`,
+      { ...data, taskId },
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    if (res.status === 201) {
+      toast.success("Análise de causa raiz adicionada com sucesso!");
+      setIshikawa([...ishikawa, res.data]);
+    }
+  };
+
+  const editIshikawa = async (data) => {
+    const res = await api.patch(
+      `tasks-details/ishikawa/${editSelected.id}`,
+      data
+    );
+
+    if (res.status === 200) {
+      toast.success("Análise de causa raiz atualizada com sucesso!");
+      const ishikawaCopy = [...ishikawa];
+      const index = ishikawaCopy.findIndex(
+        (item) => item.id === editSelected.id
+      );
+      ishikawaCopy[index] = { ...res.data };
+      setIshikawa(ishikawaCopy);
+    }
+  };
 
   useEffect(() => {
     const updateIcons = () => {
@@ -142,9 +176,13 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
     updateIcons();
   }, [canDelete, canEdit]);
 
+  useEffect(() => {
+    getIshikawa(taskId);
+  }, []);
+
   const ishikawaTable = (
     <CustomTable
-      data={mockedData}
+      data={ishikawa}
       columns={columns}
       showSearchInput={false}
       icons={tableIcons}
@@ -167,6 +205,7 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
         table={ishikawaTable}
         columns={columns}
         onAdd={onAddModalOpen}
+        canAdd={canAdd}
       />
       <ModalForm
         isOpen={isAddModalOpen}
@@ -176,6 +215,7 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
             formRef={formRef}
             onClose={onAddModalClose}
             setIsLoading={setIsLoading}
+            onAdd={addIshikawa}
           />
         }
         formRef={formRef}
@@ -194,6 +234,8 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
             onClose={onEditModalClose}
             setIsLoading={setIsLoading}
             formValues={editSelected}
+            onEdit={editIshikawa}
+            event="edit"
           />
         }
         formRef={formRef}
@@ -213,7 +255,7 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
-          // await onDelete(id);
+          await deleteItem(deleteSelected.id);
           setIsLoading(false);
           onDeleteModalClose();
         }}
@@ -229,6 +271,7 @@ const IshikawaTable = ({ canDelete, canEdit }) => {
         onConfirm={async () => {
           setIsLoading(true);
           await sleep(200);
+          await deleteMultiple(selected);
           setIsLoading(false);
           onDeleteMultipleModalClose();
         }}

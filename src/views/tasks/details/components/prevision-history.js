@@ -1,17 +1,32 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
 import { Minus, Plus } from "@phosphor-icons/react";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-const PrevisionHistory = () => {
+const PrevisionHistory = ({
+  getPrevisionHistory,
+  taskId,
+  previsionsList,
+  setPrevisionsList,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
+    getPrevisionHistory(taskId).then((res) => {
+      setIsLoading(false);
+      setPrevisionsList(res);
+    });
+  }, []);
+
   const [isShowing, setIsShowing] = useState(false);
   const prevision = ({
-    createdAt,
-    changedBy,
-    oldData,
-    newData,
+    oldDate,
+    userName,
+    newDate,
     description,
+    createdAt,
   }) => {
     return (
       <VStack
@@ -22,12 +37,12 @@ const PrevisionHistory = () => {
         <Text fontWeight={"bold"}>
           {moment.utc(createdAt).format("DD/MM/YYYY HH:mm")} Alterada por{" "}
           <Text as={"span"} color={"red"}>
-            {changedBy}.
+            {userName}.
           </Text>
         </Text>
         <Text>
-          De: {moment.utc(oldData).format("DD/MM/YYYY")} para:{" "}
-          {moment.utc(newData).format("DD/MM/YYYY")}
+          De: {moment.utc(oldDate).format("DD/MM/YYYY")} para:{" "}
+          {moment.utc(newDate).format("DD/MM/YYYY")}
         </Text>
         <Text>{description}</Text>
       </VStack>
@@ -79,27 +94,14 @@ const PrevisionHistory = () => {
           transition={{ duration: 0.3 }}
           style={{ overflow: "hidden", width: "100%" }}
         >
-          {prevision({
-            createdAt: "2024-07-04 11:20:52",
-            changedBy: "João da Silva",
-            oldData: "2024-08-11 11:20:52",
-            newData: "2024-07-04 11:20:52",
-            description: "Esta task necessita de mais prazo para sua conclusão",
+          {previsionsList.map((item) => {
+            return prevision(item);
           })}
-          {prevision({
-            createdAt: "2024-07-04 11:20x:52",
-            changedBy: "João da Silva",
-            oldData: "2024-08-11 11:20:52",
-            newData: "2024-07-04 11:20:52",
-            description: "Esta task necessita de mais prazo para sua conclusão",
-          })}{" "}
-          {prevision({
-            createdAt: "2024-07-04 11:20:52",
-            changedBy: "João da Silva",
-            oldData: "2024-08-11 11:20:52",
-            newData: "2024-07-04 11:20:52",
-            description: "Esta task necessita de mais prazo para sua conclusão",
-          })}
+          {previsionsList.length === 0 && (
+            <Text fontSize={"16px"}>
+              Ainda não foram feitas alterações na previsão
+            </Text>
+          )}
         </motion.div>
       )}
     </VStack>

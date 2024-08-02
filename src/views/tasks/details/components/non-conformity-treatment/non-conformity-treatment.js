@@ -8,7 +8,7 @@ import CorrectiveActionsTable from "./corrective-actions.table";
 import { Minus, Plus } from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 
-const NonConformityTreatment = ({ canDelete, canEdit }) => {
+const NonConformityTreatment = ({ canDelete, canEdit, canAdd, taskId }) => {
   const [isShowing, setIsShowing] = useState(false);
   return (
     <VStack
@@ -55,11 +55,36 @@ const NonConformityTreatment = ({ canDelete, canEdit }) => {
           transition={{ duration: 0.3 }}
           style={{ overflow: "hidden", width: "100%" }}
         >
-          <CustomRootCausesTable canDelete={canDelete} canEdit={canEdit} />
-          <IshikawaTable canDelete={canDelete} canEdit={canEdit} />
-          <RootCauseTable canDelete={canDelete} canEdit={canEdit} />
-          <ImediateActionsTable canDelete={canDelete} canEdit={canEdit} />
-          <CorrectiveActionsTable canDelete={canDelete} canEdit={canEdit} />
+          <CustomRootCausesTable
+            canDelete={canDelete}
+            canEdit={canEdit}
+            canAdd={canAdd}
+            taskId={taskId}
+          />
+          <IshikawaTable
+            canDelete={canDelete}
+            canEdit={canEdit}
+            canAdd={canAdd}
+            taskId={taskId}
+          />
+          <RootCauseTable
+            canDelete={canDelete}
+            canAdd={canAdd}
+            canEdit={canEdit}
+            taskId={taskId}
+          />
+          <ImediateActionsTable
+            canDelete={canDelete}
+            canAdd={canAdd}
+            canEdit={canEdit}
+            taskId={taskId}
+          />
+          <CorrectiveActionsTable
+            canAdd={canAdd}
+            canDelete={canDelete}
+            canEdit={canEdit}
+            taskId={taskId}
+          />
         </motion.div>
       )}
     </VStack>

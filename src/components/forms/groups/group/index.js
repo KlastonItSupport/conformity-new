@@ -15,7 +15,6 @@ import { CompanyContext } from "providers/company";
 import { SelectDropDown } from "components/select-drop-down";
 import { GroupContext } from "providers/group";
 import { getCheckBoxes } from "./helper";
-import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 
 export const GroupForm = ({

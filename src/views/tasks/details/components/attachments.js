@@ -2,14 +2,24 @@ import { HStack, Link, Text, useDisclosure, VStack } from "@chakra-ui/react";
 import { Trash } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AttachmentForm from "./attachment-form";
 import { useTranslation } from "react-i18next";
 import { DeleteModal } from "components/components";
 
-const Attachments = ({ attachments }) => {
+const Attachments = ({
+  taskId,
+  getAdditionalDocuments,
+  onAddAttachments,
+  onDeleteAttachment,
+  canAdd,
+  canDelete,
+}) => {
   const { t } = useTranslation();
   const attachmentFormRef = useRef();
+  const [attachments, setAttachments] = useState([]);
+  const [deleteId, setDeleteId] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     isOpen: isAddModalOpen,
@@ -48,15 +58,29 @@ const Attachments = ({ attachments }) => {
         <HStack>
           <Trash
             size={24}
-            color="#0086FF"
             weight="fill"
-            cursor={"pointer"}
-            onClick={() => onDeleteModalOpen()}
+            onClick={
+              canDelete
+                ? () => {
+                    setDeleteId(id);
+                    onDeleteModalOpen();
+                  }
+                : null
+            }
+            color={canDelete ? "#0086FF" : "#ddd"}
+            cursor={canDelete ? "pointer" : "not-allowed"}
           />
         </HStack>
       </HStack>
     );
   };
+
+  useEffect(() => {
+    getAdditionalDocuments(taskId).then((documents) => {
+      setAttachments(documents);
+    });
+  }, []);
+
   return (
     <>
       <VStack
@@ -85,9 +109,10 @@ const Attachments = ({ attachments }) => {
             type="submit"
             onClick={onAddModalOpen}
             margin="0 0 10px 0 !important"
+            disabled={!canAdd}
           />
         </HStack>
-        {attachments.length > 0 ? (
+        {attachments && attachments.length > 0 ? (
           attachments.map((document, index) => {
             const isFirst = index === 0;
             const isLast = index === attachments.length - 1;
@@ -108,21 +133,49 @@ const Attachments = ({ attachments }) => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <AttachmentForm formRef={attachmentFormRef} onClose={(type) => {}} />
+          <AttachmentForm
+            formRef={attachmentFormRef}
+            onClose={async (type) => {
+              setIsLoading(true);
+              const res = await onAddAttachments({
+                documents: type,
+                taskId,
+              });
+
+              if (res) {
+                setAttachments([...attachments, ...res]);
+              }
+              setIsLoading(false);
+              onAddModalClose();
+            }}
+            setIsLoading={setIsLoading}
+          />
         }
         formRef={attachmentFormRef}
         title={t("Adicionar Anexo")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Criar")}
-        // isLoading={isLoading}
+        isLoading={isLoading}
       />
       <DeleteModal
         title={t("Excluir Anexo")}
         subtitle={t("Tem certeza de que deseja excluir anexo da sua tarefa?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
-        onConfirm={async () => {}}
-        // isLoading={isDeleteLoading}
+        onConfirm={async () => {
+          setIsLoading(true);
+          const res = await onDeleteAttachment(deleteId);
+
+          if (res) {
+            setAttachments(
+              attachments.filter((document) => document.id !== deleteId)
+            );
+          }
+
+          setIsLoading(false);
+          onDeleteModalClose();
+        }}
+        isLoading={isLoading}
       />
     </>
   );

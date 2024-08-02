@@ -26,6 +26,7 @@ import { UserInfo } from "./components/user-info";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "providers/auth";
 import { useTranslation } from "react-i18next";
+import undefinedPic from "assets/img/undefined-pic.png";
 
 const animation = keyframes`
 from {top: 0px;}
@@ -277,7 +278,7 @@ export const NavBar = () => {
             {!isLoading && (
               <UserInfo
                 name={user?.name}
-                profilePhoto={user?.profilePic}
+                profilePhoto={user?.profilePic ?? undefinedPic}
                 companyName={user.companyName}
                 itemsList={[
                   {

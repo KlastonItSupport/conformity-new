@@ -14,7 +14,15 @@ export const schema = Yup.object().shape({
   material: Yup.string().required("Obrigatório"),
 });
 
-const IshikawaForm = ({ formRef, onClose, setIsLoading, formValues }) => {
+const IshikawaForm = ({
+  formRef,
+  onClose,
+  setIsLoading,
+  formValues,
+  event = "add",
+  onAdd,
+  onEdit,
+}) => {
   const {
     handleSubmit,
     register,
@@ -25,7 +33,14 @@ const IshikawaForm = ({ formRef, onClose, setIsLoading, formValues }) => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    await sleep(250);
+    if (event === "edit") {
+      await onEdit(data);
+      setIsLoading(false);
+      onClose();
+      return;
+    }
+
+    await onAdd(data);
     setIsLoading(false);
     onClose();
   };

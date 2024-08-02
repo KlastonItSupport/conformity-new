@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ButtonPrimary } from "components/button-primary";
 
-const ToggleArrow = ({ title, table, onAdd }) => {
+const ToggleArrow = ({ title, table, onAdd, canAdd }) => {
   const [isShowing, setIsShowing] = useState(false);
+  console.log("canAdd", canAdd);
 
   return (
     <VStack
@@ -58,6 +59,7 @@ const ToggleArrow = ({ title, table, onAdd }) => {
             h="40px"
             type="submit"
             onClick={onAdd}
+            disabled={!canAdd}
           />
         </HStack>
       )}

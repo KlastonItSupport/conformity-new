@@ -1,31 +1,25 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import { sleep } from "helpers/sleep";
 import * as Yup from "yup";
 import { FormInput } from "components/components";
-import moment from "moment-timezone";
+import moment from "moment";
 import { CalendarCustom } from "components/calendar";
 import { Box } from "@chakra-ui/react";
 import { FormTextArea } from "components/components";
 
 export const schema = Yup.object().shape({
-  action: Yup.string().required("Ação obrigatória"),
-  responsable: Yup.string().required("Responsável obrigatório"),
-  date: Yup.string().required("Data obrigatória"),
-  result: Yup.string().required("Resultado obrigatório"),
+  data: Yup.string().required("Data obrigatória"),
+  description: Yup.string().required("Descrição obrigatória"),
 });
 
-const CorrectiveActionsForm = ({
+const ChangePrevisionForm = ({
   formRef,
   onClose,
   setIsLoading,
   formValues,
-  onAdd,
-  onEdit,
-  event = "add",
 }) => {
-  const dateRef = useRef(null);
-  const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const {
     handleSubmit,
     register,
@@ -34,23 +28,14 @@ const CorrectiveActionsForm = ({
   } = useForm({
     resolver: yupResolver(schema),
   });
+  const [isShowingCalendar, setIsShowingCalendar] = useState(false);
+  const dateRef = useRef(null);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-
-    const date = moment
-      .tz(data.date, "DD/MM/YYYY", "America/Sao_Paulo")
-      .format("YYYY-MM-DD");
-    if (event === "edit") {
-      await onEdit({ ...data, date });
-      setIsLoading(false);
-      onClose();
-      return;
-    }
-
-    await onAdd({ ...data, date });
+    await sleep(250);
+    await onClose(data);
     setIsLoading(false);
-    onClose();
   };
   return (
     <form
@@ -58,24 +43,6 @@ const CorrectiveActionsForm = ({
       onSubmit={handleSubmit(onSubmit)}
       ref={formRef}
     >
-      <FormTextArea
-        label={"Ação corretiva"}
-        {...register("action")}
-        error={errors.action?.message}
-        defaultValue={formValues?.action}
-      />{" "}
-      <FormTextArea
-        label={"Resultado da ação corretiva"}
-        {...register("result")}
-        error={errors.result?.message}
-        defaultValue={formValues?.result}
-      />{" "}
-      <FormInput
-        label={"Responsável (s) pela ação corretiva"}
-        {...register("responsable")}
-        error={errors.responsable?.message}
-        defaultValue={formValues?.responsable}
-      />{" "}
       <Box position="relative" w="100%" mt={"20px"}>
         <FormInput
           ref={dateRef}
@@ -96,10 +63,10 @@ const CorrectiveActionsForm = ({
           onChange={(e) => {
             if (e.target.value.length === 10) setIsShowingCalendar(false);
           }}
-          {...register("date")}
-          error={errors.date?.message}
+          {...register("data")}
+          error={errors.data?.message}
           defaultValue={moment
-            .utc(formValues?.date ?? new Date())
+            .utc(formValues?.data ?? new Date())
             .format("DD/MM/YYYY")}
         />
         {isShowingCalendar && (
@@ -112,15 +79,21 @@ const CorrectiveActionsForm = ({
 
                 const formattedDate = `${day}/${month}/${year}`;
 
-                setValue("date", formattedDate);
+                setValue("data", formattedDate);
                 setIsShowingCalendar(!isShowingCalendar);
               }}
             />
           </Box>
         )}
       </Box>
+      <FormTextArea
+        label={"Descrição * "}
+        {...register("description")}
+        error={errors.description?.message}
+        defaultValue={"Esta task necessita de mais prazo para sua conclusão"}
+      />
     </form>
   );
 };
 
-export default CorrectiveActionsForm;
+export default ChangePrevisionForm;

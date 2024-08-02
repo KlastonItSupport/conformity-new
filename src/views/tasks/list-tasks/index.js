@@ -113,7 +113,7 @@ const ListTasksPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("documents", "canDelete")
+      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -129,7 +129,7 @@ const ListTasksPage = () => {
           }
         : null;
 
-      const searchIcon = checkPermissionForAction("documents", "canRead")
+      const searchIcon = checkPermissionForAction("tasks", "canRead")
         ? {
             icon: <MagnifyingGlass size={20} />,
             onClickRow: (item) => history(`/tasks/details?id=${item.id}`),
@@ -140,7 +140,7 @@ const ListTasksPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("documents", "canEdit")
+      const editIcon = checkPermissionForAction("tasks", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -243,7 +243,7 @@ const ListTasksPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             width="150px"
-            disabled={!checkPermissionForAction("documents", "canAdd")}
+            disabled={!checkPermissionForAction("tasks", "canAdd")}
           />
           <ButtonPrimary
             fontSize="sm"
