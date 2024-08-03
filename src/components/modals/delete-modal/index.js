@@ -18,6 +18,7 @@ const DeleteModal = ({
   id,
   title,
   subtitle,
+  buttonLabel = "Excluir",
   isLoading = false,
 }) => {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ const DeleteModal = ({
             borderRadius="7px"
             _active={{ bgColor: "red.800" }}
             type="submit"
-            label={t("Excluir")}
+            label={t(buttonLabel)}
             onClick={onConfirm}
             width="150px"
             margin={"0 auto"}

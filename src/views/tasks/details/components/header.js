@@ -1,4 +1,11 @@
-import { Box, HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  HStack,
+  Progress,
+  Text,
+  useDisclosure,
+  VStack,
+} from "@chakra-ui/react";
 import { NotePencil } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
@@ -15,6 +22,7 @@ const Header = ({
   changeTaskPrevision,
   setPrevisionsList,
   canEdit,
+  percentage,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
@@ -90,7 +98,6 @@ const Header = ({
       isLoading={isLoading}
     />
   );
-  const percentage = 40;
 
   return (
     <>
@@ -105,15 +112,27 @@ const Header = ({
             TASK CÓDIGO: #{task.id}
           </Text>
           <HStack>
-            <Box w={"60px"} h={"60px"} mr={"20px"}>
-              {/* <CircularProgressbar
+            <Box position="relative" width="100%">
+              <Progress
                 value={percentage}
-                text={`${percentage}%`}
-                styles={buildStyles({
-                  pathColor: "#0086FF",
-                  textColor: "#0086FF",
-                })}
-              /> */}
+                size="md"
+                color={"#0086FF"}
+                bgColor={""}
+                border={"3px solid #ddd"}
+                width={"200px"}
+                height={"20px"}
+              />
+              <Text
+                position="absolute"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                color="black"
+                fontSize="sm"
+                fontWeight="bold"
+              >
+                {`${percentage}%`}
+              </Text>
             </Box>
             {statusBox}
           </HStack>

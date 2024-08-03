@@ -44,6 +44,7 @@ const TaskDetailsPage = () => {
   const taskId = queryParams.get("id");
   const [task, setTask] = useState(null);
   const [previsionsList, setPrevisionsList] = useState([]);
+  const [percentage, setPercentage] = useState(0);
 
   const routeTreePaths = [
     {
@@ -82,6 +83,7 @@ const TaskDetailsPage = () => {
             setPrevisionsList([...previsionsList, newPrevision])
           }
           canEdit={canEdit}
+          percentage={percentage}
         />
       )}
       <RelatedTasks
@@ -89,6 +91,7 @@ const TaskDetailsPage = () => {
         canDelete={canDelete}
         canEdit={canEdit}
         canAdd={canAdd}
+        setPercentage={setPercentage}
       />
       <EvaluatorsTasks taskId={taskId} canAdd={canAdd} canDelete={canDelete} />
       <Attachments

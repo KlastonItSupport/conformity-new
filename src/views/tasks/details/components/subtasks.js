@@ -11,7 +11,6 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AlertModal from "components/modals/alert-modal";
 import { useTranslation } from "react-i18next";
-import { sleep } from "helpers/sleep";
 import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
 import { DeleteModal } from "components/components";
@@ -20,11 +19,19 @@ import { SubtaskModal } from "./subtask-modal";
 import { AuthContext } from "providers/auth";
 import { api } from "api/api";
 import { toast } from "react-toastify";
+import { Trash } from "@phosphor-icons/react/dist/ssr";
 
-const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
+const RelatedTasks = ({
+  taskId,
+  canDelete,
+  canEdit,
+  canAdd,
+  setPercentage,
+}) => {
   const [isShowing, setIsShowing] = useState(false);
   const [selectedComplete, setSelectedCompleted] = useState(null);
   const [selectedDelete, setSelectedDelete] = useState(null);
+  const [selectedUndo, setSelectedUndo] = useState(null);
   const { getToken } = useContext(AuthContext);
   const [relatedTasks, setRelatedTasks] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -56,6 +63,12 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
     onClose: onDeleteModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isUndoModalOpen,
+    onOpen: onUndoModalOpen,
+    onClose: onUndoModalClose,
+  } = useDisclosure();
+
   const getRelatedTasks = async (id) => {
     try {
       const response = await api.get(`/tasks-details/related-task/${id}`, {
@@ -63,6 +76,18 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
       });
 
       if (response.status === 200) {
+        const completedTasks = response.data.filter(
+          (task) => task.completed
+        ).length;
+        const totalTasks = response.data.length;
+        const percentage =
+          totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
+        if (response.data.length === 0) {
+          setPercentage(100);
+        } else {
+          setPercentage(percentage);
+        }
         return response.data;
       }
     } catch (error) {}
@@ -81,11 +106,18 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
         if (showToast) {
           toast.success("Subtarefa concluída com sucesso");
         }
+        setPercentage(); // Ajude a arrumar a porcentagem de
         setRelatedTasks(
           relatedTasks.map((task) =>
             task.id === id ? { ...task, completed: true } : task
           )
         );
+
+        if (selectedSubTask && selectedSubTask.id === id) {
+          setSelectedSubTask({ ...selectedSubTask, completed: true });
+        }
+
+        await getRelatedTasks(taskId);
         return response.data;
       }
     } catch (error) {
@@ -113,6 +145,12 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
             task.id === id ? { ...task, completed: false } : task
           )
         );
+
+        if (selectedSubTask && selectedSubTask.id === id) {
+          setSelectedSubTask({ ...selectedSubTask, completed: false });
+        }
+
+        await getRelatedTasks(taskId);
         return response.data;
       }
     } catch (error) {
@@ -132,6 +170,7 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
       if (response.status === 201) {
         toast.success("Subtarefa criada com sucesso");
         setRelatedTasks([...relatedTasks, response.data]);
+        await getRelatedTasks(taskId);
         return response.data;
       }
     } catch (error) {
@@ -146,6 +185,7 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
       if (response.status === 200) {
         toast.success("Subtarefa excluída com sucesso");
         setRelatedTasks(relatedTasks.filter((task) => task.id !== id));
+        await getRelatedTasks(taskId);
         return response.data;
       }
     } catch (error) {
@@ -153,14 +193,6 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
     }
   };
 
-  const setTaskProgress = async (id, isCompleted) => {
-    if (isCompleted) {
-      await completeRelatedTask(id, false);
-      return;
-    }
-    await uncompleteRelatedTask(id, false);
-    return;
-  };
   useEffect(() => {
     getRelatedTasks(taskId).then((res) => {
       setRelatedTasks(res);
@@ -200,6 +232,7 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
             setSelectedSubTask(details.task);
             onSubTaskModalOpen();
           }}
+          title="Detalhes"
         />
         ,
         <Check
@@ -209,14 +242,25 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
             setSelectedCompleted(details);
             onAlertModalOpen();
           }}
+          title="Marcar como concluída"
         />
         <X
+          size={20}
+          cursor={"pointer"}
+          onClick={() => {
+            setSelectedUndo(details.task);
+            onUndoModalOpen();
+          }}
+          title="Desfazer progresso"
+        />
+        <Trash
           size={20}
           cursor={"pointer"}
           onClick={() => {
             setSelectedDelete(details.task);
             onDeleteModalOpen();
           }}
+          title="Excluir"
         />
       </HStack>
     );
@@ -346,17 +390,31 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
         isLoading={loading}
       />
       <DeleteModal
-        title={t("Desrelacionar Tarefa")}
-        subtitle={t("Tem certeza de que deseja desrelacionar esta tarefa?")}
+        title={t("Deletar  Subtarefa")}
+        subtitle={t("Tem certeza de que deseja deletar esta subtarefa?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setLoading(true);
-          await sleep(500);
           await deleteRelatedTask(selectedDelete.id);
           setLoading(false);
           onDeleteModalClose();
         }}
+        isLoading={loading}
+      />
+
+      <DeleteModal
+        title={t("Desfazer progresso")}
+        subtitle={t("Tem certeza de que deseja desfazer o progresso?")}
+        isOpen={isUndoModalOpen}
+        onClose={onUndoModalClose}
+        onConfirm={async () => {
+          setLoading(true);
+          await uncompleteRelatedTask(selectedUndo.id);
+          setLoading(false);
+          onUndoModalClose();
+        }}
+        buttonLabel="Desfazer"
         isLoading={loading}
       />
 
@@ -367,7 +425,8 @@ const RelatedTasks = ({ taskId, canDelete, canEdit, canAdd }) => {
           modalSize="xl"
           isLoading={loading}
           subtask={selectedSubTask}
-          setTaskProgress={setTaskProgress}
+          completeRelatedTask={completeRelatedTask}
+          uncompleteRelatedTask={uncompleteRelatedTask}
         />
       )}
     </>
