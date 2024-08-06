@@ -65,7 +65,7 @@ const Feed = ({
     setIsLoading(true);
 
     const res = await api.post("feed", {
-      ...data,
+      text: description,
       moduleId,
       externalId,
       user: user.id,

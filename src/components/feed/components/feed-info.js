@@ -5,6 +5,7 @@ import { FeedDescriptionForm } from "components/components";
 import { DeleteModal } from "components/components";
 import moment from "moment";
 import React, { useRef, useState } from "react";
+import ReactHtmlParser from "react-html-parser";
 import { useTranslation } from "react-i18next";
 
 const FeedInfo = ({
@@ -83,7 +84,7 @@ const FeedInfo = ({
           </HStack>
         </HStack>
         <Divider color={"#ddd"} />
-        <Text>{text}</Text>
+        <Text>{ReactHtmlParser(text)}</Text>
       </VStack>
       <DeleteModal
         title={t("Excluir Feed")}

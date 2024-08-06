@@ -1,9 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FormTextArea } from "components/components";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { feedSchema } from "./schema";
 import { sleep } from "helpers/sleep";
+import TextEditor from "components/text-editor-mce";
 
 const FeedDescriptionForm = ({
   formRef,
@@ -12,21 +12,24 @@ const FeedDescriptionForm = ({
   defaultValue,
   setIsLoading,
 }) => {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({
+  const { handleSubmit } = useForm({
     resolver: yupResolver(feedSchema),
   });
+
+  const [description, setDescription] = useState("");
+  const richTextRef = useRef(null);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     await sleep(250);
-    await handleEdit(data);
+    await handleEdit({ text: description });
     setIsLoading(false);
     onClose();
   };
+
+  useEffect(() => {
+    setDescription(defaultValue);
+  }, [defaultValue]);
 
   return (
     <form
@@ -34,11 +37,11 @@ const FeedDescriptionForm = ({
       onSubmit={handleSubmit(onSubmit)}
       ref={formRef}
     >
-      <FormTextArea
-        label={"Descrição"}
-        {...register("text")}
-        error={errors.text?.message}
-        defaultValue={defaultValue}
+      <TextEditor
+        value={description}
+        onChange={setDescription}
+        ref={richTextRef}
+        menubar={false}
       />
     </form>
   );
