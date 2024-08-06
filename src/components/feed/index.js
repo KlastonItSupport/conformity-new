@@ -20,7 +20,7 @@ const Feed = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [feedItems, setFeedItems] = useState([]);
-  const { user } = useContext(AuthContext);
+  const { user, getToken } = useContext(AuthContext);
   const richTextRef = useRef(null);
   const [description, setDescription] = useState("");
 
@@ -51,7 +51,9 @@ const Feed = ({
   };
 
   const updateFeedItem = async (id, data) => {
-    const response = await api.patch(`feed/${id}`, data);
+    const response = await api.patch(`feed/${id}`, data, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
 
     if (response.status === 200) {
       toast.success("Item atualizado com sucesso");
@@ -64,12 +66,18 @@ const Feed = ({
   const onSubmit = async (data) => {
     setIsLoading(true);
 
-    const res = await api.post("feed", {
-      text: description,
-      moduleId,
-      externalId,
-      user: user.id,
-    });
+    const res = await api.post(
+      "feed",
+      {
+        text: description,
+        moduleId,
+        externalId,
+        user: user.id,
+      },
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
 
     if (res.status === 201) {
       setFeedItems([res.data, ...feedItems]);
