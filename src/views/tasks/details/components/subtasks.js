@@ -1,12 +1,5 @@
-import {
-  Box,
-  HStack,
-  Progress,
-  Text,
-  useDisclosure,
-  VStack,
-} from "@chakra-ui/react";
-import { Check, MagnifyingGlass, Minus, Plus, X } from "@phosphor-icons/react";
+import { HStack, Text, useDisclosure, VStack } from "@chakra-ui/react";
+import { Minus, Plus } from "@phosphor-icons/react";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import AlertModal from "components/modals/alert-modal";
@@ -19,7 +12,21 @@ import { SubtaskModal } from "./subtask-modal";
 import { AuthContext } from "providers/auth";
 import { api } from "api/api";
 import { toast } from "react-toastify";
-import { Trash } from "@phosphor-icons/react/dist/ssr";
+import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import SubTaskCheckListItem from "./subtask-checklist-item";
 
 const RelatedTasks = ({
   taskId,
@@ -193,97 +200,34 @@ const RelatedTasks = ({
     }
   };
 
+  const getTaskPosition = (id) =>
+    relatedTasks.findIndex((task) => task.id === id);
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id === over.id) return;
+
+    setRelatedTasks((tasks) => {
+      const originalPos = getTaskPosition(active.id);
+      const newPos = getTaskPosition(over.id);
+
+      return arrayMove(tasks, originalPos, newPos);
+    });
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor)
+  );
+
   useEffect(() => {
     getRelatedTasks(taskId).then((res) => {
       setRelatedTasks(res);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const taskIcons = (details) => {
-    return (
-      <HStack alignItems={"center"}>
-        <Box position="relative" width="100%">
-          <Progress
-            value={details.task.completed ? 100 : 0}
-            size="md"
-            color={"#0086FF"}
-            bgColor={""}
-            border={"3px solid #ddd"}
-            width={"200px"}
-            height={"20px"}
-          />
-          <Text
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            color="black"
-            fontSize="sm"
-            fontWeight="bold"
-          >
-            {details.task.completed ? "100%" : "0%"}
-          </Text>
-        </Box>
-        <MagnifyingGlass
-          cursor={"pointer"}
-          size={20}
-          onClick={() => {
-            setSelectedSubTask(details.task);
-            onSubTaskModalOpen();
-          }}
-          title="Detalhes"
-        />
-        ,
-        <Check
-          size={20}
-          cursor={"pointer"}
-          onClick={() => {
-            setSelectedCompleted(details);
-            onAlertModalOpen();
-          }}
-          title="Marcar como concluída"
-        />
-        <X
-          size={20}
-          cursor={"pointer"}
-          onClick={() => {
-            setSelectedUndo(details.task);
-            onUndoModalOpen();
-          }}
-          title="Desfazer progresso"
-        />
-        <Trash
-          size={20}
-          cursor={"pointer"}
-          onClick={() => {
-            setSelectedDelete(details.task);
-            onDeleteModalOpen();
-          }}
-          title="Excluir"
-        />
-      </HStack>
-    );
-  };
-  const task = (relatedTask) => (
-    <VStack
-      alignItems={"start"}
-      border={"2px solid #ddd"}
-      p={"10px"}
-      borderRadius={"5px"}
-      m={"5px 0px"}
-    >
-      <HStack justifyContent={"space-between"} w={"100%"}>
-        <VStack alignItems={"start"} w={"100%"}>
-          <Text fontWeight={"bold"}>{relatedTask.title}</Text>
-        </VStack>
-        {taskIcons({
-          id: relatedTask.id,
-          task: relatedTask,
-        })}
-      </HStack>
-    </VStack>
-  );
 
   return (
     <>
@@ -351,9 +295,32 @@ const RelatedTasks = ({
           transition={{ duration: 0.3 }}
           style={{ overflow: "hidden", width: "100%" }}
         >
-          {isShowing &&
-            relatedTasks.length > 0 &&
-            relatedTasks.map((taskInfo) => task(taskInfo))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={relatedTasks}
+              strategy={verticalListSortingStrategy}
+            >
+              {isShowing &&
+                relatedTasks.length > 0 &&
+                relatedTasks.map((taskInfo) => (
+                  <SubTaskCheckListItem
+                    relatedTask={taskInfo}
+                    onSubTaskModalOpen={onSubTaskModalOpen}
+                    setSelectedSubTask={setSelectedSubTask}
+                    setSelectedCompleted={setSelectedCompleted}
+                    setSelectedUndo={setSelectedUndo}
+                    setSelectedDelete={setSelectedDelete}
+                    onAlertModalOpen={onAlertModalOpen}
+                    onUndoModalOpen={onUndoModalOpen}
+                    onDeleteModalOpen={onDeleteModalOpen}
+                  />
+                ))}
+            </SortableContext>
+          </DndContext>
         </motion.div>
       </VStack>
       <AlertModal

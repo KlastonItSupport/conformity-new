@@ -14,6 +14,7 @@ import moment from "moment";
 import React, { useRef, useState } from "react";
 import ChangePrevisionForm from "./non-conformity-treatment/forms/prevision-form";
 import { useTranslation } from "react-i18next";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 const Header = ({
   task,
@@ -27,6 +28,8 @@ const Header = ({
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
   const formRef = useRef();
+  const { isMobile } = useBreakpoint();
+
   const {
     isOpen: isEditModalOpen,
     onOpen: onEditModalOpen,
@@ -111,31 +114,60 @@ const Header = ({
           <Text fontSize={"20px"} color={"header.100"}>
             TASK CÓDIGO: #{task.id}
           </Text>
-          <HStack>
-            <Box position="relative" width="100%">
-              <Progress
-                value={percentage}
-                size="md"
-                color={"#0086FF"}
-                bgColor={""}
-                border={"3px solid #ddd"}
-                width={"200px"}
-                height={"20px"}
-              />
-              <Text
-                position="absolute"
-                top="50%"
-                left="50%"
-                transform="translate(-50%, -50%)"
-                color="black"
-                fontSize="sm"
-                fontWeight="bold"
-              >
-                {`${percentage}%`}
-              </Text>
-            </Box>
-            {statusBox}
-          </HStack>
+          {!isMobile ? (
+            <HStack>
+              <Box position="relative" width="100%">
+                <Progress
+                  value={percentage}
+                  size="md"
+                  color={"#0086FF"}
+                  bgColor={""}
+                  border={"3px solid #ddd"}
+                  width={"200px"}
+                  height={"20px"}
+                />
+                <Text
+                  position="absolute"
+                  top="50%"
+                  left="50%"
+                  transform="translate(-50%, -50%)"
+                  color="black"
+                  fontSize="sm"
+                  fontWeight="bold"
+                >
+                  {`${parseInt(percentage)}%`}
+                </Text>
+              </Box>
+              {statusBox}
+            </HStack>
+          ) : (
+            <VStack alignItems={"end"} w={"100%"}>
+              <Box position="relative" width="100%">
+                <Progress
+                  value={percentage}
+                  size="md"
+                  color={"#0086FF"}
+                  bgColor={""}
+                  border={"3px solid #ddd"}
+                  width={"200px"}
+                  height={"20px"}
+                />
+                <Text
+                  position="absolute"
+                  top="50%"
+                  left="50%"
+                  transform="translate(-50%, -50%)"
+                  color="black"
+                  fontSize="sm"
+                  fontWeight="bold"
+                >
+                  {`${parseInt(percentage)}%`}
+                </Text>
+              </Box>
+
+              {statusBox}
+            </VStack>
+          )}
         </HStack>
         {label("Autor", task.responsable)}
         {label("Projeto", task.project)}
