@@ -24,20 +24,14 @@ const Feed = ({
   const richTextRef = useRef(null);
   const [description, setDescription] = useState("");
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-    setValue,
-  } = useForm({
+  const { handleSubmit, setValue } = useForm({
     resolver: yupResolver(FeedSchema),
   });
 
   const getFeedItems = async () => {
-    const response = await api.get("feed", {
-      moduleId,
-      externalId,
-    });
+    const response = await api.get(
+      `feed?externalId=${externalId}&moduleId=${moduleId}`
+    );
     setFeedItems(response.data);
   };
 
