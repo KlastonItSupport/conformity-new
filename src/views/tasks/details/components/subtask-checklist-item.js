@@ -3,6 +3,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { Check, MagnifyingGlass, Trash, X } from "@phosphor-icons/react";
 import React from "react";
 import { CSS } from "@dnd-kit/utilities";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 const SubTaskCheckListItem = ({
   relatedTask,
@@ -15,21 +16,23 @@ const SubTaskCheckListItem = ({
   onUndoModalOpen,
   onDeleteModalOpen,
 }) => {
+  const { isMobile } = useBreakpoint();
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: relatedTask.id,
     });
+
   const taskIcons = (details) => {
     return (
       <HStack alignItems={"center"}>
-        <Box position="relative" width="100%">
+        <Box position="relative" width={isMobile ? "100px" : "100%"}>
           <Progress
             value={details.task.completed ? 100 : 0}
             size="md"
             color={"#0086FF"}
             bgColor={""}
             border={"3px solid #ddd"}
-            width={"200px"}
+            width={isMobile ? "100px" : "200px"}
             height={"20px"}
           />
           <Text
