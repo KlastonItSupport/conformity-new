@@ -34,21 +34,23 @@ export const columns = [
   },
 ];
 
-const CustomRootCausesTable = ({ canDelete, canEdit, canAdd, taskId }) => {
+const CustomRootCausesTable = ({
+  canDelete,
+  canEdit,
+  canAdd,
+  taskId,
+  customRootCauses,
+  setCustomRootCauses,
+}) => {
   const formRef = useRef(null);
   const { t } = useTranslation();
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
+  const [isShowing, setIsShowing] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [customRootCauses, setCustomRootCauses] = useState([]);
   const { getToken } = useContext(AuthContext);
-
-  const getCustomRootCauses = async () => {
-    const res = await api.get(`tasks-details/root-cause-analysis/${taskId}`);
-    setCustomRootCauses(res.data);
-  };
 
   const onDelete = async (id) => {
     const res = await api.delete(`tasks-details/root-cause-analysis/${id}`);
@@ -173,7 +175,9 @@ const CustomRootCausesTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   // }, [userPermissions, userAccessRule]);
 
   useEffect(() => {
-    getCustomRootCauses();
+    if (customRootCauses.length > 0) {
+      setIsShowing(true);
+    }
   }, []);
 
   const customRootCausesTable = (
@@ -203,6 +207,8 @@ const CustomRootCausesTable = ({ canDelete, canEdit, canAdd, taskId }) => {
           columns={columns}
           onAdd={onAddModalOpen}
           canAdd={canAdd}
+          isShowing={isShowing}
+          setIsShowing={setIsShowing}
         />
       </VStack>
       <ModalForm

@@ -19,15 +19,22 @@ export const columns = [
   },
 ];
 
-const RootCauseTable = ({ canDelete, canEdit, canAdd, taskId }) => {
+const RootCauseTable = ({
+  canDelete,
+  canEdit,
+  canAdd,
+  taskId,
+  rootCauses,
+  setRootCauses,
+}) => {
   const [tableIcons, setTableIcons] = useState([]);
 
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
+  const [isShowing, setIsShowing] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [rootCauses, setRootCauses] = useState([]);
   const { getToken } = useContext(AuthContext);
   const formRef = useRef(null);
 
@@ -71,11 +78,6 @@ const RootCauseTable = ({ canDelete, canEdit, canAdd, taskId }) => {
       toast.success("Análise de causa raiz criada com sucesso!");
       setRootCauses([...rootCauses, res.data]);
     }
-  };
-
-  const getRootCauses = async () => {
-    const res = await api.get(`tasks-details/root-cause/${taskId}`);
-    setRootCauses(res.data);
   };
 
   const onDelete = async (id) => {
@@ -153,12 +155,15 @@ const RootCauseTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     };
 
     updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canDelete, canEdit]);
 
   useEffect(() => {
-    getRootCauses();
+    if (rootCauses.length > 0) {
+      setIsShowing(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const rootCauseTable = (
     <CustomTable
       data={rootCauses}
@@ -184,6 +189,8 @@ const RootCauseTable = ({ canDelete, canEdit, canAdd, taskId }) => {
         columns={columns}
         onAdd={onAddModalOpen}
         canAdd={canAdd}
+        isShowing={isShowing}
+        setIsShowing={setIsShowing}
       />
       <ModalForm
         isOpen={isAddModalOpen}

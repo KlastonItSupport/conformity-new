@@ -1,12 +1,17 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
 import { Minus, Plus } from "@phosphor-icons/react";
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+import React from "react";
 import { ButtonPrimary } from "components/button-primary";
 
-const ToggleArrow = ({ title, table, onAdd, canAdd }) => {
-  const [isShowing, setIsShowing] = useState(false);
-  console.log("canAdd", canAdd);
+const ToggleArrow = ({
+  title,
+  table,
+  onAdd,
+  canAdd,
+  isShowing,
+  setIsShowing,
+}) => {
+  // const [isShowing, setIsShowing] = useState(false);
 
   return (
     <VStack
@@ -63,17 +68,9 @@ const ToggleArrow = ({ title, table, onAdd, canAdd }) => {
           />
         </HStack>
       )}
-      <motion.div
-        initial={{ opacity: 0, height: 0 }}
-        animate={{
-          opacity: isShowing ? 1 : 0,
-          height: isShowing ? "auto" : 0,
-        }}
-        transition={{ duration: 0.3 }}
-        style={{ overflow: "hidden", width: "100%" }}
-      >
-        {table}
-      </motion.div>
+      {isShowing && (
+        <VStack style={{ overflow: "hidden", width: "100%" }}>{table}</VStack>
+      )}
     </VStack>
   );
 };

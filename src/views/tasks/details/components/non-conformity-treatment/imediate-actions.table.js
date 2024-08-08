@@ -32,13 +32,20 @@ export const columns = [
   },
 ];
 
-const ImediateActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
+const ImediateActionsTable = ({
+  canDelete,
+  canEdit,
+  canAdd,
+  taskId,
+  immediateActions,
+  setImmediateActions,
+}) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [deleteSelected, setDeleteSelected] = useState(null);
-  const [immediateActions, setImmediateActions] = useState([]);
   const [editSelected, setEditSelected] = useState(null);
+  const [isShowing, setIsShowing] = useState(false);
   const { getToken } = useContext(AuthContext);
   const { t } = useTranslation();
   const formRef = useRef(null);
@@ -101,11 +108,6 @@ const ImediateActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     }
   };
 
-  const getImmediateActions = async () => {
-    const res = await api.get(`tasks-details/immediate-actions/${taskId}`);
-    setImmediateActions(res.data);
-  };
-
   const deleteItem = async (id) => {
     const res = await api.delete(`tasks-details/immediate-actions/${id}`);
 
@@ -166,10 +168,15 @@ const ImediateActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     };
 
     updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canDelete, canEdit]);
 
   useEffect(() => {
-    getImmediateActions();
+    if (immediateActions.length > 0) {
+      setIsShowing(true);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const imeadiateActionsTable = (
@@ -197,6 +204,8 @@ const ImediateActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
         columns={columns}
         onAdd={onAddModalOpen}
         canAdd={canAdd}
+        isShowing={isShowing}
+        setIsShowing={setIsShowing}
       />
       <ModalForm
         isOpen={isAddModalOpen}

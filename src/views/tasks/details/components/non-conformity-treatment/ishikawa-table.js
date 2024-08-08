@@ -43,13 +43,21 @@ export const columns = [
   },
 ];
 
-const IshikawaTable = ({ canDelete, canEdit, canAdd, taskId }) => {
+const IshikawaTable = ({
+  canDelete,
+  canEdit,
+  canAdd,
+  taskId,
+  ishikawa,
+  setIshikawa,
+}) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [deleteSelected, setDeleteSelected] = useState(false);
   const [editSelected, setEditSelected] = useState(false);
+  const [isShowing, setIsShowing] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [ishikawa, setIshikawa] = useState([]);
+
   const { getToken } = useContext(AuthContext);
   const formRef = useRef(null);
   const { t } = useTranslation();
@@ -76,11 +84,6 @@ const IshikawaTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
-
-  const getIshikawa = async (id) => {
-    const res = await api.get(`tasks-details/ishikawa/${id}`);
-    setIshikawa(res.data);
-  };
 
   const deleteItem = async (id) => {
     const res = await api.delete(`tasks-details/ishikawa/${id}`);
@@ -177,7 +180,9 @@ const IshikawaTable = ({ canDelete, canEdit, canAdd, taskId }) => {
   }, [canDelete, canEdit]);
 
   useEffect(() => {
-    getIshikawa(taskId);
+    if (ishikawa.length > 0) {
+      setIsShowing(true);
+    }
   }, []);
 
   const ishikawaTable = (
@@ -206,6 +211,8 @@ const IshikawaTable = ({ canDelete, canEdit, canAdd, taskId }) => {
         columns={columns}
         onAdd={onAddModalOpen}
         canAdd={canAdd}
+        isShowing={isShowing}
+        setIsShowing={setIsShowing}
       />
       <ModalForm
         isOpen={isAddModalOpen}

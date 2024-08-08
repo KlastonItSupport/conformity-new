@@ -10,7 +10,6 @@ import { useTranslation } from "react-i18next";
 import CorrectiveActionsForm from "./forms/corrective-actions-form";
 import { DeleteModal } from "components/components";
 import { sleep } from "helpers/sleep";
-import { get } from "lodash";
 import { api } from "api/api";
 import { toast } from "react-toastify";
 import { AuthContext } from "providers/auth";
@@ -35,14 +34,21 @@ export const columns = [
   },
 ];
 
-const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
+const CorrectiveActionsTable = ({
+  canDelete,
+  canEdit,
+  canAdd,
+  taskId,
+  correctiveActions,
+  setCorrectiveActions,
+}) => {
   const [tableIcons, setTableIcons] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState([]);
   const [deleteSelected, setDeleteSelected] = useState(null);
-  const [çorretiveActions, setCorrectiveActions] = useState([]);
   const { getToken } = useContext(AuthContext);
   const [editSelected, setEditSelected] = useState(null);
+  const [isShowing, setIsShowing] = useState(false);
   const { t } = useTranslation();
   const formRef = useRef(null);
 
@@ -70,18 +76,13 @@ const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     onClose: onDeleteMultipleModalClose,
   } = useDisclosure();
 
-  const getCorrectiveActions = async (id) => {
-    const res = await api.get(`tasks-details/corrective-actions/${id}`);
-    setCorrectiveActions(res.data);
-  };
-
   const deleteCorrectiveAction = async (id) => {
     const res = await api.delete(`tasks-details/corrective-actions/${id}`);
 
     if (res.status === 200) {
       toast.success("Ação corretiva excluída com sucesso!");
       setCorrectiveActions([
-        ...çorretiveActions.filter((item) => item.id !== id),
+        ...correctiveActions.filter((item) => item.id !== id),
       ]);
     }
   };
@@ -99,7 +100,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
 
     if (res.status === 201) {
       toast.success("Ação corretiva adicionada com sucesso!");
-      setCorrectiveActions([...çorretiveActions, res.data]);
+      setCorrectiveActions([...correctiveActions, res.data]);
     }
   };
 
@@ -111,7 +112,7 @@ const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
 
     if (res.status === 200) {
       toast.success("Ação corretiva atualizada com sucesso!");
-      const correctiveActionsCopy = [...çorretiveActions];
+      const correctiveActionsCopy = [...correctiveActions];
       const index = correctiveActionsCopy.findIndex(
         (item) => item.id === editSelected.id
       );
@@ -171,15 +172,19 @@ const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
     };
 
     updateIcons();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canDelete, canEdit]);
 
   useEffect(() => {
-    getCorrectiveActions(taskId);
+    if (correctiveActions.length > 0) {
+      setIsShowing(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const correctiveActionsTable = (
     <CustomTable
-      data={çorretiveActions}
+      data={correctiveActions}
       columns={columns}
       showSearchInput={false}
       hasMinHg={false}
@@ -202,6 +207,8 @@ const CorrectiveActionsTable = ({ canDelete, canEdit, canAdd, taskId }) => {
         columns={columns}
         onAdd={onAddModalOpen}
         canAdd={canAdd}
+        isShowing={isShowing}
+        setIsShowing={setIsShowing}
       />
       <ModalForm
         isOpen={isAddModalOpen}
