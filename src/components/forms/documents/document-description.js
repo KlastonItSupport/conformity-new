@@ -72,7 +72,7 @@ const DocumentDescriptionForm = ({
         value={provisionalDescription}
         onChange={setProvisionalDescription}
         ref={richTextRef}
-        menubar={false}
+        menubar={true}
       />
     </form>
   );

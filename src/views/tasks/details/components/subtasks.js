@@ -203,14 +203,20 @@ const RelatedTasks = ({
   const getTaskPosition = (id) =>
     relatedTasks.findIndex((task) => task.id === id);
 
+  const changeOrder = async (id, newPosition) => {
+    await api.get(
+      `/tasks-details/related-task/change-order/${id}?order=${newPosition}`
+    );
+  };
+
   const handleDragEnd = (event) => {
     const { active, over } = event;
-
     if (active.id === over.id) return;
 
     setRelatedTasks((tasks) => {
       const originalPos = getTaskPosition(active.id);
       const newPos = getTaskPosition(over.id);
+      changeOrder(active.id, newPos + 1);
 
       return arrayMove(tasks, originalPos, newPos);
     });
@@ -232,6 +238,9 @@ const RelatedTasks = ({
   useEffect(() => {
     getRelatedTasks(taskId).then((res) => {
       setRelatedTasks(res);
+      if (res.length > 0) {
+        setIsShowing(true);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
