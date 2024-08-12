@@ -126,16 +126,48 @@ const TasksProvider = ({ children }) => {
     }
   };
 
-  const getTypes = async () => {
+  const getTypes = async (page = 1, search = "") => {
     try {
-      const response = await api.get("/types", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const response = await api.get(
+        `/types?page=${page}&search=${search}&pageSize=10`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
 
       if (response.status === 200) {
         return response.data;
       }
     } catch (error) {}
+  };
+
+  const deleteType = async (id) => {
+    try {
+      const response = await api.delete(`/types/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 200) {
+        toast.success("Tipo excluído com sucesso");
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao deletar tipo");
+    }
+  };
+  const deleteMultipleTypes = async (selectedItems, setTypes, types) => {
+    const deletePromises = selectedItems.map((selected) =>
+      selected.id !== "checkall" ? deleteType(selected.id) : () => {}
+    );
+    await Promise.all(deletePromises);
+
+    setTypes(
+      types.filter(
+        (type) => !selectedItems.some((selected) => selected.id === type.id)
+      )
+    );
+
+    toast.success("Tipos excluídos com sucesso!");
   };
 
   const getClassifications = async () => {
@@ -236,6 +268,8 @@ const TasksProvider = ({ children }) => {
         getOrigins,
         getClassifications,
         getTypes,
+        deleteType,
+        deleteMultipleTypes,
         deleteMultipleTasks,
         editTask,
         origins,

@@ -194,6 +194,7 @@ const Revisions = () => {
                 })
               );
             }}
+            deskWidth={"100%"}
             onChangeSearchInput={(e) => {}}
             searchInputValue={() => {}}
             paddingOnTitle={false}

@@ -34,6 +34,7 @@ import { TasksProvider } from "providers/tasks";
 import TaskDetailsPage from "views/tasks/details";
 import OriginsPage from "views/tasks/origins";
 import { DetailsTaskProvider } from "providers/details-task";
+import TypesPage from "views/tasks/types";
 
 const routes = createBrowserRouter([
   {
@@ -96,6 +97,10 @@ const routes = createBrowserRouter([
   {
     path: "/tasks/origins",
     element: <OriginsPage />,
+  },
+  {
+    path: "/tasks/types",
+    element: <TypesPage />,
   },
 ]);
 

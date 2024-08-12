@@ -132,6 +132,14 @@ export const NavBar = () => {
               src: "/tasks/origins",
               label: "Origens",
             },
+            {
+              src: "/tasks/types",
+              label: "Tipos",
+            },
+            {
+              src: "/tasks/classifications",
+              label: "Classificações",
+            },
           ]}
           key={"admin-tasks"}
         />

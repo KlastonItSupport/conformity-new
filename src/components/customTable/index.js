@@ -233,10 +233,13 @@ const TableCustom = ({
                     border={"1px solid #ddd"}
                     key={column + index}
                     padding={cellPadding}
+                    fontSize={"sm"}
                   >
-                    {column.formatData
-                      ? column.formatData(item[column.access], item)
-                      : item[column.access]}
+                    <Text>
+                      {column.formatData
+                        ? column.formatData(item[column.access], item)
+                        : item[column.access]}
+                    </Text>
                   </Td>
                 )
               );

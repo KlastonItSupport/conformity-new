@@ -12,7 +12,14 @@ export const originSchema = Yup.object().shape({
   name: Yup.string().required("Nome  obrigatório"),
 });
 
-const TaskType = ({ formRef, onClose, setLoading }) => {
+const TaskType = ({
+  formRef,
+  onClose,
+  setLoading,
+  event = "add",
+  formValues,
+  id,
+}) => {
   const {
     handleSubmit,
     register,
@@ -29,8 +36,20 @@ const TaskType = ({ formRef, onClose, setLoading }) => {
     toast.success("Tipo de tarefa criada com sucesso!");
     return response.data;
   };
+  const updateTaskType = async (data) => {
+    const response = await api.patch(`types/${id}`, data, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    toast.success("Tipo de tarefa atualizada com sucesso!");
+    return response.data;
+  };
 
   const onSubmit = async (data) => {
+    if (event === "edit") {
+      const response = await updateTaskType(data);
+      onClose(response);
+      return;
+    }
     setLoading(true);
     const response = await createTaskType(data);
     setLoading(false);
@@ -47,6 +66,7 @@ const TaskType = ({ formRef, onClose, setLoading }) => {
         label={"Nome * "}
         {...register("name")}
         error={errors.name?.message}
+        defaultValue={formValues?.name}
       />
     </form>
   );

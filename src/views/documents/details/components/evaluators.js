@@ -161,6 +161,7 @@ const Evaluators = () => {
         <CustomTable
           data={evaluators}
           columns={columns}
+          deskWidth={"100%"}
           title={t("Avaliações")}
           actionButtons={[<Trash size={20} cursor={"pointer"} color="black" />]}
           icons={tableIcons}
