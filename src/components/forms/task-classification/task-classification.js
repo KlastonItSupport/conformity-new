@@ -12,7 +12,14 @@ export const originSchema = Yup.object().shape({
   name: Yup.string().required("Nome  obrigatório"),
 });
 
-const TaskClassification = ({ formRef, onClose, setLoading }) => {
+const TaskClassification = ({
+  formRef,
+  onClose,
+  setLoading,
+  event = "add",
+  formValues,
+  id,
+}) => {
   const {
     handleSubmit,
     register,
@@ -30,7 +37,24 @@ const TaskClassification = ({ formRef, onClose, setLoading }) => {
     return res.data;
   };
 
+  const editClassification = async (data) => {
+    const res = await api.patch(`/classifications/${id}`, data, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    toast.success("Classificação editada com sucesso");
+    return res.data;
+  };
+
   const onSubmit = async (data) => {
+    if (event === "edit") {
+      setLoading(true);
+
+      const res = await editClassification(data);
+
+      setLoading(false);
+      onClose(res);
+      return res.data;
+    }
     setLoading(true);
 
     const classification = await createClassification(data);
@@ -49,6 +73,7 @@ const TaskClassification = ({ formRef, onClose, setLoading }) => {
         label={"Nome * "}
         {...register("name")}
         error={errors.name?.message}
+        defaultValue={formValues?.name}
       />
     </form>
   );

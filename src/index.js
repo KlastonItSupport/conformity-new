@@ -35,6 +35,7 @@ import TaskDetailsPage from "views/tasks/details";
 import OriginsPage from "views/tasks/origins";
 import { DetailsTaskProvider } from "providers/details-task";
 import TypesPage from "views/tasks/types";
+import ClassificationPage from "views/tasks/classifications";
 
 const routes = createBrowserRouter([
   {
@@ -101,6 +102,10 @@ const routes = createBrowserRouter([
   {
     path: "/tasks/types",
     element: <TypesPage />,
+  },
+  {
+    path: "/tasks/classifications",
+    element: <ClassificationPage />,
   },
 ]);
 

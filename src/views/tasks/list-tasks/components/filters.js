@@ -53,12 +53,12 @@ const Filters = ({
           })
         );
         setClassifications(
-          data[1].map((item) => {
+          data[1].items.map((item) => {
             return { label: item.name, value: item.id };
           })
         );
         setTypes(
-          data[2].map((item) => {
+          data[2].items.map((item) => {
             return { label: item.name, value: item.id };
           })
         );

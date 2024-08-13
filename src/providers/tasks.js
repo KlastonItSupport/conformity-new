@@ -170,16 +170,54 @@ const TasksProvider = ({ children }) => {
     toast.success("Tipos excluídos com sucesso!");
   };
 
-  const getClassifications = async () => {
+  const getClassifications = async (page = 1, search = "", limit = 10) => {
     try {
-      const response = await api.get("/classifications", {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const response = await api.get(
+        `/classifications?page=${page}&search=${search}&pageSize=${limit}`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
 
       if (response.status === 200) {
         return response.data;
       }
-    } catch (error) {}
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const deleteClassification = async (id) => {
+    try {
+      const response = await api.delete(`/classifications/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+
+      if (response.status === 200) {
+        toast.success("Classificação excluída com sucesso");
+        return response.data;
+      }
+    } catch (error) {
+      toast.error("Erro ao deletar classificação");
+    }
+  };
+
+  const deleteMultipleClassifications = async (
+    selectedItems,
+    setClassifications,
+    classifications
+  ) => {
+    const deletePromises = selectedItems.map((selected) =>
+      selected.id !== "checkall" ? deleteClassification(selected.id) : () => {}
+    );
+    await Promise.all(deletePromises);
+    setClassifications(
+      classifications.filter(
+        (classification) =>
+          !selectedItems.some((selected) => selected.id === classification.id)
+      )
+    );
+    toast.success("Classificações excluídas com sucesso!");
   };
 
   const getOrigins = async (page = 1, search = "") => {
@@ -267,6 +305,8 @@ const TasksProvider = ({ children }) => {
         createTask,
         getOrigins,
         getClassifications,
+        deleteMultipleClassifications,
+        deleteClassification,
         getTypes,
         deleteType,
         deleteMultipleTypes,
