@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { NotePencil, Trash } from "@phosphor-icons/react";
+import { DownloadSimple, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -16,30 +16,31 @@ import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
 
-import { ModalForm } from "components/components";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
-import TaskClassification from "components/forms/task-classification/task-classification";
+import { mockedData } from "./table-helper";
+import { ModalForm } from "components/components";
+import FileForm from "../forms/files-form";
 
-const ClassificationPage = () => {
+const CertificatesPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const categoryRef = useRef();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [deleteId, setDeleteId] = useState(false);
+  const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
-  const [editSelected, setEditSelected] = useState(false);
   const [classifications, setClassifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
+  const formRef = useRef(null);
 
   const {
     deleteMultipleClassifications,
@@ -56,8 +57,13 @@ const ClassificationPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/tasks/classifications",
-      label: "Classificações",
+      path: "/equipments",
+      label: "Equipamentos",
+      isCurrent: false,
+    },
+    {
+      path: "/equipments/certificates",
+      label: "Documentos",
       isCurrent: true,
     },
   ];
@@ -72,12 +78,6 @@ const ClassificationPage = () => {
     isOpen: isDeleteMultipleModalOpen,
     onOpen: onDeleteMultipleModalOpen,
     onClose: onDeleteMultipleModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isEditModalOpen,
-    onOpen: onEditModalOpen,
-    onClose: onEditModalClose,
   } = useDisclosure();
 
   const {
@@ -100,7 +100,7 @@ const ClassificationPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("equipments", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -116,20 +116,17 @@ const ClassificationPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const downloadIcon = checkPermissionForAction("equipments", "canAdd")
         ? {
-            icon: <NotePencil size={20} />,
+            icon: <DownloadSimple size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
-              onEditModalOpen();
+              navigate(`/equipments/certificates?id=${item.id}`);
             },
             onClickHeader: () => {},
-            isDisabled: false,
-            shouldShow: false,
           }
         : null;
 
-      const icons = [deleteIcon, editIcon].filter((icon) => icon !== null);
+      const icons = [downloadIcon, deleteIcon].filter((icon) => icon !== null);
 
       setTableIcons(icons);
     };
@@ -188,9 +185,9 @@ const ClassificationPage = () => {
         </HStack>
 
         <CustomTable
-          data={classifications ?? []}
+          data={mockedData}
           columns={columns}
-          title={t("Classificações")}
+          title={t("Documentos")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -223,8 +220,8 @@ const ClassificationPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Classificação")}
-        subtitle={t("Tem certeza de que deseja excluir esta Classificação?")}
+        title={t("Excluir Documento")}
+        subtitle={t("Tem certeza de que deseja excluir este Documento?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -245,8 +242,8 @@ const ClassificationPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Classificações")}
-        subtitle={t("Tem certeza de que deseja excluir estas Classificações?")}
+        title={t("Excluir Equipamentos")}
+        subtitle={t("Tem certeza de que deseja excluir estas Equipamentos?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -262,13 +259,13 @@ const ClassificationPage = () => {
         isLoading={isDeleteLoading}
       />
       <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
+        isOpen={isAddModalOpen}
+        onClose={onAddModalClose}
         form={
-          <TaskClassification
-            formRef={categoryRef}
+          <FileForm
+            formRef={formRef}
             onClose={(origin) => {
-              onEditModalClose();
+              onAddModalClose();
               const originsCopy = [...classifications];
               const index = originsCopy.findIndex(
                 (item) => item.id === origin.id
@@ -277,41 +274,17 @@ const ClassificationPage = () => {
               setClassifications(originsCopy);
             }}
             event="edit"
-            id={editSelected.id}
-            formValues={editSelected}
-            setLoading={setIsLoading}
           />
         }
-        formRef={categoryRef}
-        title={t("Editar Classificação")}
+        formRef={formRef}
+        title={t("Adicionar Documento")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
-        modalSize="md"
-        isLoading={isLoading}
-      />
-
-      <ModalForm
-        isOpen={isAddModalOpen}
-        onClose={onAddModalClose}
-        form={
-          <TaskClassification
-            formRef={categoryRef}
-            onClose={(origin) => {
-              onAddModalClose();
-              setClassifications([origin, ...classifications]);
-            }}
-            setLoading={setIsLoading}
-          />
-        }
-        formRef={categoryRef}
-        title={t("Adicionar Classificação")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Adicionar")}
-        modalSize="md"
+        modalSize="xl"
         isLoading={isLoading}
       />
     </>
   );
 };
 
-export default ClassificationPage;
+export default CertificatesPage;

@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { NotePencil, Trash } from "@phosphor-icons/react";
+import { FileArrowUp, Gear, NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -17,15 +17,16 @@ import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
 
 import { ModalForm } from "components/components";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
-import TaskClassification from "components/forms/task-classification/task-classification";
+import { mockedData } from "./table-helper";
+import EquipmentForm from "./forms/equipment-form";
 
-const ClassificationPage = () => {
+const EquipmmentsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,6 +36,7 @@ const ClassificationPage = () => {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [deleteId, setDeleteId] = useState(false);
+  const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
   const [classifications, setClassifications] = useState([]);
@@ -56,8 +58,8 @@ const ClassificationPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/tasks/classifications",
-      label: "Classificações",
+      path: "/tasks/equipments",
+      label: "Equipamentos",
       isCurrent: true,
     },
   ];
@@ -100,7 +102,7 @@ const ClassificationPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("equipments", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -116,7 +118,7 @@ const ClassificationPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const editIcon = checkPermissionForAction("equipments", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -129,7 +131,34 @@ const ClassificationPage = () => {
           }
         : null;
 
-      const icons = [deleteIcon, editIcon].filter((icon) => icon !== null);
+      const actions = checkPermissionForAction("equipments", "canEdit")
+        ? {
+            icon: <Gear size={20} />,
+            onClickRow: (item) => {
+              // setEditSelected(item);
+              // onEditModalOpen();
+              navigate(`/equipments/actions?id=${item.id}`);
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+          }
+        : null;
+
+      const uploadFiles = checkPermissionForAction("equipments", "canAdd")
+        ? {
+            icon: <FileArrowUp size={20} />,
+            onClickRow: (item) => {
+              navigate(`/equipments/certificates?id=${item.id}`);
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+          }
+        : null;
+      const icons = [uploadFiles, editIcon, actions, deleteIcon].filter(
+        (icon) => icon !== null
+      );
 
       setTableIcons(icons);
     };
@@ -188,9 +217,9 @@ const ClassificationPage = () => {
         </HStack>
 
         <CustomTable
-          data={classifications ?? []}
+          data={mockedData}
           columns={columns}
-          title={t("Classificações")}
+          title={t("Equipamentos")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -245,8 +274,8 @@ const ClassificationPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Classificações")}
-        subtitle={t("Tem certeza de que deseja excluir estas Classificações?")}
+        title={t("Excluir Equipamentos")}
+        subtitle={t("Tem certeza de que deseja excluir estas Equipamentos?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -265,7 +294,7 @@ const ClassificationPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <TaskClassification
+          <EquipmentForm
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
@@ -286,7 +315,7 @@ const ClassificationPage = () => {
         title={t("Editar Classificação")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
-        modalSize="md"
+        modalSize="xl"
         isLoading={isLoading}
       />
 
@@ -294,7 +323,7 @@ const ClassificationPage = () => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <TaskClassification
+          <EquipmentForm
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
@@ -304,14 +333,14 @@ const ClassificationPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Classificação")}
+        title={t("Adicionar Equipamento")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
-        modalSize="md"
+        modalSize="xl"
         isLoading={isLoading}
       />
     </>
   );
 };
 
-export default ClassificationPage;
+export default EquipmmentsPage;

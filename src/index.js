@@ -36,6 +36,9 @@ import OriginsPage from "views/tasks/origins";
 import { DetailsTaskProvider } from "providers/details-task";
 import TypesPage from "views/tasks/types";
 import ClassificationPage from "views/tasks/classifications";
+import EquipmmentsPage from "views/equipments";
+import CertificatesPage from "views/equipments/certificates";
+import ActionsPage from "views/equipments/actions";
 
 const routes = createBrowserRouter([
   {
@@ -106,6 +109,18 @@ const routes = createBrowserRouter([
   {
     path: "/tasks/classifications",
     element: <ClassificationPage />,
+  },
+  {
+    path: "/equipments",
+    element: <EquipmmentsPage />,
+  },
+  {
+    path: "/equipments/certificates",
+    element: <CertificatesPage />,
+  },
+  {
+    path: "/equipments/actions",
+    element: <ActionsPage />,
   },
 ]);
 
