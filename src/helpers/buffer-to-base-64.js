@@ -17,6 +17,7 @@ const handlingFileToBase64 = async (file) => {
 };
 
 const handlingMultipleFilesToBase64 = async (files) => {
+  if (!files || files.length === 0) return [];
   const filesTreated = [];
   for (let i = 0; i < files.length; i++) {
     const file = files[i];

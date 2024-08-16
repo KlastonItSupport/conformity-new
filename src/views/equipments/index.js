@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { FileArrowUp, Gear, NotePencil, Trash } from "@phosphor-icons/react";
+import { Gear, NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -22,9 +22,8 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { mockedData } from "./table-helper";
 import EquipmentForm from "./forms/equipment-form";
+import { EquipmentContext } from "providers/equipments";
 
 const EquipmmentsPage = () => {
   const { t } = useTranslation();
@@ -33,21 +32,21 @@ const EquipmmentsPage = () => {
   const queryParams = useQuery();
   const categoryRef = useRef();
 
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-
   const [deleteId, setDeleteId] = useState(false);
   const navigate = useNavigate();
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [classifications, setClassifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState(null);
 
   const {
-    deleteMultipleClassifications,
-    deleteClassification,
-    getClassifications,
-  } = useContext(TasksContext);
+    deleteMultipleEquipments,
+    deleteEquipment,
+    getEquipments,
+    equipments,
+    pagination,
+    createEquipment,
+    updateEquipment,
+  } = useContext(EquipmentContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -89,13 +88,10 @@ const EquipmmentsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getClassifications(
+    getEquipments(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""
-    ).then((res) => {
-      setClassifications(res.items);
-      setPagination(res.pages);
-    });
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -137,7 +133,7 @@ const EquipmmentsPage = () => {
             onClickRow: (item) => {
               // setEditSelected(item);
               // onEditModalOpen();
-              navigate(`/equipments/actions?id=${item.id}`);
+              navigate(`/equipments/actions?id=${item.id}&name=${item.name}`);
             },
             onClickHeader: () => {},
             isDisabled: false,
@@ -145,18 +141,7 @@ const EquipmmentsPage = () => {
           }
         : null;
 
-      const uploadFiles = checkPermissionForAction("equipments", "canAdd")
-        ? {
-            icon: <FileArrowUp size={20} />,
-            onClickRow: (item) => {
-              navigate(`/equipments/certificates?id=${item.id}`);
-            },
-            onClickHeader: () => {},
-            isDisabled: false,
-            shouldShow: false,
-          }
-        : null;
-      const icons = [uploadFiles, editIcon, actions, deleteIcon].filter(
+      const icons = [actions, editIcon, deleteIcon].filter(
         (icon) => icon !== null
       );
 
@@ -172,9 +157,7 @@ const EquipmmentsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getClassifications(page, queryParams.get("search") ?? "");
-    setPagination(res.pages);
-    setClassifications(res.items);
+    await getEquipments(page, queryParams.get("search") ?? "");
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -183,13 +166,10 @@ const EquipmmentsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getClassifications(
+      const res = await getEquipments(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? ""
       );
-
-      setPagination(res.pages);
-      setClassifications(res.items);
     }
   }, 500);
 
@@ -212,12 +192,12 @@ const EquipmmentsPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             width="150px"
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
+            disabled={!checkPermissionForAction("equipments", "canAdd")}
           />
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={equipments}
           columns={columns}
           title={t("Equipamentos")}
           icons={tableIcons}
@@ -240,7 +220,7 @@ const EquipmmentsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={classifications}
+              data={equipments}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -259,14 +239,7 @@ const EquipmmentsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteClassification(deleteId);
-          if (response) {
-            setClassifications(
-              classifications.filter(
-                (classification) => classification.id !== deleteId
-              )
-            );
-          }
+          await deleteEquipment(deleteId);
 
           setIsLoading(false);
           onDeleteModalClose();
@@ -279,16 +252,12 @@ const EquipmmentsPage = () => {
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
-          setIsDeleteLoading(true);
-          await deleteMultipleClassifications(
-            selected,
-            setClassifications,
-            classifications
-          );
-          setIsDeleteLoading(false);
+          setIsLoading(true);
+          await deleteMultipleEquipments(selected);
           onDeleteMultipleModalClose();
+          setIsLoading(false);
         }}
-        isLoading={isDeleteLoading}
+        isLoading={isLoading}
       />
       <ModalForm
         isOpen={isEditModalOpen}
@@ -296,15 +265,8 @@ const EquipmmentsPage = () => {
         form={
           <EquipmentForm
             formRef={categoryRef}
-            onClose={(origin) => {
-              onEditModalClose();
-              const originsCopy = [...classifications];
-              const index = originsCopy.findIndex(
-                (item) => item.id === origin.id
-              );
-              originsCopy[index] = origin;
-              setClassifications(originsCopy);
-            }}
+            onClose={onEditModalClose}
+            onEdit={updateEquipment}
             event="edit"
             id={editSelected.id}
             formValues={editSelected}
@@ -325,10 +287,8 @@ const EquipmmentsPage = () => {
         form={
           <EquipmentForm
             formRef={categoryRef}
-            onClose={(origin) => {
-              onAddModalClose();
-              setClassifications([origin, ...classifications]);
-            }}
+            onClose={onAddModalClose}
+            onAdd={createEquipment}
             setLoading={setIsLoading}
           />
         }

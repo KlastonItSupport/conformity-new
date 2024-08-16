@@ -1,19 +1,54 @@
 import { VStack } from "@chakra-ui/react";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { FormTextArea } from "components/components";
 import { FormInput } from "components/components";
 import React from "react";
+import * as Yup from "yup";
 import { useForm } from "react-hook-form";
+import { handlingMultipleFilesToBase64 } from "helpers/buffer-to-base-64";
 
-const EquipmentForm = ({ formValues, formRef }) => {
+const equipmentSchema = Yup.object().shape({
+  name: Yup.string().required("O nome é obrigatório"),
+  description: Yup.string(),
+  model: Yup.string().required("O modelo é obrigatório"),
+  series: Yup.string().required("A série é obrigatório"),
+  manufacturer: Yup.string().required("O fabricante é obrigatório"),
+  certified: Yup.string().required("O certificado é obrigatório"),
+  range: Yup.string().required("O range é obrigatório"),
+  tolerancy: Yup.string().required("A tolerância é obrigatória"),
+  documents: Yup.mixed(),
+});
+
+const EquipmentForm = ({
+  formValues,
+  formRef,
+  event = "add",
+  onAdd,
+  onEdit,
+  setLoading,
+  onClose,
+  id,
+}) => {
   const {
     register,
     handleSubmit,
 
     formState: { errors },
-  } = useForm();
+  } = useForm({ resolver: yupResolver(equipmentSchema) });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    setLoading(true);
+
+    if (event === "add") {
+      await onAdd({ ...data });
+      setLoading(false);
+      onClose();
+      return;
+    }
+
+    await onEdit(data, id);
+    setLoading(false);
+    onClose();
   };
 
   return (
@@ -30,22 +65,7 @@ const EquipmentForm = ({ formValues, formRef }) => {
         error={errors.name?.message}
         defaultValue={formValues?.name}
       />
-      <FormInput
-        variant="auth"
-        fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
-        type="file"
-        margin="0 0 10px 0 "
-        fontWeight="500"
-        size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
-        label={"Insira seus documentos"}
-        {...register("documents")}
-        multiple
-        className="center-file-input"
-        error={errors.documents?.message}
-      />
+
       <FormTextArea
         label={"Descrição * "}
         {...register("description")}

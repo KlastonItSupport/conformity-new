@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { Trash } from "@phosphor-icons/react";
+import { FileArrowUp, Folder, NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -18,38 +18,45 @@ import { DeleteModal } from "components/components";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
-import { debounce } from "lodash";
+import { debounce, set } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { mockedData } from "./table-helper";
 import { ModalForm } from "components/components";
 import ActionForm from "../forms/actions-form";
+import { EquipmentContext } from "providers/equipments";
+import ActionDocumentModal from "../components/documents-modal";
 
 const ActionsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
+  const { userPermissions, userAccessRule, checkPermissionForAction } =
+    useContext(AuthContext);
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [deleteId, setDeleteId] = useState(false);
-  const navigate = useNavigate();
+  const [editId, setEditId] = useState(false);
+  const [documentActionId, setDocumentActionId] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [classifications, setClassifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState(null);
   const formRef = useRef(null);
+  const id = searchParams.get("id");
+  const name = searchParams.get("name");
+  const canAdd = checkPermissionForAction("equipments", "canAdd");
+  const canDelete = checkPermissionForAction("equipments", "canDelete");
+  const canEdit = checkPermissionForAction("equipments", "canEdit");
 
   const {
-    deleteMultipleClassifications,
-    deleteClassification,
-    getClassifications,
-  } = useContext(TasksContext);
-
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+    getActions,
+    deleteActions,
+    actions,
+    createActions,
+    updateActions,
+    paginationActions,
+    deleteMultipleActions,
+  } = useContext(EquipmentContext);
 
   const routeTreePaths = [
     {
@@ -86,20 +93,44 @@ const ActionsPage = () => {
     onClose: onAddModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isEditModalOpen,
+    onOpen: onEditModalOpen,
+    onClose: onEditModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDocumentModalOpen,
+    onOpen: onDocumentModalOpen,
+    onClose: onDocumentModalClose,
+  } = useDisclosure();
+
   useEffect(() => {
-    getClassifications(
+    getActions(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? ""
-    ).then((res) => {
-      setClassifications(res.items);
-      setPagination(res.pages);
-    });
+      searchParams.get("search") ?? "",
+      10,
+      id
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const updateIcons = () => {
+      const fileIcon = true
+        ? {
+            icon: <Folder size={20} />,
+            onClickRow: (item) => {
+              setDocumentActionId(item.id);
+              onDocumentModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Verificar documentos",
+          }
+        : null;
       const deleteIcon = checkPermissionForAction("equipments", "canDelete")
         ? {
             icon: <Trash size={20} />,
@@ -116,7 +147,25 @@ const ActionsPage = () => {
           }
         : null;
 
-      const icons = [deleteIcon].filter((icon) => icon !== null);
+      const editIcon = checkPermissionForAction("equipments", "canEdit")
+        ? {
+            icon: <NotePencil size={20} />,
+            onClickRow: (item) => {
+              setEditId(item);
+              onEditModalOpen();
+            },
+            onClickHeader: (selecteds) => {
+              // setSelected(selecteds);
+              // onEditMultipleModalOpen();
+            },
+            isDisabled: false,
+            shouldShow: false,
+          }
+        : null;
+
+      const icons = [fileIcon, editIcon, deleteIcon].filter(
+        (icon) => icon !== null
+      );
 
       setTableIcons(icons);
     };
@@ -130,9 +179,7 @@ const ActionsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getClassifications(page, queryParams.get("search") ?? "");
-    setPagination(res.pages);
-    setClassifications(res.items);
+    await getActions(page, queryParams.get("search") ?? "", 10, id);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -141,13 +188,12 @@ const ActionsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getClassifications(
+      await getActions(
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? ""
+        searchParams.get("search") ?? "",
+        10,
+        id
       );
-
-      setPagination(res.pages);
-      setClassifications(res.items);
     }
   }, 500);
 
@@ -175,9 +221,9 @@ const ActionsPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={actions}
           columns={columns}
-          title={t("Ações do equipamento: Balança")}
+          title={t(`Ações do equipamento: ${name}`)}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -196,15 +242,15 @@ const ActionsPage = () => {
           w={isMobile ? "99vw" : "95vw"}
           bgColor={"white"}
         >
-          {pagination && (
+          {paginationActions && (
             <Pagination
-              data={classifications}
+              data={actions}
               onClickPagination={updateData}
               itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+              totalPages={paginationActions.totalPages}
+              currentPage={paginationActions.currentPage}
+              nextPage={paginationActions.next}
+              lastPage={paginationActions.last}
             />
           )}
         </Flex>
@@ -217,14 +263,7 @@ const ActionsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteClassification(deleteId);
-          if (response) {
-            setClassifications(
-              classifications.filter(
-                (classification) => classification.id !== deleteId
-              )
-            );
-          }
+          await deleteActions(deleteId);
 
           setIsLoading(false);
           onDeleteModalClose();
@@ -238,11 +277,7 @@ const ActionsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleClassifications(
-            selected,
-            setClassifications,
-            classifications
-          );
+          await deleteMultipleActions(selected);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -255,16 +290,10 @@ const ActionsPage = () => {
         form={
           <ActionForm
             formRef={formRef}
-            onClose={(origin) => {
-              onAddModalClose();
-              const originsCopy = [...classifications];
-              const index = originsCopy.findIndex(
-                (item) => item.id === origin.id
-              );
-              originsCopy[index] = origin;
-              setClassifications(originsCopy);
-            }}
-            event="edit"
+            onClose={onAddModalClose}
+            setLoading={setIsLoading}
+            onAdd={createActions}
+            id={id}
           />
         }
         formRef={formRef}
@@ -273,6 +302,34 @@ const ActionsPage = () => {
         rightButtonLabel={t("Editar")}
         modalSize="xl"
         isLoading={isLoading}
+      />
+      <ModalForm
+        isOpen={isEditModalOpen}
+        onClose={onEditModalClose}
+        form={
+          <ActionForm
+            formRef={formRef}
+            onClose={onEditModalClose}
+            setLoading={setIsLoading}
+            onEdit={updateActions}
+            id={id}
+            formValues={editId}
+            event="edit"
+          />
+        }
+        formRef={formRef}
+        title={t("Editar Ação")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Editar")}
+        modalSize="xl"
+        isLoading={isLoading}
+      />
+      <ActionDocumentModal
+        isOpen={isDocumentModalOpen}
+        onClose={onDocumentModalClose}
+        id={documentActionId}
+        canAdd={canAdd}
+        canDelete={canDelete}
       />
     </>
   );

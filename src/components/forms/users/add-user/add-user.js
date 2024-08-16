@@ -17,9 +17,11 @@ import {
 import { Plus } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
 import { GroupForm } from "components/forms/groups/group";
+import { AuthContext } from "providers/auth";
 
 export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
   const { createUser } = useContext(UserContext);
+  const { getUserInfo } = useContext(AuthContext);
   const { getGroups, createGroupIsLoading } = useContext(GroupContext);
   const [groupOptions, setGroupOptions] = useState([]);
   const [groupIsLoading, setGroupIsLoading] = useState(false);
@@ -205,7 +207,9 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           errors={errors.accessRule}
           {...register("accessRule")}
           options={[
-            { label: "Super Admin", value: "super-admin" },
+            getUserInfo.accessRule()
+              ? { label: "Super Admin", value: "super-admin" }
+              : null,
             { label: "Super Usuário", value: "super-user" },
             { label: "Usuário", value: "user" },
           ]}

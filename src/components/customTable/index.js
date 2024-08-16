@@ -317,7 +317,7 @@ const TableCustom = ({
           justifyContent={"space-between"}
         >
           <Text
-            fontSize={{ lg: "24px", md: "32px", sm: "24px" }}
+            fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
             color={"navy.700"}
             fontWeight={"bold"}
             paddingBottom={isMobile ? "10px" : "0"}

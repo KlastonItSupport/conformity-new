@@ -1,7 +1,15 @@
+import moment from "moment";
+
 export const columns = [
   {
     header: "Data",
     access: "date",
+    formatData: (data) => {
+      if (data) {
+        return moment.utc(data).format("DD/MM/YYYY");
+      }
+      return "N/A";
+    },
   },
   {
     header: "Tipo",
@@ -13,7 +21,13 @@ export const columns = [
   },
   {
     header: "Próxima",
-    access: "next",
+    access: "nextDate",
+    formatData: (data) => {
+      if (data) {
+        return moment.utc(data).format("DD/MM/YYYY");
+      }
+      return "N/A";
+    },
   },
 ];
 

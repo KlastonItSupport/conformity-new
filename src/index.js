@@ -37,8 +37,8 @@ import { DetailsTaskProvider } from "providers/details-task";
 import TypesPage from "views/tasks/types";
 import ClassificationPage from "views/tasks/classifications";
 import EquipmmentsPage from "views/equipments";
-import CertificatesPage from "views/equipments/certificates";
 import ActionsPage from "views/equipments/actions";
+import { EquipmentProvider } from "providers/equipments";
 
 const routes = createBrowserRouter([
   {
@@ -114,10 +114,7 @@ const routes = createBrowserRouter([
     path: "/equipments",
     element: <EquipmmentsPage />,
   },
-  {
-    path: "/equipments/certificates",
-    element: <CertificatesPage />,
-  },
+
   {
     path: "/equipments/actions",
     element: <ActionsPage />,
@@ -136,14 +133,16 @@ ReactDOM.render(
                   <DepartamentProvider>
                     <TasksProvider>
                       <DetailsTaskProvider>
-                        <ChakraProvider theme={theme}>
-                          <ToastContainer />
-                          <React.StrictMode>
-                            <ThemeEditorProvider>
-                              <RouterProvider router={routes} />
-                            </ThemeEditorProvider>
-                          </React.StrictMode>
-                        </ChakraProvider>
+                        <EquipmentProvider>
+                          <ChakraProvider theme={theme}>
+                            <ToastContainer />
+                            <React.StrictMode>
+                              <ThemeEditorProvider>
+                                <RouterProvider router={routes} />
+                              </ThemeEditorProvider>
+                            </React.StrictMode>
+                          </ChakraProvider>
+                        </EquipmentProvider>
                       </DetailsTaskProvider>
                     </TasksProvider>
                   </DepartamentProvider>
