@@ -33,6 +33,7 @@ export const Pagination = ({
         _disabled={{ color: "black" }}
         bgColor={"secondaryGray.400"}
         cursor={"not-allowed"}
+        maxHeight={"30px"}
       >
         ...
       </Button>
@@ -49,6 +50,7 @@ export const Pagination = ({
         onClick={() => onPageClick(page)}
         isActive={Number(currentPage) === page}
         bgColor={"secondaryGray.100"}
+        maxHeight={"30px"}
       >
         {page}
       </Button>
@@ -96,6 +98,7 @@ export const Pagination = ({
         onClick={() => onPageClick(Number(currentPage) - 1)}
         disabled={Number(currentPage) === 1}
         bgColor={"secondaryGray.100"}
+        maxHeight={"30px"}
       >
         {t("Anterior")}
       </Button>
@@ -108,6 +111,7 @@ export const Pagination = ({
         onClick={() => onPageClick(Number(currentPage) + 1)}
         disabled={Number(currentPage) === lastPage || lastPage === 0}
         bgColor={"secondaryGray.100"}
+        maxHeight={"30px"}
       >
         {t("Próximo")}
       </Button>

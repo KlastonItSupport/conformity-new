@@ -33,7 +33,7 @@ const TableCustom = ({
   showSearchInput = true,
   hasMinHg = true,
   iconsHasMaxW = false,
-  cellPadding = "16px",
+  cellPadding = "8px",
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -235,11 +235,15 @@ const TableCustom = ({
                     padding={cellPadding}
                     fontSize={"sm"}
                   >
-                    <Text>
-                      {column.formatData
-                        ? column.formatData(item[column.access], item)
-                        : item[column.access]}
-                    </Text>
+                    {column.customCell ? (
+                      column.customCell(item)
+                    ) : (
+                      <Text>
+                        {column.formatData
+                          ? column.formatData(item[column.access], item)
+                          : item[column.access]}
+                      </Text>
+                    )}
                   </Td>
                 )
               );

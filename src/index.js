@@ -39,6 +39,7 @@ import ClassificationPage from "views/tasks/classifications";
 import EquipmmentsPage from "views/equipments";
 import ActionsPage from "views/equipments/actions";
 import { EquipmentProvider } from "providers/equipments";
+import IndicatorsPage from "views/indicators";
 
 const routes = createBrowserRouter([
   {
@@ -119,40 +120,44 @@ const routes = createBrowserRouter([
     path: "/equipments/actions",
     element: <ActionsPage />,
   },
+  {
+    path: "indicators",
+    element: <IndicatorsPage />,
+  },
 ]);
 
 ReactDOM.render(
   <AuthProvider>
-    <CompanyProvider>
-      <UserProvider>
-        <GroupProvider>
-          <DocumentProvider>
-            <AnalysisProvider>
-              <DetailsDocumentsProvider>
-                <CategoryProvider>
-                  <DepartamentProvider>
-                    <TasksProvider>
-                      <DetailsTaskProvider>
-                        <EquipmentProvider>
-                          <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme}>
+      <CompanyProvider>
+        <UserProvider>
+          <GroupProvider>
+            <DocumentProvider>
+              <AnalysisProvider>
+                <DetailsDocumentsProvider>
+                  <CategoryProvider>
+                    <DepartamentProvider>
+                      <TasksProvider>
+                        <DetailsTaskProvider>
+                          <EquipmentProvider>
                             <ToastContainer />
                             <React.StrictMode>
                               <ThemeEditorProvider>
                                 <RouterProvider router={routes} />
                               </ThemeEditorProvider>
                             </React.StrictMode>
-                          </ChakraProvider>
-                        </EquipmentProvider>
-                      </DetailsTaskProvider>
-                    </TasksProvider>
-                  </DepartamentProvider>
-                </CategoryProvider>
-              </DetailsDocumentsProvider>
-            </AnalysisProvider>
-          </DocumentProvider>
-        </GroupProvider>
-      </UserProvider>
-    </CompanyProvider>
+                          </EquipmentProvider>
+                        </DetailsTaskProvider>
+                      </TasksProvider>
+                    </DepartamentProvider>
+                  </CategoryProvider>
+                </DetailsDocumentsProvider>
+              </AnalysisProvider>
+            </DocumentProvider>
+          </GroupProvider>
+        </UserProvider>
+      </CompanyProvider>
+    </ChakraProvider>
   </AuthProvider>,
   document.getElementById("root")
 );

@@ -167,8 +167,8 @@ export const NavBar = () => {
           icon={<ChartLineUp size={28} />}
           itemsList={[
             {
-              src: "/",
-              label: "N/A",
+              src: "/indicators",
+              label: "Indicadores",
             },
           ]}
           key={"admin-indicators"}
