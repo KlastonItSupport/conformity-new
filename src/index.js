@@ -40,6 +40,8 @@ import EquipmmentsPage from "views/equipments";
 import ActionsPage from "views/equipments/actions";
 import { EquipmentProvider } from "providers/equipments";
 import IndicatorsPage from "views/indicators";
+import GraphItemsPage from "views/indicators/graph-items";
+import GraphsPage from "views/indicators/graphs";
 
 const routes = createBrowserRouter([
   {
@@ -123,6 +125,14 @@ const routes = createBrowserRouter([
   {
     path: "indicators",
     element: <IndicatorsPage />,
+  },
+  {
+    path: "indicators/graph-items",
+    element: <GraphItemsPage />,
+  },
+  {
+    path: "indicators/graphs",
+    element: <GraphsPage />,
   },
 ]);
 

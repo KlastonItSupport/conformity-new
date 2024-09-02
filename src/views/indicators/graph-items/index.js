@@ -23,9 +23,10 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
-import IndicatorForm from "./components/indicator-form";
+import GraphItemForm from "./graph-item.form";
+import TaskForm from "components/forms/tasks/task-form";
 
-const IndicatorsPage = () => {
+const GraphItemsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -40,6 +41,7 @@ const IndicatorsPage = () => {
   const [origins, setOrigins] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
+  const name = queryParams.get("name");
 
   const { getOrigins, deleteOrigin, deleteMultipleOrigins } =
     useContext(TasksContext);
@@ -55,6 +57,11 @@ const IndicatorsPage = () => {
     {
       path: "/indicators",
       label: "Indicadores",
+      isCurrent: false,
+    },
+    {
+      path: "/indicators/graph-items",
+      label: "Formulários",
       isCurrent: true,
     },
   ];
@@ -81,6 +88,12 @@ const IndicatorsPage = () => {
     isOpen: isAddModalOpen,
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
+  } = useDisclosure();
+
+  const {
+    isOpen: isTaskModalOpen,
+    onOpen: onTaskModalOpen,
+    onClose: onTaskModalClose,
   } = useDisclosure();
 
   useEffect(() => {
@@ -127,16 +140,6 @@ const IndicatorsPage = () => {
           }
         : null;
 
-      const graphIcon = checkPermissionForAction("indicators", "canEdit")
-        ? {
-            icon: <ChartLineUp size={20} />,
-            onClickRow: (item) => {},
-            onClickHeader: () => {},
-            isDisabled: false,
-            shouldShow: false,
-          }
-        : null;
-
       const addDataToIndicator = checkPermissionForAction(
         "indicators",
         "canEdit"
@@ -144,22 +147,16 @@ const IndicatorsPage = () => {
         ? {
             icon: <Plus size={20} />,
             onClickRow: (item) => {
-              window.open(
-                `/indicators/graph-items?id=${item.id}&name=${item.goal}`,
-                "_blank"
-              );
+              onTaskModalOpen();
             },
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
           }
         : null;
-      const icons = [
-        graphIcon,
-        addDataToIndicator,
-        editIcon,
-        deleteIcon,
-      ].filter((icon) => icon !== null);
+      const icons = [editIcon, deleteIcon, addDataToIndicator].filter(
+        (icon) => icon !== null
+      );
 
       setTableIcons(icons);
     };
@@ -225,7 +222,7 @@ const IndicatorsPage = () => {
         <CustomTable
           data={mockedData}
           columns={columns}
-          title={t("Indicadores")}
+          title={`${t("Indicador")}: ${name}`}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -258,8 +255,8 @@ const IndicatorsPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Origem")}
-        subtitle={t("Tem certeza de que deseja excluir este Indicador?")}
+        title={t("Excluir Resposta")}
+        subtitle={t("Tem certeza de que deseja excluir esta resposta?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -292,7 +289,7 @@ const IndicatorsPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <IndicatorForm
+          <GraphItemForm
             formRef={categoryRef}
             onClose={onAddModalClose}
             onEdit={() => {}}
@@ -301,32 +298,45 @@ const IndicatorsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Editar Origem")}
+        title={t("Editar Resposta")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
-        modalSize="2xl"
+        modalSize="xl"
+        isLoading={isLoading}
+      />
+      <ModalForm
+        isOpen={isTaskModalOpen}
+        onClose={onTaskModalClose}
+        form={<TaskForm />}
+        formRef={categoryRef}
+        title={t("Adicionar Resposta")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Adicionar")}
+        modalSize="xl"
         isLoading={isLoading}
       />
       <ModalForm
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <IndicatorForm
+          <GraphItemForm
             formRef={categoryRef}
             onClose={onAddModalClose}
-            onAdd={() => {}}
+            onAdd={() => {
+              <TaskForm />;
+            }}
             event="add"
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Origem")}
+        title={t("Adicionar Resposta")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
-        modalSize="2xl"
+        modalSize="xl"
         isLoading={isLoading}
       />
     </>
   );
 };
 
-export default IndicatorsPage;
+export default GraphItemsPage;
