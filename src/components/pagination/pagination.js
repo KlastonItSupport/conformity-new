@@ -9,6 +9,7 @@ export const Pagination = ({
   totalPages,
   nextPage,
   lastPage,
+  hasPadding = true,
 }) => {
   const pages = [];
   const { t } = useTranslation();
@@ -90,7 +91,7 @@ export const Pagination = ({
   };
 
   return (
-    <HStack padding={"20px"}>
+    <HStack padding={hasPadding ? "20px" : "0px"}>
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}

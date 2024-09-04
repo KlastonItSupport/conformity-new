@@ -1,4 +1,4 @@
-import { Link, Text } from "@chakra-ui/react";
+import { Link } from "@chakra-ui/react";
 import moment from "moment";
 
 export const columns = [

@@ -167,6 +167,10 @@ export const NavBar = () => {
           icon={<ChartLineUp size={28} />}
           itemsList={[
             {
+              src: "/indicators/graphs",
+              label: "Dashboard/ Gráficos",
+            },
+            {
               src: "/indicators",
               label: "Indicadores",
             },

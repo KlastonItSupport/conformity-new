@@ -10,6 +10,7 @@ const NavigationLinks = ({ routeTree, padding }) => {
       w={isMobile ? "100vw" : "95vw"}
       pb={"20px"}
       paddingX={isMobile ? "20px" : 0}
+      padding={padding}
     >
       {routeTree.map((route, index) => {
         const isNotLast = index !== 0;

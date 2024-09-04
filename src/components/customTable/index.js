@@ -34,6 +34,9 @@ const TableCustom = ({
   hasMinHg = true,
   iconsHasMaxW = false,
   cellPadding = "8px",
+  border,
+  borderRadius,
+  paginationComponent,
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -313,6 +316,9 @@ const TableCustom = ({
       margin={"0 auto"}
       bgColor={"white"}
       minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
+      border={border}
+      borderRadius={borderRadius}
+      padding={border ? "0 15px" : null}
     >
       <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
         <Flex
@@ -401,6 +407,7 @@ const TableCustom = ({
           <Tbody>{renderTableRows()}</Tbody>
         </Table>
       </Box>
+      {paginationComponent && paginationComponent}
     </Box>
   );
 };
