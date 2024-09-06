@@ -31,6 +31,10 @@ export const columns = [
     access: "dataType",
   },
   {
+    header: "Meta",
+    access: "meta",
+  },
+  {
     header: "Prazo",
     access: "deadline",
     formatData: (item) => {
@@ -41,8 +45,7 @@ export const columns = [
     header: "Status",
     access: "status",
     customCell: (item) => {
-      console.log("item", item);
-      const bgColor = item.status !== "Pendente" ? "red.600" : "green.600";
+      const bgColor = item.status === "Pendente" ? "red.600" : "green.600";
       return (
         <Container padding={"2px"} borderRadius={"5px"} bgColor={bgColor}>
           <Text textAlign={"center"} color={"white"}>

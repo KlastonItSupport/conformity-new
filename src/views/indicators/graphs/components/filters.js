@@ -19,7 +19,7 @@ export const filtersSchema = Yup.object().shape({
   endDate: Yup.string(),
 });
 
-const Filters = ({ formDefaultValues }) => {
+const Filters = ({ formDefaultValues, showDepartament }) => {
   const { isMobile } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [isShowingCalendarInitial, setIsShowingCalendarInitial] =
@@ -74,6 +74,7 @@ const Filters = ({ formDefaultValues }) => {
   useEffect(() => {
     // setFormDefaultValues(queryParams);
     handlingSelects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const statusInput = (
@@ -301,7 +302,7 @@ const Filters = ({ formDefaultValues }) => {
       as={"form"}
       onSubmit={handleSubmit(onSubmit)}
     >
-      {departamentInput}
+      {showDepartament && departamentInput}
       {classificationInput}
       {initialDateInput}
       {finalDateInput}

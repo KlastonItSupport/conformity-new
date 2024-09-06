@@ -10,7 +10,6 @@ import { TasksContext } from "providers/tasks";
 import { DepartamentContext } from "providers/departament";
 import moment from "moment";
 import { CompanyContext } from "providers/company";
-import { sleep } from "helpers/sleep";
 import StatusAndProject from "./components/status-and-project";
 import PrevisionAndDepartament from "./components/prevision-and-departament";
 import OriginAndType from "./components/origin-and-type";
@@ -29,6 +28,7 @@ const TaskForm = ({
   formValues,
   event = "add",
   setLoading,
+  indicator,
 }) => {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -132,13 +132,14 @@ const TaskForm = ({
         ...data,
         datePrevision,
         description,
+        indicator,
       });
 
       if (response) {
         setTasks([...tasks, response]);
-        onCloseModal();
+        onCloseModal(response);
       }
-      await sleep(1000);
+
       setLoading(false);
       return;
     }

@@ -2,8 +2,8 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns, mockedData } from "./table-helper";
-import { ChartLineUp, NotePencil, Plus, Trash } from "@phosphor-icons/react";
+import { columns } from "./table-helper";
+import { NotePencil, Plus, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -22,29 +22,48 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
 import GraphItemForm from "./graph-item.form";
 import TaskForm from "components/forms/tasks/task-form";
+import { IndicatorsAnswerContext } from "providers/indicator-answer";
+import { TasksContext } from "providers/tasks";
 
 const GraphItemsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const categoryRef = useRef();
+  const formRef = useRef();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [origins, setOrigins] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState(null);
   const name = queryParams.get("name");
+  const id = queryParams.get("id");
 
-  const { getOrigins, deleteOrigin, deleteMultipleOrigins } =
-    useContext(TasksContext);
+  const {
+    getIndicatorsAnswers,
+    indicatorsAnswers,
+    updateTasksColumn,
+    deleteIndicatorAnswer,
+    deleteMultipleIndicatorsAnswers,
+    pagination,
+    addIndicatorAnswer,
+    editIndicatorAnswer,
+  } = useContext(IndicatorsAnswerContext);
+
+  const {
+    origins,
+    setOrigins,
+    classifications,
+    setClassifications,
+    types,
+    setTypes,
+    departaments,
+    setDepartaments,
+  } = useContext(TasksContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -97,14 +116,11 @@ const GraphItemsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getOrigins(
+    getIndicatorsAnswers(
+      id,
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
-    ).then((res) => {
-      setOrigins(res.items);
-      setPagination(res.pages);
-    });
+      searchParams.get("search") ?? ""
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -147,6 +163,7 @@ const GraphItemsPage = () => {
         ? {
             icon: <Plus size={20} />,
             onClickRow: (item) => {
+              setEditSelected(item.id);
               onTaskModalOpen();
             },
             onClickHeader: () => {},
@@ -170,13 +187,7 @@ const GraphItemsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getOrigins(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
-    setPagination(res.pages);
-    setOrigins(res.items);
+    await getIndicatorsAnswers(id, page, queryParams.get("search") ?? "");
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -185,14 +196,11 @@ const GraphItemsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getOrigins(
+      await getIndicatorsAnswers(
+        id,
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? "",
-        setPagination
+        searchParams.get("search") ?? ""
       );
-
-      setPagination(res.pages);
-      setOrigins(res.items);
     }
   }, 500);
 
@@ -220,7 +228,7 @@ const GraphItemsPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={indicatorsAnswers}
           columns={columns}
           title={`${t("Indicador")}: ${name}`}
           icons={tableIcons}
@@ -243,7 +251,7 @@ const GraphItemsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={origins}
+              data={indicatorsAnswers}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -262,10 +270,7 @@ const GraphItemsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteOrigin(deleteId);
-          if (response) {
-            setOrigins(origins.filter((category) => category.id !== deleteId));
-          }
+          await deleteIndicatorAnswer(deleteId);
 
           setIsLoading(false);
           onDeleteModalClose();
@@ -279,7 +284,7 @@ const GraphItemsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleOrigins(selected, setOrigins, origins);
+          await deleteMultipleIndicatorsAnswers(selected);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -290,14 +295,16 @@ const GraphItemsPage = () => {
         onClose={onEditModalClose}
         form={
           <GraphItemForm
-            formRef={categoryRef}
-            onClose={onAddModalClose}
-            onEdit={() => {}}
+            formRef={formRef}
+            onClose={onEditModalClose}
+            onEdit={editIndicatorAnswer}
             event="edit"
             formValues={editSelected}
+            setLoading={setIsLoading}
+            id={id}
           />
         }
-        formRef={categoryRef}
+        formRef={formRef}
         title={t("Editar Resposta")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
@@ -307,8 +314,26 @@ const GraphItemsPage = () => {
       <ModalForm
         isOpen={isTaskModalOpen}
         onClose={onTaskModalClose}
-        form={<TaskForm />}
-        formRef={categoryRef}
+        form={
+          <TaskForm
+            formRef={formRef}
+            onCloseModal={(res) => {
+              updateTasksColumn(res);
+              onTaskModalClose();
+            }}
+            setLoading={setIsLoading}
+            origins={origins}
+            classifications={classifications}
+            types={types}
+            departaments={departaments}
+            setOrigins={setOrigins}
+            setClassifications={setClassifications}
+            setTypes={setTypes}
+            setDepartaments={setDepartaments}
+            indicator={editSelected}
+          />
+        }
+        formRef={formRef}
         title={t("Adicionar Resposta")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
@@ -320,15 +345,15 @@ const GraphItemsPage = () => {
         onClose={onAddModalClose}
         form={
           <GraphItemForm
-            formRef={categoryRef}
+            formRef={formRef}
             onClose={onAddModalClose}
-            onAdd={() => {
-              <TaskForm />;
-            }}
+            onAdd={addIndicatorAnswer}
             event="add"
+            setLoading={setIsLoading}
+            id={id}
           />
         }
-        formRef={categoryRef}
+        formRef={formRef}
         title={t("Adicionar Resposta")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}

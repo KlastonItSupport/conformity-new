@@ -6,11 +6,12 @@ export const columns = [
     header: "Indicador",
     access: "indicator",
   },
+
   {
     header: "Data",
     access: "date",
     formatData: (item) => {
-      return moment(item).format("DD/MM/YYYY");
+      return moment(item.date).format("DD/MM/YYYY");
     },
   },
   {
@@ -25,19 +26,17 @@ export const columns = [
     header: "Justificativa",
     access: "reason",
   },
-  {
-    header: "Frequência",
-    access: "frequency",
-  },
-  {
-    header: "Tipo de dado",
-    access: "dataType",
-  },
+
   {
     header: "Tasks",
     access: "tasks",
     customCell: (item) => {
-      return item.tasks.map((task) => {
+      if (!item.tasks) {
+        return "";
+      }
+      return item.tasks.map((task, index) => {
+        const isLast = index === item.tasks.length - 1;
+
         return (
           <Link
             onClick={() => window.open(`/tasks/details?id=${task}`, "_blank")}
@@ -45,7 +44,8 @@ export const columns = [
             cursor={"pointer"}
             _hover={{ textDecoration: "underline" }}
           >
-            {task},{" "}
+            {task}
+            {isLast ? "" : " - "}
           </Link>
         );
       });

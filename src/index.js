@@ -42,6 +42,8 @@ import { EquipmentProvider } from "providers/equipments";
 import IndicatorsPage from "views/indicators";
 import GraphItemsPage from "views/indicators/graph-items";
 import GraphsPage from "views/indicators/graphs";
+import { IndicatorsProvider } from "providers/indicators";
+import { IndicatorsAnswerProvider } from "providers/indicator-answer";
 
 const routes = createBrowserRouter([
   {
@@ -150,12 +152,16 @@ ReactDOM.render(
                       <TasksProvider>
                         <DetailsTaskProvider>
                           <EquipmentProvider>
-                            <ToastContainer />
-                            <React.StrictMode>
-                              <ThemeEditorProvider>
-                                <RouterProvider router={routes} />
-                              </ThemeEditorProvider>
-                            </React.StrictMode>
+                            <IndicatorsProvider>
+                              <IndicatorsAnswerProvider>
+                                <ToastContainer />
+                                <React.StrictMode>
+                                  <ThemeEditorProvider>
+                                    <RouterProvider router={routes} />
+                                  </ThemeEditorProvider>
+                                </React.StrictMode>
+                              </IndicatorsAnswerProvider>
+                            </IndicatorsProvider>
                           </EquipmentProvider>
                         </DetailsTaskProvider>
                       </TasksProvider>

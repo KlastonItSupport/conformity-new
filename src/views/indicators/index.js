@@ -2,7 +2,7 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import { ChartLineUp, NotePencil, Plus, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
@@ -22,8 +22,8 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
 import IndicatorForm from "./components/indicator-form";
+import { IndicatorsContext } from "providers/indicators";
 
 const IndicatorsPage = () => {
   const { t } = useTranslation();
@@ -37,12 +37,17 @@ const IndicatorsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [origins, setOrigins] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState(null);
 
-  const { getOrigins, deleteOrigin, deleteMultipleOrigins } =
-    useContext(TasksContext);
+  const {
+    getIndicators,
+    indicators,
+    pagination,
+    addIndicator,
+    deleteIndicator,
+    deleteMultipleIndicators,
+    editIndicator,
+  } = useContext(IndicatorsContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -84,14 +89,10 @@ const IndicatorsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getOrigins(
+    getIndicators(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
-    ).then((res) => {
-      setOrigins(res.items);
-      setPagination(res.pages);
-    });
+      searchParams.get("search") ?? ""
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -130,7 +131,12 @@ const IndicatorsPage = () => {
       const graphIcon = checkPermissionForAction("indicators", "canEdit")
         ? {
             icon: <ChartLineUp size={20} />,
-            onClickRow: (item) => {},
+            onClickRow: (item) => {
+              window.open(
+                `indicators/graphs?id=${item.id}&department=${item.department}&dataType=${item.dataType}&frequency=${item.frequency}`,
+                "_blank"
+              );
+            },
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
@@ -173,13 +179,7 @@ const IndicatorsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getOrigins(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
-    setPagination(res.pages);
-    setOrigins(res.items);
+    await getIndicators(page, queryParams.get("search") ?? "");
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -188,14 +188,13 @@ const IndicatorsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getOrigins(
+      await getIndicators(
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? "",
-        setPagination
+        searchParams.get("search") ?? ""
       );
 
-      setPagination(res.pages);
-      setOrigins(res.items);
+      // setPagination(res.pages);
+      // setOrigins(res.items);
     }
   }, 500);
 
@@ -223,7 +222,7 @@ const IndicatorsPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={indicators}
           columns={columns}
           title={t("Indicadores")}
           icons={tableIcons}
@@ -246,7 +245,7 @@ const IndicatorsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={origins}
+              data={indicators}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -258,17 +257,14 @@ const IndicatorsPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Origem")}
+        title={t("Excluir Indicador")}
         subtitle={t("Tem certeza de que deseja excluir este Indicador?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteOrigin(deleteId);
-          if (response) {
-            setOrigins(origins.filter((category) => category.id !== deleteId));
-          }
+          await deleteIndicator(deleteId);
 
           setIsLoading(false);
           onDeleteModalClose();
@@ -276,13 +272,13 @@ const IndicatorsPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Origem")}
+        title={t("Excluir Indicadores")}
         subtitle={t("Tem certeza de que deseja excluir estes Indicadores?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleOrigins(selected, setOrigins, origins);
+          await deleteMultipleIndicators(selected);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -294,14 +290,16 @@ const IndicatorsPage = () => {
         form={
           <IndicatorForm
             formRef={categoryRef}
-            onClose={onAddModalClose}
-            onEdit={() => {}}
+            onClose={onEditModalClose}
+            onEdit={editIndicator}
             event="edit"
             formValues={editSelected}
+            setLoading={setIsLoading}
+            id={editSelected.id}
           />
         }
         formRef={categoryRef}
-        title={t("Editar Origem")}
+        title={t("Editar Indicador")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="2xl"
@@ -314,12 +312,13 @@ const IndicatorsPage = () => {
           <IndicatorForm
             formRef={categoryRef}
             onClose={onAddModalClose}
-            onAdd={() => {}}
+            onAdd={addIndicator}
+            setLoading={setIsLoading}
             event="add"
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Origem")}
+        title={t("Adicionar Indicador")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"

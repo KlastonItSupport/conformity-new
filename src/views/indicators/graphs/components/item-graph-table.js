@@ -14,8 +14,7 @@ import GraphItemForm from "views/indicators/graph-items/graph-item.form";
 import { columns } from "views/indicators/graph-items/table-helper";
 import { mockedData } from "views/indicators/graph-items/table-helper";
 
-const ItemGraphTable = () => {
-  const name = "TI - Tipo de dado: PERCENTUAL - Frequência: MENSAL";
+const ItemGraphTable = ({ indicatorsAnswers }) => {
   const { t } = useTranslation();
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -140,9 +139,9 @@ const ItemGraphTable = () => {
     <>
       <Box w={"100%"} mt={"20px !important"} pb={"20px"}>
         <CustomTable
-          data={mockedData}
+          data={indicatorsAnswers}
           columns={columns}
-          title={`${t("Indicador")}: ${name}`}
+          title={`${t("Indicador")}:`}
           icons={tableIcons}
           searchInputValue={""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}

@@ -1,28 +1,20 @@
 import { Box, Button, Divider, HStack, Text, VStack } from "@chakra-ui/react";
 import React, { useState } from "react";
-import { Line, Bar, Pie } from "react-chartjs-2"; // Importe o Pie aqui
-import { Chart, defaults } from "chart.js/auto";
+import { Line, Bar } from "react-chartjs-2";
+import { defaults } from "chart.js/auto";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import moment from "moment";
 
 defaults.maintainAspectRatio = false;
 defaults.responsive = true;
 
-const GraphContainer = () => {
+const GraphContainer = ({
+  department,
+  dataType,
+  frequency,
+  indicatorsAnswers,
+}) => {
   const { isMobile } = useBreakpoint();
-  const revenueData = [
-    { label: "Jan", revenue: 64854, cost: 32652 },
-    { label: "Feb", revenue: 54628, cost: 42393 },
-    { label: "Mar", revenue: 117238, cost: 50262 },
-    { label: "Apr", revenue: 82830, cost: 64731 },
-    { label: "May", revenue: 91208, cost: 41893 },
-    { label: "Jun", revenue: 103609, cost: 83809 },
-    { label: "Jul", revenue: 90974, cost: 44772 },
-    { label: "Aug", revenue: 82919, cost: 37590 },
-    { label: "Sep", revenue: 62407, cost: 43349 },
-    { label: "Oct", revenue: 82528, cost: 45324 },
-    { label: "Nov", revenue: 56979, cost: 47978 },
-    { label: "Dec", revenue: 87436, cost: 39175 },
-  ];
 
   const [selectedGraph, setSelectedGraph] = useState("lines");
 
@@ -49,6 +41,27 @@ const GraphContainer = () => {
     setSelectedGraph(value);
   };
 
+  const graphData = {
+    labels: indicatorsAnswers.map((answer) =>
+      moment(answer.date).format("DD/MM/YYYY")
+    ),
+    datasets: [
+      {
+        label: "Planejado",
+        data: indicatorsAnswers.map((answer) => answer.goal),
+        backgroundColor: "#064FF0",
+        borderColor: "#064FF0",
+      },
+      {
+        label: "Realizado",
+        data: indicatorsAnswers.map((answer) => answer.answer),
+
+        backgroundColor: "#FF3030",
+        borderColor: "#FF3030",
+      },
+    ],
+  };
+
   return (
     <VStack
       bgColor={"white"}
@@ -59,7 +72,8 @@ const GraphContainer = () => {
       borderRadius={"8px"}
     >
       <Text color={"header.100"} fontSize={"xl"}>
-        Departamento: TI - Tipo de dado: PERCENTUAL - Frequência: MENSAL
+        Departamento: {department} - Tipo de dado: {dataType} - Frequência:{" "}
+        {frequency}
       </Text>
       <Divider borderColor={"#ddd"} w={"100%"} borderWidth={"1px"} />
       {isMobile ? (
@@ -89,23 +103,7 @@ const GraphContainer = () => {
       {selectedGraph === "lines" && (
         <Box w={"100%"} minH={"100%"} h={{ lg: "520px", sm: "500px" }}>
           <Line
-            data={{
-              labels: revenueData.map((data) => data.label),
-              datasets: [
-                {
-                  label: "Revenue",
-                  data: revenueData.map((data) => data.revenue),
-                  backgroundColor: "#064FF0",
-                  borderColor: "#064FF0",
-                },
-                {
-                  label: "Cost",
-                  data: revenueData.map((data) => data.cost),
-                  backgroundColor: "#FF3030",
-                  borderColor: "#FF3030",
-                },
-              ],
-            }}
+            data={graphData}
             options={{
               elements: {
                 line: {
@@ -125,21 +123,7 @@ const GraphContainer = () => {
       {selectedGraph === "bars" && (
         <Box w={"100%"} minH={"100%"} h={{ lg: "520px", sm: "500px" }}>
           <Bar
-            data={{
-              labels: revenueData.map((data) => data.label),
-              datasets: [
-                {
-                  label: "Revenue",
-                  data: revenueData.map((data) => data.revenue),
-                  backgroundColor: "#064FF0",
-                },
-                {
-                  label: "Cost",
-                  data: revenueData.map((data) => data.cost),
-                  backgroundColor: "#FF3030",
-                },
-              ],
-            }}
+            data={graphData}
             options={{
               plugins: {
                 title: {
@@ -155,54 +139,13 @@ const GraphContainer = () => {
       {selectedGraph === "horizontal" && (
         <Box w={"100%"} minH={"100%"} h={{ lg: "520px", sm: "500px" }}>
           <Bar
-            data={{
-              labels: revenueData.map((data) => data.label),
-              datasets: [
-                {
-                  label: "Revenue",
-                  data: revenueData.map((data) => data.revenue),
-                  backgroundColor: "#064FF0",
-                },
-                {
-                  label: "Cost",
-                  data: revenueData.map((data) => data.cost),
-                  backgroundColor: "#FF3030",
-                },
-              ],
-            }}
+            data={graphData}
             options={{
-              indexAxis: "y", // Altera a orientação para horizontal
+              indexAxis: "y",
               plugins: {
                 title: {
                   display: true,
                   text: "Monthly Revenue & Cost (Horizontal)",
-                },
-              },
-            }}
-          />
-        </Box>
-      )}
-
-      {selectedGraph === "pie" && (
-        <Box w={"100%"} minH={"100%"} h={{ lg: "520px", sm: "500px" }}>
-          <Pie
-            data={{
-              labels: revenueData.map((data) => data.label),
-              datasets: [
-                {
-                  label: "Revenue",
-                  data: revenueData.map((data) => data.revenue),
-                  backgroundColor: revenueData.map((data, index) =>
-                    index % 2 === 0 ? "#064FF0" : "#FF3030"
-                  ),
-                },
-              ],
-            }}
-            options={{
-              plugins: {
-                title: {
-                  display: true,
-                  text: "Monthly Revenue Distribution (Pie Chart)",
                 },
               },
             }}

@@ -2,25 +2,30 @@ import { Box, HStack, Image, Text, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormTextArea } from "components/components";
 import { FormInput } from "components/components";
-import React, { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import SelectInput from "components/select";
 import UpArrow from "assets/img/up.png";
 import DownArrow from "assets/img/down.png";
 import { CalendarCustom } from "components/calendar";
+import { DepartamentContext } from "providers/departament";
+import moment from "moment";
+import { sleep } from "helpers/sleep";
 
 const equipmentSchema = Yup.object().shape({
-  department: Yup.string().required("O Departamento é obrigatorio"),
+  departamentId: Yup.string().required("O Departamento é obrigatorio"),
   responsable: Yup.string().required("O responsável é obrigatório"),
   goal: Yup.string().required("O objetivo é obrigatório"),
   whatToMeasure: Yup.string().required("O que mede é obrigatório"),
   howToMeasure: Yup.string().required("Como mede é obrigatório"),
   frequency: Yup.string().required("A frequência é obrigatória"),
-  collectionDay: Yup.number().required("O dia de coleta é obrigatório"),
+  collectDay: Yup.number().required("O dia de coleta é obrigatório"),
   dataType: Yup.string().required("O tipo de dado é obrigatório"),
-  meta: Yup.string().required("A meta é obrigatória"),
-  creationDate: Yup.string().required("A data de criação é obrigatória"),
+  meta: Yup.number()
+    .typeError("A meta deve ser um número válido")
+    .required("A meta é obrigatória"),
+  deadline: Yup.string().required("A data de criação é obrigatória"),
 });
 
 const IndicatorForm = ({
@@ -35,7 +40,9 @@ const IndicatorForm = ({
 }) => {
   const [improveDirection, setImproveDirection] = useState("");
   const [isShowingCalendarCreate, setIsShowingCalendarCreate] = useState(false);
+  const [departamentsSelect, setDepartamentsSelect] = useState([]);
   const documentCreateDateRef = useRef(null);
+  const { getDepartaments } = useContext(DepartamentContext);
 
   const {
     register,
@@ -46,18 +53,45 @@ const IndicatorForm = ({
 
   const onSubmit = async (data) => {
     setLoading(true);
+    const deadline = moment(data.deadline, "DD/MM/YYYY").format("YYYY-MM-DD");
 
     if (event === "add") {
-      await onAdd({ ...data });
+      await onAdd({ ...data, direction: improveDirection, deadline });
+      sleep(1000);
       setLoading(false);
       onClose();
       return;
     }
 
-    await onEdit(data, id);
+    console.log("b0", data.departamentId);
+    await onEdit(
+      {
+        ...data,
+        direction: improveDirection,
+        deadline,
+        departamentId: data.departamentId,
+      },
+      id
+    );
     setLoading(false);
     onClose();
   };
+
+  useEffect(() => {
+    getDepartaments().then((departaments) => {
+      setDepartamentsSelect(
+        departaments.map((departament) => {
+          return { label: departament.name, value: departament.id };
+        })
+      );
+    });
+
+    if (formValues) {
+      console.log("formvalues", formValues);
+      setImproveDirection(formValues.direction);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <VStack
@@ -69,18 +103,20 @@ const IndicatorForm = ({
     >
       <SelectInput
         label={"Departamento * "}
-        {...register("department")}
-        error={errors.department?.message}
-        defaultValue={{
-          label: formValues?.department,
-          value: formValues?.department,
-        }}
-        options={[
-          { label: "Ciência e Tecnologia", value: "1" },
-          { label: "Engenharia", value: "2" },
-          { label: "Saúde", value: "3" },
-          { label: "Educação", value: "4" },
-        ]}
+        {...register("departamentId")}
+        error={errors.departamentId?.message}
+        defaultValue={
+          formValues
+            ? {
+                label: formValues?.department,
+                value: formValues?.departamentId,
+              }
+            : {
+                label: "Selecione um departamento",
+                value: "not-selected",
+              }
+        }
+        options={departamentsSelect}
       />
 
       <FormInput
@@ -106,46 +142,52 @@ const IndicatorForm = ({
         label={"Frequencia * "}
         {...register("frequency")}
         error={errors.frequency?.message}
-        defaultValue={{
-          label: formValues?.frequency,
-          value: formValues?.frequency,
-        }}
+        defaultValue={
+          formValues
+            ? {
+                label: formValues?.frequency,
+                value: formValues?.frequency.toUpperCase(),
+              }
+            : {
+                label: "Selecione uma frequência",
+                value: "not-selected",
+              }
+        }
         options={[
-          { label: "Diário", value: "1" },
-          { label: "Mensal", value: "2" },
-          { label: "Bimensal", value: "3" },
-          { label: "Trimestral", value: "4" },
-          { label: "Semestral", value: "5" },
-          { label: "Anual", value: "6" },
+          { label: "Diário", value: "DIÁRIO" },
+          { label: "Semanal", value: "SEMANAL" },
+          { label: "Mensal", value: "MENSAL" },
+          { label: "Bimensal", value: "BIMENSAL" },
+          { label: "Trimestral", value: "TRIMESTRAL" },
+          { label: "Semestral", value: "SEMESTRAL" },
+          { label: "Anual", value: "ANUAL" },
         ]}
       />
 
       <FormInput
         label={"Dia previsto de coleta * "}
-        {...register("collectionDay")}
-        error={errors.collectionDate?.message}
-        defaultValue={formValues?.collectionDate}
+        {...register("collectDay")}
+        error={errors.collectDay?.message}
+        defaultValue={formValues?.collectDay}
         type="number"
       />
-      <FormInput
-        label={"Tolerância * "}
-        {...register("tolerancy")}
-        error={errors.tolerancy?.message}
-        defaultValue={formValues?.tolerancy}
-      />
+
       <SelectInput
         label={"Tipo de Dado: * "}
         {...register("dataType")}
         error={errors.dataType?.message}
-        defaultValue={formValues?.dataType}
+        defaultValue={{
+          label: formValues?.dataType,
+          value: formValues?.dataType.toUpperCase(),
+        }}
         options={[
-          { label: "Numero inteiro", value: "1" },
-          { label: "Peso", value: "2" },
-          { label: "Volume", value: "3" },
-          { label: "BRL", value: "4" },
-          { label: "Percentual", value: "5" },
-          { label: "USD", value: "6" },
-          { label: "Percentual (%)", value: "7" },
+          { label: "Numero inteiro", value: "Numero inteiro" },
+          { label: "Peso", value: "Peso" },
+          { label: "Volume", value: "Volume" },
+          { label: "BRL", value: "BRL" },
+          { label: "Percentual", value: "Percentual" },
+          { label: "USD", value: "USD" },
+          { label: "Percentual (%)", value: "Percentual (%)" },
         ]}
       />
       <FormInput
@@ -197,22 +239,20 @@ const IndicatorForm = ({
           borderRadius="6px"
           bgColor={"primary.50"}
           label={"Data de criação (Documento)"}
-          {...register("creationDate")}
+          {...register("deadline")}
           onClick={() => setIsShowingCalendarCreate(!isShowingCalendarCreate)}
           width="100%"
           autocomplete="off"
           onChange={(e) => {
             if (e.target.value.length === 10) setIsShowingCalendarCreate(false);
           }}
-          {...register("creationDate")}
-          error={errors.creationDate?.message}
-          // defaultValue={
-          //   formValues.creationDate
-          //     ? moment(formValues.creationDate).format(
-          //         "DD/MM/YYYY"
-          //       )
-          //     : null
-          // }
+          {...register("deadline")}
+          error={errors.deadline?.message}
+          defaultValue={
+            formValues?.deadline
+              ? moment(formValues.deadline).format("DD/MM/YYYY")
+              : null
+          }
         />
         {isShowingCalendarCreate && (
           <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
@@ -224,7 +264,7 @@ const IndicatorForm = ({
 
                 const formattedDate = `${day}/${month}/${year}`;
 
-                setValue("creationDate", formattedDate);
+                setValue("deadline", formattedDate);
                 setIsShowingCalendarCreate(!isShowingCalendarCreate);
               }}
             />

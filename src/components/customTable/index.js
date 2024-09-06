@@ -117,6 +117,14 @@ const TableCustom = ({
     });
 
     data.sort((a, b) => {
+      if (
+        !a[column] ||
+        !b[column] ||
+        a[column] === null ||
+        b[column] === null
+      ) {
+        return 0;
+      }
       if (typeof a[column] === "boolean" && typeof b[column] === "boolean") {
         return (
           (a[column] === b[column] ? 0 : a[column] ? 1 : -1) *

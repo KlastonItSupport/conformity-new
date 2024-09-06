@@ -1,4 +1,4 @@
-import { Box, HStack, Image, Text, VStack } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormTextArea } from "components/components";
 import { FormInput } from "components/components";
@@ -9,16 +9,15 @@ import { CalendarCustom } from "components/calendar";
 import moment from "moment";
 
 const equipmentSchema = Yup.object().shape({
-  department: Yup.string().required("O Departamento é obrigatorio"),
-  responsable: Yup.string().required("O responsável é obrigatório"),
-  goal: Yup.string().required("O objetivo é obrigatório"),
-  whatToMeasure: Yup.string().required("O que mede é obrigatório"),
-  howToMeasure: Yup.string().required("Como mede é obrigatório"),
-  frequency: Yup.string().required("A frequência é obrigatória"),
-  collectionDay: Yup.number().required("O dia de coleta é obrigatório"),
-  dataType: Yup.string().required("O tipo de dado é obrigatório"),
-  meta: Yup.string().required("A meta é obrigatória"),
+  goal: Yup.number()
+    .typeError("Somente aceito ")
+    .required("A meta é obrigatória"),
   date: Yup.string().required("A data de criação é obrigatória"),
+  answer: Yup.number()
+    .typeError("Somente aceito ")
+    .required("Resposta é obrigatória"),
+
+  reason: Yup.string(),
 });
 
 const GraphItemForm = ({
@@ -31,7 +30,6 @@ const GraphItemForm = ({
   onClose,
   id,
 }) => {
-  const [improveDirection, setImproveDirection] = useState("");
   const [isShowingCalendarCreate, setIsShowingCalendarCreate] = useState(false);
   const documentCreateDateRef = useRef(null);
 
@@ -44,15 +42,23 @@ const GraphItemForm = ({
 
   const onSubmit = async (data) => {
     setLoading(true);
+    const date = moment(data.date, "DD/MM/YYYY").format("YYYY-MM-DD");
 
     if (event === "add") {
-      await onAdd({ ...data });
+      await onAdd({ ...data, date, indicatorId: id });
       setLoading(false);
       onClose();
       return;
     }
 
-    await onEdit(data, id);
+    await onEdit(
+      {
+        ...data,
+        date,
+        indicatorId: id,
+      },
+      formValues.id
+    );
     setLoading(false);
     onClose();
   };
