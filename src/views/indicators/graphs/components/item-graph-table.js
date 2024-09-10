@@ -158,7 +158,7 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
           columns={columns}
           title={`${t("Indicador")}`}
           icons={tableIcons}
-          searchInputValue={""}
+          showSearchInput={false}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
           iconsHasMaxW={true}
           onCheckItems={(show) => {
