@@ -109,7 +109,6 @@ const DocumentForm = ({ formRef, onClose, setIsLoading, event = "add" }) => {
   useEffect(() => {
     if (formValues.description) {
       setDescription(formValues.description);
-      console.log(formValues.description);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -5,9 +5,12 @@ import { CalendarCustom } from "components/calendar";
 import { FormInput } from "components/components";
 import SelectInput from "components/select";
 import { notSelectedCleaning } from "helpers/not-selected-cleaning";
+import { sleep } from "helpers/sleep";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import moment from "moment";
 import { DepartamentContext } from "providers/departament";
-import { TasksContext } from "providers/tasks";
+import { IndicatorsAnswerContext } from "providers/indicator-answer";
+import { IndicatorsContext } from "providers/indicators";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
@@ -15,11 +18,18 @@ import * as Yup from "yup";
 
 export const filtersSchema = Yup.object().shape({
   departament: Yup.string(),
+  indicator: Yup.string(),
   initialDate: Yup.string(),
   endDate: Yup.string(),
 });
 
-const Filters = ({ formDefaultValues, showDepartament }) => {
+const Filters = ({
+  formDefaultValues,
+  showDepartament,
+  id,
+  titles,
+  setTitles,
+}) => {
   const { isMobile } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [isShowingCalendarInitial, setIsShowingCalendarInitial] =
@@ -27,10 +37,13 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
   const initialDateRef = useRef(null);
   const endDateRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [indicatorsOptions, setIndicatorsOptions] = useState([]);
+  const [departaments, setDepartaments] = useState([]);
 
   const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
-  const { getOrigins, getClassifications, getTypes, getTasks, setTasks } =
-    useContext(TasksContext);
+  const { getIndicators } = useContext(IndicatorsContext);
+  const { getIndicatorsAnswers } = useContext(IndicatorsAnswerContext);
+
   const { getDepartaments } = useContext(DepartamentContext);
   const {
     handleSubmit,
@@ -40,97 +53,55 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
   } = useForm(filtersSchema);
 
   const handlingSelects = async () => {
-    const origins = getOrigins();
-    const classifications = getClassifications();
-    const types = getTypes();
     const departaments = getDepartaments();
+    const indicators = getIndicators(1, "", 1000);
 
-    await Promise.all([origins, classifications, types, departaments]).then(
-      (data) => {
-        // setOrigins(
-        //   data[0].items.map((item) => {
-        //     return { label: item.name, value: item.id };
-        //   })
-        // );
-        // setClassifications(
-        //   data[1].items.map((item) => {
-        //     return { label: item.name, value: item.id };
-        //   })
-        // );
-        // setTypes(
-        //   data[2].items.map((item) => {
-        //     return { label: item.name, value: item.id };
-        //   })
-        // );
-        // setDepartaments(
-        //   data[3].map((item) => {
-        //     return { label: item.name, value: item.id };
-        //   })
-        // );
-      }
-    );
+    await Promise.all([departaments, indicators]).then((data) => {
+      setDepartaments(
+        data[0].map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
+
+      setIndicatorsOptions(
+        data[1].items.map((item) => {
+          return {
+            label: item.goal,
+            value: item.id,
+            dataType: item.dataType,
+            frequency: item.frequency,
+          };
+        })
+      );
+    });
   };
 
-  useEffect(() => {
-    // setFormDefaultValues(queryParams);
-    handlingSelects();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const statusInput = (
-    <VStack w={"100%"} align={"start"}>
-      <SelectInput
-        label="Status"
-        {...register("status")}
-        errors={errors.status}
-        defaultValue={{
-          label: "Selecione um status",
-          value: "not-selected",
-        }}
-        options={[
-          {
-            label: "Aberta",
-            value: "Aberta",
-          },
-          {
-            label: "Fechada",
-            value: "Fechada",
-          },
-          {
-            label: "Reaberta",
-            value: "Reaberta",
-          },
-        ]}
-      />
-    </VStack>
-  );
-
-  const originInput = (
-    <VStack w={"100%"} align={"start"}>
-      <SelectInput
-        label="Origem "
-        {...register("origin")}
-        errors={errors.origin}
-        defaultValue={{
-          label: "Selecione uma origem",
-          value: "not-selected",
-        }}
-        options={[]}
-      />
-    </VStack>
-  );
-
-  const classificationInput = (
+  const indicatorInput = (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
         label="Indicador"
-        {...register("classification")}
-        errors={errors.classification}
+        {...register("indicator")}
+        errors={errors.indicator}
         defaultValue={{
           label: "Selecione um Indicador",
           value: "not-selected",
         }}
-        options={[]}
+        options={indicatorsOptions}
+        onChange={async (e) => {
+          const indicatorId = e.target.value;
+          const indicator = indicatorsOptions.find(
+            (item) => item.value === Number(indicatorId)
+          );
+          console.log("indicator", indicator);
+
+          if (indicator) {
+            setTitles({
+              ...titles,
+              dataType: indicator.dataType,
+              frequency: indicator.frequency,
+            });
+          }
+        }}
       />
     </VStack>
   );
@@ -141,9 +112,34 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
         label="Departamento"
         {...register("departament")}
         errors={errors.departament}
-        options={[]}
+        options={departaments}
+        onChange={async (e) => {
+          if (!showDepartament) return;
+          const departamentId = e.target.value;
+          const selectedOption = e.target.options[e.target.selectedIndex];
+          const departamentLabel = selectedOption.text;
+
+          if (departamentLabel !== "Selecione um departamento") {
+            setTitles({
+              ...titles,
+              department: departamentLabel,
+            });
+          }
+
+          const indicators = await getIndicators(
+            1,
+            "",
+            1000,
+            departamentId === "not-selected" ? "" : departamentId
+          );
+          setIndicatorsOptions(
+            indicators.items.map((item) => {
+              return { label: item.goal, value: item.id };
+            })
+          );
+        }}
         defaultValue={{
-          label: "Selecione um tipo",
+          label: "Selecione um departamento",
           value: "not-selected",
         }}
       />
@@ -263,18 +259,44 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
   const onSubmit = async (data) => {
     notSelectedCleaning(data);
     setIsLoading(true);
+    let initialFormatedDate;
+    let finalFormatedDate;
 
-    const tasks = await getTasks(1, "", data);
+    if (data.initialDate) {
+      initialFormatedDate = moment(data.initialDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
 
-    setTasks(tasks.items);
+    if (data.endDate) {
+      finalFormatedDate = moment(data.endDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
+
+    getIndicatorsAnswers(data.indicator ?? id, 1, "", 1000, {
+      initialDate: initialFormatedDate ?? "",
+      finalDate: finalFormatedDate ?? "",
+    });
+    await sleep(1000);
+
     setIsLoading(false);
   };
 
-  return isMobile ? (
-    <VStack w={"100%"} paddingX={"20px"} as="form">
-      {statusInput}
-      {originInput}
+  useEffect(() => {
+    handlingSelects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  return isMobile ? (
+    <VStack
+      w={"100%"}
+      paddingX={"20px"}
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      {showDepartament && departamentInput}
+      {showDepartament && indicatorInput}
       {initialDateInput}
       {finalDateInput}
       <ButtonPrimary
@@ -290,6 +312,8 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
         label={"Filtrar"}
         width="100%"
         m={"10px  20px !important"}
+        isLoading={isLoading}
+        type="submit"
       />
     </VStack>
   ) : (
@@ -303,7 +327,7 @@ const Filters = ({ formDefaultValues, showDepartament }) => {
       onSubmit={handleSubmit(onSubmit)}
     >
       {showDepartament && departamentInput}
-      {classificationInput}
+      {showDepartament && indicatorInput}
       {initialDateInput}
       {finalDateInput}
 

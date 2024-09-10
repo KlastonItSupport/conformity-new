@@ -1,18 +1,18 @@
-import { Box, Flex, useBreakpoint, useDisclosure } from "@chakra-ui/react";
+import { Box, useDisclosure } from "@chakra-ui/react";
 import { NotePencil, Plus, Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
 import { ModalForm } from "components/components";
-import { Pagination } from "components/components";
 import { CustomTable } from "components/components";
 import TaskForm from "components/forms/tasks/task-form";
 import { sleep } from "helpers/sleep";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
+import { IndicatorsAnswerContext } from "providers/indicator-answer";
+import { TasksContext } from "providers/tasks";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import GraphItemForm from "views/indicators/graph-items/graph-item.form";
 import { columns } from "views/indicators/graph-items/table-helper";
-import { mockedData } from "views/indicators/graph-items/table-helper";
 
 const ItemGraphTable = ({ indicatorsAnswers }) => {
   const { t } = useTranslation();
@@ -22,15 +22,26 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
 
+  const {
+    editIndicatorAnswer,
+    deleteIndicatorAnswer,
+    deleteMultipleIndicatorsAnswers,
+    updateTasksColumn,
+  } = useContext(IndicatorsAnswerContext);
+
+  const {
+    origins,
+    setOrigins,
+    classifications,
+    setClassifications,
+    types,
+    setTypes,
+    departaments,
+    setDepartaments,
+  } = useContext(TasksContext);
+
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState({
-    totalPages: 3,
-    currentPage: 1,
-    next: 2,
-    last: 3,
-  });
-  const { isMobile } = useBreakpoint();
   const formRef = useRef();
 
   const {
@@ -57,14 +68,13 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
     onClose: onTaskModalClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isAddModalOpen,
-    onOpen: onAddModalOpen,
-    onClose: onAddModalClose,
-  } = useDisclosure();
-
   const debouncedSearch = debounce(async (inputValue) => {
     if (inputValue.length >= 1 || !inputValue.length) {
+      // await getIndicatorsAnswers(
+      //   id,
+      //   searchParams.get("page") ?? 1,
+      //   searchParams.get("search") ?? ""
+      // );
       //   searchParams.set("search", inputValue);
       //   searchParams.set("page", 1);
       //   setSearchParams(searchParams);
@@ -116,6 +126,7 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
         ? {
             icon: <Plus size={20} />,
             onClickRow: (item) => {
+              setEditSelected(item.id);
               onTaskModalOpen();
             },
             onClickHeader: () => {},
@@ -141,7 +152,7 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
         <CustomTable
           data={indicatorsAnswers}
           columns={columns}
-          title={`${t("Indicador")}:`}
+          title={`${t("Indicador")}`}
           icons={tableIcons}
           searchInputValue={""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -156,27 +167,6 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
           }}
           border="1px solid #ddd"
           borderRadius="8px"
-          paginationComponent={
-            <Flex
-              justifyContent={"end"}
-              bgColor={"white"}
-              pt={"25px"}
-              pr={"5px"}
-            >
-              {pagination && (
-                <Pagination
-                  data={mockedData}
-                  onClickPagination={() => {}}
-                  itemsPerPage={5}
-                  totalPages={pagination.totalPages}
-                  currentPage={pagination.currentPage}
-                  nextPage={pagination.next}
-                  lastPage={pagination.last}
-                  hasPadding={false}
-                />
-              )}
-            </Flex>
-          }
         />
       </Box>
       <DeleteModal
@@ -187,10 +177,7 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          // const response = await deleteOrigin(deleteId);
-          // if (response) {
-          //   setOrigins(origins.filter((category) => category.id !== deleteId));
-          // }
+          await deleteIndicatorAnswer(deleteId);
 
           sleep(2000);
           setIsLoading(false);
@@ -205,7 +192,7 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          // await deleteMultipleOrigins(selected, setOrigins, origins);
+          await deleteMultipleIndicatorsAnswers(selected);
           setIsDeleteLoading(false);
           sleep(2000);
           onDeleteMultipleModalClose();
@@ -218,10 +205,11 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
         form={
           <GraphItemForm
             formRef={formRef}
-            onClose={onAddModalClose}
-            onEdit={() => {}}
+            onClose={onEditModalClose}
+            onEdit={editIndicatorAnswer}
             event="edit"
             formValues={editSelected}
+            setLoading={setIsLoading}
           />
         }
         formRef={formRef}
@@ -234,25 +222,23 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
       <ModalForm
         isOpen={isTaskModalOpen}
         onClose={onTaskModalClose}
-        form={<TaskForm />}
-        formRef={formRef}
-        title={t("Adicionar Resposta")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Adicionar")}
-        modalSize="xl"
-        isLoading={isLoading}
-      />
-      <ModalForm
-        isOpen={isAddModalOpen}
-        onClose={onAddModalClose}
         form={
-          <GraphItemForm
+          <TaskForm
             formRef={formRef}
-            onClose={onAddModalClose}
-            onAdd={() => {
-              <TaskForm />;
+            onCloseModal={(res) => {
+              updateTasksColumn(res);
+              onTaskModalClose();
             }}
-            event="add"
+            setLoading={setIsLoading}
+            origins={origins}
+            classifications={classifications}
+            types={types}
+            departaments={departaments}
+            setOrigins={setOrigins}
+            setClassifications={setClassifications}
+            setTypes={setTypes}
+            setDepartaments={setDepartaments}
+            indicator={editSelected}
           />
         }
         formRef={formRef}

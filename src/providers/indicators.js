@@ -11,9 +11,14 @@ const IndicatorsProvider = ({ children }) => {
   const [indicators, setIndicators] = useState([]);
   const [pagination, setPagination] = useState(null);
 
-  const getIndicators = async (page = 1, search = "", limit = 10) => {
+  const getIndicators = async (
+    page = 1,
+    search = "",
+    limit = 10,
+    departament
+  ) => {
     const response = await api.get(
-      `/indicators?page=${page}&search=${search}&pageSize=${limit}`,
+      `/indicators?page=${page}&search=${search}&pageSize=${limit}&departmentId=${departament ?? ""}`,
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }

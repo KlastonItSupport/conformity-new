@@ -15,10 +15,14 @@ const IndicatorsAnswerProvider = ({ children }) => {
     id,
     page = 1,
     search = "",
-    limit = 10
+    limit = 10,
+    queryParams
   ) => {
+    const queryParamsString = queryParams
+      ? `&initialDate=${queryParams.initialDate}&finalDate=${queryParams.finalDate}`
+      : null;
     const response = await api.get(
-      `/indicators/indicator-answer/${id}?page=${page}&search=${search}&pageSize=${limit}`,
+      `/indicators/indicator-answer/${id}?page=${page}&search=${search}&pageSize=${limit}&${queryParamsString}`,
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }

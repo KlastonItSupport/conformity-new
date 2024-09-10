@@ -11,7 +11,7 @@ export const columns = [
     header: "Data",
     access: "date",
     formatData: (item) => {
-      return moment(item.date).format("DD/MM/YYYY");
+      return moment(item).format("DD/MM/YYYY");
     },
   },
   {

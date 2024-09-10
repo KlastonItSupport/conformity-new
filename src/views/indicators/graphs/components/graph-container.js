@@ -8,12 +8,7 @@ import moment from "moment";
 defaults.maintainAspectRatio = false;
 defaults.responsive = true;
 
-const GraphContainer = ({
-  department,
-  dataType,
-  frequency,
-  indicatorsAnswers,
-}) => {
+const GraphContainer = ({ title, indicatorsAnswers }) => {
   const { isMobile } = useBreakpoint();
 
   const [selectedGraph, setSelectedGraph] = useState("lines");
@@ -72,8 +67,8 @@ const GraphContainer = ({
       borderRadius={"8px"}
     >
       <Text color={"header.100"} fontSize={"xl"}>
-        Departamento: {department} - Tipo de dado: {dataType} - Frequência:{" "}
-        {frequency}
+        Departamento: {title?.department} - Tipo de dado: {title?.dataType} -
+        Frequência: {title?.frequency}
       </Text>
       <Divider borderColor={"#ddd"} w={"100%"} borderWidth={"1px"} />
       {isMobile ? (
@@ -85,7 +80,6 @@ const GraphContainer = ({
             "horizontal",
             onClickGraphSelect
           )}
-          {buttonGraph("Gráfico de pizza", "pie", onClickGraphSelect)}{" "}
         </VStack>
       ) : (
         <HStack spacing={4}>
@@ -96,7 +90,6 @@ const GraphContainer = ({
             "horizontal",
             onClickGraphSelect
           )}
-          {buttonGraph("Gráfico de pizza", "pie", onClickGraphSelect)}{" "}
         </HStack>
       )}
 
