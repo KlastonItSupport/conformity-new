@@ -42,6 +42,9 @@ const GraphItemsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const name = queryParams.get("name");
   const id = queryParams.get("id");
+  const department = queryParams.get("department");
+  const dataType = queryParams.get("dataType");
+  const frequency = queryParams.get("frequency");
 
   const {
     getIndicatorsAnswers,
@@ -209,7 +212,12 @@ const GraphItemsPage = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
+        <HStack
+          display={"flex"}
+          justifyContent={{ sm: "space-between", lg: "start" }}
+          w={"95vw"}
+          py={"20px"}
+        >
           <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"
@@ -222,6 +230,26 @@ const GraphItemsPage = () => {
             _active={{ bgColor: "primary.200" }}
             label={"Adicionar"}
             onClick={onAddModalOpen}
+            width="150px"
+            disabled={!checkPermissionForAction("indicators", "canAdd")}
+          />
+          <ButtonPrimary
+            fontSize="sm"
+            fontWeight="bold"
+            h="50"
+            bgColor={"primary.100"}
+            _hover={{ bgColor: "primary.200" }}
+            textColor={"white"}
+            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+            borderRadius="7px"
+            _active={{ bgColor: "primary.200" }}
+            label={"Vizualizar Gráfico"}
+            onClick={() => {
+              window.open(
+                `/indicators/graphs?id=${id}&department=${department}&dataType=${dataType}&frequency=${frequency}`,
+                "_blank"
+              );
+            }}
             width="150px"
             disabled={!checkPermissionForAction("indicators", "canAdd")}
           />
@@ -334,7 +362,7 @@ const GraphItemsPage = () => {
           />
         }
         formRef={formRef}
-        title={t("Adicionar Resposta")}
+        title={t("Adicionar Tarefa")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="xl"

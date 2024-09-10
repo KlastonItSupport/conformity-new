@@ -151,7 +151,7 @@ const IndicatorsPage = () => {
             icon: <Plus size={20} />,
             onClickRow: (item) => {
               window.open(
-                `/indicators/graph-items?id=${item.id}&name=${item.goal}`,
+                `/indicators/graph-items?id=${item.id}&name=${item.goal}&department=${item.department}&dataType=${item.dataType}&frequency=${item.frequency}`,
                 "_blank"
               );
             },
