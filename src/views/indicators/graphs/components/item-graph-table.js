@@ -148,7 +148,11 @@ const ItemGraphTable = ({ indicatorsAnswers }) => {
   const [tableIcons, setTableIcons] = useState([]);
   return (
     <>
-      <Box w={"100%"} mt={"20px !important"} pb={"20px"}>
+      <Box
+        w={{ sm: "100%", md: "95%", lg: "100%" }}
+        mt={"20px !important"}
+        pb={"20px"}
+      >
         <CustomTable
           data={indicatorsAnswers}
           columns={columns}

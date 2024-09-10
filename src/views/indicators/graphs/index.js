@@ -10,9 +10,11 @@ import Filters from "./components/filters";
 import GraphContainer from "./components/graph-container";
 import ItemGraphTable from "./components/item-graph-table";
 import { IndicatorsAnswerContext } from "providers/indicator-answer";
+import { useBreakpoint } from "hooks/usebreakpoint";
 
 const GraphsPage = () => {
   const [searchParams] = useSearchParams();
+  const { isMobile } = useBreakpoint();
   const [titles, setTitles] = useState({
     department: "",
     dataType: "",
@@ -75,8 +77,13 @@ const GraphsPage = () => {
     <>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} padding={"0px"} />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}></HStack>
+        <NavigationLinks routeTree={routeTreePaths} paddingX={{ sm: "20px" }} />
+        <HStack
+          justify={"start"}
+          w={isMobile ? "100vw" : "95vw"}
+          paddingX={isMobile ? "20px" : 0}
+          py={"20px"}
+        ></HStack>
         <Filters
           showDepartament={!id}
           id={id}

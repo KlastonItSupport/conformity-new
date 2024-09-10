@@ -289,12 +289,7 @@ const Filters = ({
   }, []);
 
   return isMobile ? (
-    <VStack
-      w={"100%"}
-      paddingX={"20px"}
-      as="form"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <VStack w={"95%"} as="form" onSubmit={handleSubmit(onSubmit)}>
       {showDepartament && departamentInput}
       {showDepartament && indicatorInput}
       {initialDateInput}
@@ -311,7 +306,7 @@ const Filters = ({
         _active={{ bgColor: "primary.200" }}
         label={"Filtrar"}
         width="100%"
-        m={"10px  20px !important"}
+        m={"20px  20px !important"}
         isLoading={isLoading}
         type="submit"
       />
