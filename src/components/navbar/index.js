@@ -186,8 +186,8 @@ export const NavBar = () => {
           icon={<HardDrives size={28} />}
           itemsList={[
             {
-              src: "/",
-              label: "N/A",
+              src: "/crm/clients-suppliers",
+              label: "Clientes / Fornecedores",
             },
           ]}
           key={"admin-crm"}
