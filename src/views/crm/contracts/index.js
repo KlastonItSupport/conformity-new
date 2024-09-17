@@ -2,10 +2,10 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns } from "./table-helper";
-import { NotePencil, Trash, MapPin } from "@phosphor-icons/react";
+import { NotePencil, Trash, DownloadSimple } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
+  Box,
   Flex,
   HStack,
   VStack,
@@ -23,10 +23,11 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
-import ClientSupplierForm from "../components/client-supplier-form/client-supplier-form";
-import { mockedData } from "./table-helper";
+import { columns, mockedData } from "./table-helper";
+import SquareInfos from "./squares-info";
+import ContractForm from "./components/contract-form";
 
-const ClientsSuppliers = () => {
+const ContractsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -54,8 +55,8 @@ const ClientsSuppliers = () => {
       label: "Dashboard",
     },
     {
-      path: "/crm/clients-suppliers",
-      label: "Clientes / Fornecedores",
+      path: "/crm/contracts",
+      label: "Contratos",
       isCurrent: true,
     },
   ];
@@ -128,9 +129,9 @@ const ClientsSuppliers = () => {
           }
         : null;
 
-      const mapIcon = checkPermissionForAction("tasks", "canEdit")
+      const downloadIcon = checkPermissionForAction("tasks", "canEdit")
         ? {
-            icon: <MapPin size={20} />,
+            icon: <DownloadSimple size={20} />,
             onClickRow: (item) => {
               setEditSelected(item);
               // onEditModalOpen();
@@ -141,7 +142,7 @@ const ClientsSuppliers = () => {
             title: "Vizualizar endereços",
           }
         : null;
-      const icons = [deleteIcon, editIcon, mapIcon].filter(
+      const icons = [downloadIcon, editIcon, deleteIcon].filter(
         (icon) => icon !== null
       );
 
@@ -188,6 +189,17 @@ const ClientsSuppliers = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
+        <Box
+          display={"flex"}
+          flexDir={{ base: "column", md: "row" }} // "base" é para mobile, "md" para telas maiores
+          justifyContent={"space-between"}
+          w={"95vw"}
+        >
+          <SquareInfos label={"Contratos Ativos"} value={"10"} />
+          <SquareInfos label={"Contratos Inativos"} value={"5"} />
+          <SquareInfos label={"Contratos Cancelados"} value={"2"} />
+        </Box>
+
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
           <ButtonPrimary
             fontSize="sm"
@@ -199,7 +211,8 @@ const ClientsSuppliers = () => {
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
-            label={"NOVO CLIENTE / FORNECEDOR"}
+            label={"Adicionar"}
+            width="150px"
             onClick={onAddModalOpen}
             disabled={!checkPermissionForAction("tasks", "canAdd")}
           />
@@ -279,7 +292,7 @@ const ClientsSuppliers = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <ClientSupplierForm
+          <ContractForm
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
@@ -297,7 +310,7 @@ const ClientsSuppliers = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Editar Cliente/Fornecedor")}
+        title={t(`Editar: ${editSelected.title}`)}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="2xl"
@@ -308,7 +321,7 @@ const ClientsSuppliers = () => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <ClientSupplierForm
+          <ContractForm
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
@@ -328,4 +341,4 @@ const ClientsSuppliers = () => {
   );
 };
 
-export default ClientsSuppliers;
+export default ContractsPage;
