@@ -190,6 +190,10 @@ export const NavBar = () => {
               label: "Clientes / Fornecedores",
             },
             {
+              src: "/crm/leads",
+              label: "Leads",
+            },
+            {
               src: "/crm/contracts",
               label: "Contratos",
             },

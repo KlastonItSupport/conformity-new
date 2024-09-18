@@ -2,7 +2,7 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NotePencil, Trash, DownloadSimple } from "@phosphor-icons/react";
+import { NotePencil, Trash, CheckFat, Gear } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Box,
@@ -24,10 +24,13 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
 import { columns, mockedData } from "./table-helper";
-import SquareInfos from "./squares-info";
-import ContractForm from "./components/contract-form";
+import LeadsForm from "./components/leads-form";
+import LeadsStatus from "./components/leads-status";
+import SelectTableType from "./components/select-table-type";
+import { tasksMockedData } from "./table-helper";
+import { tasksColumns } from "./table-helper";
 
-const ContractsPage = () => {
+const LeadsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -35,13 +38,14 @@ const ContractsPage = () => {
   const categoryRef = useRef();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
   const [types, setTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
+  const [selectedTable, setSelectedTable] = useState("leads");
+  const [tableIcons, setTableIcons] = useState([]);
 
   const { getTypes, deleteType, deleteMultipleTypes } =
     useContext(TasksContext);
@@ -55,8 +59,8 @@ const ContractsPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/crm/contracts",
-      label: "Contratos",
+      path: "/crm/leads",
+      label: "Leads",
       isCurrent: true,
     },
   ];
@@ -129,9 +133,9 @@ const ContractsPage = () => {
           }
         : null;
 
-      const downloadIcon = checkPermissionForAction("tasks", "canEdit")
+      const tasks = checkPermissionForAction("tasks", "canEdit")
         ? {
-            icon: <DownloadSimple size={20} />,
+            icon: <CheckFat size={20} />,
             onClickRow: (item) => {
               setEditSelected(item);
               // onEditModalOpen();
@@ -139,10 +143,21 @@ const ContractsPage = () => {
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
-            title: "Vizualizar endereços",
+            title: "Ir para tarefas",
           }
         : null;
-      const icons = [downloadIcon, editIcon, deleteIcon].filter(
+
+      const services = checkPermissionForAction("tasks", "canEdit")
+        ? {
+            icon: <Gear size={20} />,
+            onClickRow: (item) => {},
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Ir para serviços",
+          }
+        : null;
+      const icons = [tasks, services, editIcon, deleteIcon].filter(
         (icon) => icon !== null
       );
 
@@ -152,8 +167,6 @@ const ContractsPage = () => {
     updateIcons();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userPermissions, userAccessRule]); // Atualiza os ícones quando userPermissions muda
-
-  const [tableIcons, setTableIcons] = useState([]);
 
   const updateData = async (page) => {
     searchParams.set("page", page);
@@ -189,52 +202,67 @@ const ContractsPage = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <Box
-          display={"flex"}
-          flexDir={{ base: "column", md: "row" }} // "base" é para mobile, "md" para telas maiores
-          justifyContent={"space-between"}
-          w={"95vw"}
-        >
-          <SquareInfos label={"Contratos Ativos"} value={"10"} />
-          <SquareInfos label={"Contratos Inativos"} value={"5"} />
-          <SquareInfos label={"Contratos Cancelados"} value={"2"} />
-        </Box>
-
+        <LeadsStatus
+          cancelled={150}
+          requested={100}
+          refused={504}
+          inProgress={231}
+          completed={173}
+        />
+        <SelectTableType
+          selectedTable={selectedTable}
+          setSelectedTable={setSelectedTable}
+        />
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            width="150px"
-            onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
-          />
+          {selectedTable === "leads" && (
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="50"
+              bgColor={"primary.100"}
+              _hover={{ bgColor: "primary.200" }}
+              textColor={"white"}
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label={"Adicionar"}
+              width="150px"
+              onClick={onAddModalOpen}
+              disabled={!checkPermissionForAction("tasks", "canAdd")}
+            />
+          )}
+          {selectedTable !== "leads" && <Box height={50}></Box>}
         </HStack>
 
-        <CustomTable
-          data={mockedData}
-          columns={columns}
-          title={t("Contratos")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
+        {selectedTable === "leads" && (
+          <CustomTable
+            data={mockedData}
+            columns={columns}
+            title={t("Leads cadastradas")}
+            icons={tableIcons}
+            searchInputValue={searchParams.get("search") ?? ""}
+            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+            iconsHasMaxW={true}
+            onCheckItems={(show) => {
+              setTableIcons(
+                tableIcons.map((icon) => {
+                  icon.isDisabled = show;
+                  return icon;
+                })
+              );
+            }}
+          />
+        )}
+        {selectedTable === "tasks" && (
+          <CustomTable
+            data={tasksMockedData}
+            columns={tasksColumns}
+            title={t("Tarefas cadastradas")}
+            searchInputValue={searchParams.get("search") ?? ""}
+            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+            iconsHasMaxW={true}
+          />
+        )}
         <Flex
           justifyContent={"end"}
           w={isMobile ? "99vw" : "95vw"}
@@ -274,7 +302,7 @@ const ContractsPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Contratos")}
+        title={t("Excluir Tipos")}
         subtitle={t(
           "Tem certeza de que deseja excluir estes Clientes/Fornecedores?"
         )}
@@ -292,7 +320,7 @@ const ContractsPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <ContractForm
+          <LeadsForm
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
@@ -310,7 +338,7 @@ const ContractsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t(`Editar: ${editSelected.title}`)}
+        title={t(`Editar`)}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="2xl"
@@ -321,7 +349,7 @@ const ContractsPage = () => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <ContractForm
+          <LeadsForm
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
@@ -341,4 +369,4 @@ const ContractsPage = () => {
   );
 };
 
-export default ContractsPage;
+export default LeadsPage;

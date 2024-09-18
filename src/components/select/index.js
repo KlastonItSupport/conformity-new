@@ -45,10 +45,7 @@ const SelectInput = forwardRef(
             if (!defaultValue) {
               return optionJsx;
             }
-            if (
-              defaultValue.value !== option.value &&
-              defaultValue.label !== option.label
-            ) {
+            if (defaultValue.value !== option.value) {
               return optionJsx;
             }
 
