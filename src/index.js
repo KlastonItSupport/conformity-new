@@ -149,13 +149,13 @@ const routes = createBrowserRouter([
     element: <ContractsPage />,
   },
   {
-    path: "crm/leadsgf",
+    path: "crm/leads",
     element: <LeadsPage />,
   },
-  {
-    path: "crm/projectsaz",
-    element: <ProjectsPage />,
-  },
+  // {
+  //   path: "crm/projectsaz",
+  //   element: <ProjectsPage />,
+  // },
 ]);
 
 ReactDOM.render(
