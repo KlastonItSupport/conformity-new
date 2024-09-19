@@ -254,10 +254,8 @@ const ContractsPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Cliente/Fornecedor")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir este Cliente/Fornecedor?"
-        )}
+        title={t("Excluir Contrato")}
+        subtitle={t("Tem certeza de que deseja excluir este Contrato?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -275,9 +273,7 @@ const ContractsPage = () => {
       />
       <DeleteModal
         title={t("Excluir Contratos")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir estes Clientes/Fornecedores?"
-        )}
+        subtitle={t("Tem certeza de que deseja excluir estes Contratos?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -331,7 +327,7 @@ const ContractsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Cliente/Fornecedor")}
+        title={t("Adicionar Contrato")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"

@@ -282,10 +282,8 @@ const LeadsPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Cliente/Fornecedor")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir este Cliente/Fornecedor?"
-        )}
+        title={t("Excluir Lead")}
+        subtitle={t("Tem certeza de que deseja excluir este Lead?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -302,10 +300,8 @@ const LeadsPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Tipos")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir estes Clientes/Fornecedores?"
-        )}
+        title={t("Excluir Leads")}
+        subtitle={t("Tem certeza de que deseja excluir estes Leads?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -338,7 +334,7 @@ const LeadsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t(`Editar`)}
+        title={t(`Editar Lead`)}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="2xl"
@@ -359,7 +355,7 @@ const LeadsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Cliente/Fornecedor")}
+        title={t("Adicionar Lead")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"
