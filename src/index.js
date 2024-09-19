@@ -47,6 +47,7 @@ import { IndicatorsAnswerProvider } from "providers/indicator-answer";
 import ClientsSuppliers from "views/crm/clients-suppliers";
 import ContractsPage from "views/crm/contracts";
 import LeadsPage from "views/crm/leads";
+import ProjectsPage from "views/crm/projects";
 
 const routes = createBrowserRouter([
   {
@@ -148,8 +149,12 @@ const routes = createBrowserRouter([
     element: <ContractsPage />,
   },
   {
-    path: "crm/leads",
+    path: "crm/leadsgf",
     element: <LeadsPage />,
+  },
+  {
+    path: "crm/projectsaz",
+    element: <ProjectsPage />,
   },
 ]);
 

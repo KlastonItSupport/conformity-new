@@ -2,7 +2,14 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NotePencil, Trash, DownloadSimple } from "@phosphor-icons/react";
+import {
+  NotePencil,
+  Trash,
+  CheckFat,
+  Folder,
+  User,
+  Chat,
+} from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Box,
@@ -24,10 +31,11 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
 import { columns, mockedData } from "./table-helper";
-import ContractForm from "./components/contract-form";
+import ProjectsForm from "./components/projects-form";
 import SquareInfos from "../components/squares-info";
+import Filters from "./components/filters";
 
-const ContractsPage = () => {
+const ProjectsPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,8 +63,8 @@ const ContractsPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/crm/contracts",
-      label: "Contratos",
+      path: "/crm/projects",
+      label: "Projetos",
       isCurrent: true,
     },
   ];
@@ -113,6 +121,7 @@ const ContractsPage = () => {
             },
             isDisabled: false,
             shouldShow: true,
+            title: "Deletar",
           }
         : null;
 
@@ -126,12 +135,13 @@ const ContractsPage = () => {
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
+            title: "Editar",
           }
         : null;
 
-      const downloadIcon = checkPermissionForAction("tasks", "canEdit")
+      const tasks = checkPermissionForAction("tasks", "canEdit")
         ? {
-            icon: <DownloadSimple size={20} />,
+            icon: <CheckFat size={20} />,
             onClickRow: (item) => {
               setEditSelected(item);
               // onEditModalOpen();
@@ -139,12 +149,61 @@ const ContractsPage = () => {
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
-            title: "Vizualizar endereços",
+            title: "Ir para tarefas",
           }
         : null;
-      const icons = [downloadIcon, editIcon, deleteIcon].filter(
-        (icon) => icon !== null
-      );
+
+      const documents = checkPermissionForAction("tasks", "canEdit")
+        ? {
+            icon: <Folder size={20} />,
+            onClickRow: (item) => {
+              setEditSelected(item);
+              // onEditModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Ir para documentos",
+          }
+        : null;
+
+      const shareWithUsers = checkPermissionForAction("tasks", "canEdit")
+        ? {
+            icon: <User size={20} />,
+            onClickRow: (item) => {
+              setEditSelected(item);
+              // onEditModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Compartilhar com clientes",
+          }
+        : null;
+
+      const description = checkPermissionForAction("tasks", "canEdit")
+        ? {
+            icon: <Chat size={20} />,
+
+            onClickRow: (item) => {
+              setEditSelected(item);
+              // onEditModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Vizualizar descrição",
+          }
+        : null;
+
+      const icons = [
+        tasks,
+        documents,
+        shareWithUsers,
+        description,
+        editIcon,
+        deleteIcon,
+      ].filter((icon) => icon !== null);
 
       setTableIcons(icons);
     };
@@ -195,9 +254,10 @@ const ContractsPage = () => {
           justifyContent={"space-between"}
           w={"95vw"}
         >
-          <SquareInfos label={"Contratos Ativos"} value={"10"} />
-          <SquareInfos label={"Contratos Inativos"} value={"5"} />
-          <SquareInfos label={"Contratos Cancelados"} value={"2"} />
+          <SquareInfos label={"Projetos iniciados"} value={"10"} />
+          <SquareInfos label={"Projetos em pausa"} value={"5"} />
+          <SquareInfos label={"Projetos finalizados"} value={"2"} />
+          <SquareInfos label={"Projetos em andamento"} value={"2"} />
         </Box>
 
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
@@ -217,11 +277,11 @@ const ContractsPage = () => {
             disabled={!checkPermissionForAction("tasks", "canAdd")}
           />
         </HStack>
-
+        <Filters />
         <CustomTable
           data={mockedData}
           columns={columns}
-          title={t("Contratos")}
+          title={t("Projetos")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -254,10 +314,8 @@ const ContractsPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Cliente/Fornecedor")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir este Cliente/Fornecedor?"
-        )}
+        title={t("Excluir Projeto")}
+        subtitle={t("Tem certeza de que deseja excluir este Projeto?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -274,10 +332,8 @@ const ContractsPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Contratos")}
-        subtitle={t(
-          "Tem certeza de que deseja excluir estes Clientes/Fornecedores?"
-        )}
+        title={t("Excluir Projetos")}
+        subtitle={t("Tem certeza de que deseja excluir estes Projetos?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -292,7 +348,7 @@ const ContractsPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <ContractForm
+          <ProjectsForm
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
@@ -310,7 +366,7 @@ const ContractsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t(`Editar: ${editSelected.title}`)}
+        title={t(`Editar`)}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
         modalSize="2xl"
@@ -321,7 +377,7 @@ const ContractsPage = () => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <ContractForm
+          <ProjectsForm
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
@@ -331,7 +387,7 @@ const ContractsPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Cliente/Fornecedor")}
+        title={t("Adicionar Projeto")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"
@@ -341,4 +397,4 @@ const ContractsPage = () => {
   );
 };
 
-export default ContractsPage;
+export default ProjectsPage;

@@ -208,7 +208,7 @@ const ClientsSuppliers = () => {
         <CustomTable
           data={mockedData}
           columns={columns}
-          title={t("Tipos")}
+          title={t("Clientes / Fornecedores")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}

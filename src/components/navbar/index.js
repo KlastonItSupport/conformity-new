@@ -189,10 +189,14 @@ export const NavBar = () => {
               src: "/crm/clients-suppliers",
               label: "Clientes / Fornecedores",
             },
-            {
-              src: "/crm/leads",
-              label: "Leads",
-            },
+            // {
+            //   src: "/crm/leads",
+            //   label: "Leads",
+            // },
+            // {
+            //   src: "/crm/projects",
+            //   label: "Projetos",
+            // },
             {
               src: "/crm/contracts",
               label: "Contratos",
