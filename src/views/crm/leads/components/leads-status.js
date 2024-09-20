@@ -19,7 +19,7 @@ const LeadsStatus = ({
         justify={"space-between"}
         borderBottom={isVisible ? "1px solid #ddd" : null}
         borderTop={isVisible ? "1px solid #ddd" : null}
-        w={{ sm: "100%", md: "100%", lg: "33%" }}
+        w={{ sm: "100%", md: "100%", lg: "18%" }}
         padding={"10px 0px"}
       >
         {isVisible && (
@@ -43,12 +43,12 @@ const LeadsStatus = ({
     <Box
       bg={bgColor}
       w={"95vw"}
-      py={"20px"}
+      py={"10px"}
       border={"1px solid #ddd"}
       borderRadius={"5px"}
     >
       <Text
-        padding={{ sm: "0 10px", md: "0", lg: "0px 40px" }}
+        padding={{ sm: "0 10px", md: "0", lg: "0px 30px" }}
         fontSize={"xl"}
         color={"header.100"}
         mb={{ sm: "10px", md: "1px", lg: "0px" }}
@@ -57,15 +57,17 @@ const LeadsStatus = ({
       </Text>
       {isDesktop ? (
         <>
-          <HStack w={"100%"} padding={"0px 10px"}>
+          <HStack
+            w={"100%"}
+            padding={"0px 5px"}
+            justifyContent={"space-between"}
+            flexWrap={"wrap"}
+          >
             {boxInfo("Solicitado", requested)}
             {boxInfo("Recusado", refused)}
             {boxInfo("Cancelado", cancelled)}
-          </HStack>
-          <HStack w={"100%"} padding={"0px 10px"}>
             {boxInfo("Em andamento", inProgress)}
             {boxInfo("Concluído", completed)}
-            {boxInfo("Não realizado", "notPerformed", false)}
           </HStack>
         </>
       ) : (

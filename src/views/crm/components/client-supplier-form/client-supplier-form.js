@@ -50,6 +50,7 @@ const ClientSupplierForm = ({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({ resolver: yupResolver(equipmentSchema) });
 
   const onSubmit = async (data) => {
@@ -69,7 +70,11 @@ const ClientSupplierForm = ({
   };
 
   useEffect(() => {
-    console.log("formvalues", formValues);
+    if (!formValues) {
+      setValue("status", "Ativo");
+      setValue("type", "client");
+      setValue("clientType", "juridica");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

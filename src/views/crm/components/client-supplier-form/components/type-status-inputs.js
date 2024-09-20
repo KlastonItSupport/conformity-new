@@ -12,12 +12,12 @@ const TypeStatus = ({ register, errors, formValues }) => {
           error={errors.status?.message}
           options={[
             {
-              label: "Ativa",
-              value: "Ativa",
+              label: "Ativo",
+              value: "Ativo",
             },
             {
-              label: "Inativa",
-              value: "Inativa",
+              label: "Inativo",
+              value: "Inativo",
             },
           ]}
         />

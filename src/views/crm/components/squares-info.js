@@ -1,9 +1,9 @@
-import { Box, Text } from "@chakra-ui/react";
+import { HStack, Text } from "@chakra-ui/react";
 import React from "react";
 
 const SquareInfos = ({ label, value }) => {
   return (
-    <Box
+    <HStack
       bgColor={"white"}
       border={"1px solid"}
       borderColor={"#dddddd"}
@@ -11,6 +11,7 @@ const SquareInfos = ({ label, value }) => {
       borderRadius={"5px"}
       w={"100%"}
       m={{ lg: "0px 10px 0px 0px", sm: "8px 0px", md: "0px" }}
+      justifyContent={"space-between"}
     >
       <Text fontSize={"lg"} color={"#999999"}>
         {label}
@@ -18,7 +19,7 @@ const SquareInfos = ({ label, value }) => {
       <Text fontSize={"2xl"} fontWeight={"bold"}>
         {value}
       </Text>
-    </Box>
+    </HStack>
   );
 };
 
