@@ -80,20 +80,19 @@ const ProjectsForm = ({
         borderRadius="6px"
         bgColor={"primary.50"}
         label={"Data de inicio"}
-        {...register("date")}
         onClick={() => setIsShowingCalendarCreate(!isShowingCalendarCreate)}
         width="100%"
         autocomplete="off"
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarCreate(false);
         }}
-        {...register("date")}
+        {...register("startDate")}
         error={errors.date?.message}
-        defaultValue={
-          formValues && formValues.startDate
-            ? moment(formValues.startDate).format("DD/MM/YYYY")
-            : null
-        }
+        // defaultValue={
+        //   formValues && formValues.startDate
+        //     ? moment(formValues.startDate).format("DD/MM/YYYY")
+        //     : null
+        // }
       />
       {isShowingCalendarCreate && (
         <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
@@ -138,13 +137,13 @@ const ProjectsForm = ({
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarEnd(false);
         }}
-        {...register("startDate")}
+        {...register("endDate")}
         error={errors.endDate?.message}
-        defaultValue={
-          formValues && formValues.endDate
-            ? moment(formValues.endDate).format("DD/MM/YYYY")
-            : null
-        }
+        // defaultValue={
+        //   formValues && formValues.endDate
+        //     ? moment(formValues.endDate).format("DD/MM/YYYY")
+        //     : null
+        // }
       />
       {isShowingCalendarEnd && (
         <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
@@ -232,8 +231,8 @@ const ProjectsForm = ({
   useEffect(() => {
     if (formValues) {
       setValue("status", formValues.status);
-      setValue("startDate", formValues.startDate);
-      setValue("endDate", formValues.endDate);
+      setValue("startDate", moment(formValues.startDate).format("DD/MM/YYYY"));
+      setValue("endDate", moment(formValues.endDate).format("DD/MM/YYYY"));
       setValue("value", formValues.value);
       setValue("progress", formValues.progress);
       setDescription(formValues.description);

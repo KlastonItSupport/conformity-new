@@ -193,13 +193,17 @@ export const NavBar = () => {
               src: "/crm/leads",
               label: "Leads",
             },
-            // {
-            //   src: "/crm/projects",
-            //   label: "Projetos",
-            // },
+            {
+              src: "/crm/projects",
+              label: "Projetos",
+            },
             {
               src: "/crm/contracts",
               label: "Contratos",
+            },
+            {
+              src: "/crm/services",
+              label: "Serviços",
             },
           ]}
           key={"admin-crm"}

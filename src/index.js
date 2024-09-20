@@ -48,6 +48,7 @@ import ClientsSuppliers from "views/crm/clients-suppliers";
 import ContractsPage from "views/crm/contracts";
 import LeadsPage from "views/crm/leads";
 import ProjectsPage from "views/crm/projects";
+import ServicesPage from "views/crm/services";
 
 const routes = createBrowserRouter([
   {
@@ -152,10 +153,14 @@ const routes = createBrowserRouter([
     path: "crm/leads",
     element: <LeadsPage />,
   },
-  // {
-  //   path: "crm/projectsaz",
-  //   element: <ProjectsPage />,
-  // },
+  {
+    path: "crm/projects",
+    element: <ProjectsPage />,
+  },
+  {
+    path: "crm/services",
+    element: <ServicesPage />,
+  },
 ]);
 
 ReactDOM.render(
