@@ -7,14 +7,8 @@ import { useForm } from "react-hook-form";
 import { sleep } from "helpers/sleep";
 
 const serviceSchema = Yup.object().shape({
-  documents: Yup.array().of(Yup.string().required("Required")),
-  title: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
-  clientType: Yup.string().required("Required"),
-  startDate: Yup.string().required("Required"),
-  endDate: Yup.string().required("Required"),
-  value: Yup.string().required("Required"),
-  description: Yup.string().required("Required"),
+  service: Yup.string().required("Campo obrigatório"),
+  value: Yup.string().required("Campo obrigatório"),
 });
 
 const ServicesForm = ({
@@ -39,14 +33,15 @@ const ServicesForm = ({
 
     if (event === "add") {
       sleep(1000);
+      const service = await onAdd(data);
+      onClose(service);
       setLoading(false);
-      onClose();
       return;
     }
 
-    await onEdit();
+    const service = await onEdit({ ...data, id });
     setLoading(false);
-    onClose();
+    onClose(service);
   };
 
   useEffect(() => {
@@ -76,9 +71,9 @@ const ServicesForm = ({
         bgColor={"primary.50"}
         label="Serviço: "
         width="100%"
-        {...register("title")}
-        error={errors.title?.message}
-        defaultValue={formValues?.title}
+        {...register("service")}
+        error={errors.service?.message}
+        defaultValue={formValues?.service}
       />
       <FormInput
         variant="auth"

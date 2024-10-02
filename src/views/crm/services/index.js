@@ -22,9 +22,8 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { mockedData } from "./table-helper";
 import ServicesForm from "./components/service-form";
+import { CrmServicesContext } from "providers/crm-services";
 
 const ServicesPage = () => {
   const { t } = useTranslation();
@@ -38,12 +37,17 @@ const ServicesPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [types, setTypes] = useState([]);
+  const [services, setServices] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getTypes, deleteType, deleteMultipleTypes } =
-    useContext(TasksContext);
+  const {
+    getServices,
+    createService,
+    deleteService,
+    deleteMultipleservices,
+    editService,
+  } = useContext(CrmServicesContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -90,12 +94,12 @@ const ServicesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getTypes(
+    getServices(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setTypes(res.items);
+      setServices(res.items);
       setPagination(res.pages);
     });
 
@@ -147,13 +151,13 @@ const ServicesPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTypes(
+    const res = await getServices(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setTypes(res.items);
+    setServices(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -162,14 +166,14 @@ const ServicesPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTypes(
+      const res = await getServices(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setTypes(res.items);
+      setServices(res.items);
     }
   }, 500);
 
@@ -197,7 +201,7 @@ const ServicesPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={services}
           columns={columns}
           title={t("Serviços")}
           icons={tableIcons}
@@ -220,7 +224,7 @@ const ServicesPage = () => {
         >
           {pagination && (
             <Pagination
-              data={types}
+              data={services}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -239,9 +243,11 @@ const ServicesPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteType(deleteId);
+          const response = await deleteService(deleteId);
           if (response) {
-            setTypes(types.filter((category) => category.id !== deleteId));
+            setServices(
+              services.filter((category) => category.id !== deleteId)
+            );
           }
 
           setIsLoading(false);
@@ -256,7 +262,7 @@ const ServicesPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTypes(selected, setTypes, types);
+          await deleteMultipleservices(selected, setServices, services);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -270,14 +276,15 @@ const ServicesPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const originsCopy = [...types];
-              const index = originsCopy.findIndex(
+              const servicesCopy = [...services];
+              const index = servicesCopy.findIndex(
                 (item) => item.id === origin.id
               );
-              originsCopy[index] = origin;
-              setTypes(originsCopy);
+              servicesCopy[index] = origin;
+              setServices(servicesCopy);
             }}
             event="edit"
+            onEdit={editService}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -299,8 +306,10 @@ const ServicesPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setTypes([origin, ...types]);
+              setServices([origin, ...services]);
             }}
+            event="add"
+            onAdd={createService}
             setLoading={setIsLoading}
           />
         }
