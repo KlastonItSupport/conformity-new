@@ -3,7 +3,7 @@ import { FormInput } from "components/components";
 import SelectInput from "components/select";
 import React from "react";
 
-const CityNeihborhood = ({ register, errors, formValues }) => {
+const CityNeihborhood = ({ register, errors, formValues, cityOptions }) => {
   return (
     <HStack w={"100%"}>
       <VStack align={"start"} w={"100%"} mt={"5px"}>
@@ -12,7 +12,7 @@ const CityNeihborhood = ({ register, errors, formValues }) => {
           {...register("city")}
           error={errors.city?.message}
           defaultValue={formValues?.city}
-          options={[]}
+          options={cityOptions}
         />
       </VStack>
       <VStack align={"start"} w={"100%"}>
@@ -21,6 +21,7 @@ const CityNeihborhood = ({ register, errors, formValues }) => {
           {...register("neighborhood")}
           error={errors.neighborhood?.message}
           defaultValue={formValues?.neighborhood}
+          placeholder="Ex: Centro"
         />
       </VStack>
     </HStack>

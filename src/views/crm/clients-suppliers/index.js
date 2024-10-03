@@ -22,9 +22,9 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
 import ClientSupplierForm from "../components/client-supplier-form/client-supplier-form";
-import { mockedData } from "./table-helper";
+import { CrmContext } from "providers/crm";
+import { AddressModal } from "../components/address-info";
 
 const ClientsSuppliers = () => {
   const { t } = useTranslation();
@@ -35,15 +35,23 @@ const ClientsSuppliers = () => {
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
+  const [addressInfo, setAddressInfo] = useState({
+    cep: "",
+    state: "",
+    city: "",
+    neighborhood: "",
+    number: "",
+    complement: "",
+  });
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [types, setTypes] = useState([]);
+  const [crm, setCrm] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getTypes, deleteType, deleteMultipleTypes } =
-    useContext(TasksContext);
+  const { getCrm, deleteCrm, deleteMultipleCrm, createCrm, updateCrm } =
+    useContext(CrmContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -84,13 +92,19 @@ const ClientsSuppliers = () => {
     onClose: onAddModalClose,
   } = useDisclosure();
 
+  const {
+    isOpen: isAddressModalOpen,
+    onOpen: onAddressModalOpen,
+    onClose: onAddressModalClose,
+  } = useDisclosure();
+
   useEffect(() => {
-    getTypes(
+    getCrm(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setTypes(res.items);
+      setCrm(res.items);
       setPagination(res.pages);
     });
 
@@ -132,8 +146,15 @@ const ClientsSuppliers = () => {
         ? {
             icon: <MapPin size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
-              // onEditModalOpen();
+              setAddressInfo({
+                cep: item?.cep,
+                state: item.state,
+                city: item.city,
+                neighborhood: item.neighborhood,
+                number: item.number,
+                complement: item.addressComplement,
+              });
+              onAddressModalOpen();
             },
             onClickHeader: () => {},
             isDisabled: false,
@@ -157,13 +178,13 @@ const ClientsSuppliers = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTypes(
+    const res = await getCrm(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setTypes(res.items);
+    setCrm(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -172,14 +193,14 @@ const ClientsSuppliers = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTypes(
+      const res = await getCrm(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setTypes(res.items);
+      setCrm(res.items);
     }
   }, 500);
 
@@ -206,7 +227,7 @@ const ClientsSuppliers = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={crm}
           columns={columns}
           title={t("Clientes / Fornecedores")}
           icons={tableIcons}
@@ -229,7 +250,7 @@ const ClientsSuppliers = () => {
         >
           {pagination && (
             <Pagination
-              data={types}
+              data={crm}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -250,9 +271,9 @@ const ClientsSuppliers = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteType(deleteId);
+          const response = await deleteCrm(deleteId);
           if (response) {
-            setTypes(types.filter((category) => category.id !== deleteId));
+            setCrm(crm.filter((category) => category.id !== deleteId));
           }
 
           setIsLoading(false);
@@ -269,7 +290,7 @@ const ClientsSuppliers = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTypes(selected, setTypes, types);
+          await deleteMultipleCrm(selected, setCrm, crm);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -283,13 +304,14 @@ const ClientsSuppliers = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const originsCopy = [...types];
+              const originsCopy = [...crm];
               const index = originsCopy.findIndex(
                 (item) => item.id === origin.id
               );
               originsCopy[index] = origin;
-              setTypes(originsCopy);
+              setCrm(originsCopy);
             }}
+            onEdit={updateCrm}
             event="edit"
             id={editSelected.id}
             formValues={editSelected}
@@ -312,8 +334,9 @@ const ClientsSuppliers = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setTypes([origin, ...types]);
+              setCrm([origin, ...crm]);
             }}
+            onAdd={createCrm}
             setLoading={setIsLoading}
           />
         }
@@ -323,6 +346,11 @@ const ClientsSuppliers = () => {
         rightButtonLabel={t("Adicionar")}
         modalSize="2xl"
         isLoading={isLoading}
+      />
+      <AddressModal
+        isOpen={isAddressModalOpen}
+        onClose={onAddressModalClose}
+        addressInfo={addressInfo}
       />
     </>
   );

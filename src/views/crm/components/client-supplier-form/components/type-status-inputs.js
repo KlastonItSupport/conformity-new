@@ -25,17 +25,20 @@ const TypeStatus = ({ register, errors, formValues }) => {
       <VStack align={"start"} w={"100%"}>
         <SelectInput
           label={"Tipo * "}
-          {...register("type")}
-          error={errors.type?.message}
-          defaultValue={{ label: formValues?.type, value: formValues?.type }}
+          {...register("clientType")}
+          error={errors.clientType?.message}
+          defaultValue={{
+            label: formValues?.clientType,
+            value: formValues?.clientType,
+          }}
           options={[
             {
               label: "Cliente",
-              value: "client",
+              value: "cliente",
             },
             {
               label: "Fornecedor",
-              value: "Supplier",
+              value: "fornecedor",
             },
           ]}
         />

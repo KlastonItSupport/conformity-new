@@ -12,6 +12,7 @@ const Registrations = ({ register, errors, formValues }) => {
           {...register("citySubscription")}
           error={errors.citySubscription?.message}
           defaultValue={formValues?.citySubscription}
+          placeHolder="Ex: 123456"
         />
       </VStack>
       <VStack align={"start"} w={"100%"} mt={"5px"}>
@@ -20,6 +21,7 @@ const Registrations = ({ register, errors, formValues }) => {
           {...register("stateSubscription")}
           error={errors.stateSubscription?.message}
           defaultValue={formValues?.stateSubscription}
+          placeHolder="Ex: 123456"
         />
       </VStack>
     </HStack>

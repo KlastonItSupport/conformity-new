@@ -1,16 +1,42 @@
 import { HStack, VStack } from "@chakra-ui/react";
 import { FormInput } from "components/components";
 import SelectInput from "components/select";
-import React from "react";
+import { useCNPJInfos } from "hooks/cnpj-infos";
+import React, { useEffect, useState } from "react";
+import { useWatch } from "react-hook-form";
 
-const PersonDocument = ({ register, errors, formValues }) => {
+const PersonDocument = ({
+  register,
+  errors,
+  formValues,
+  setValue,
+  control,
+}) => {
+  const cnpjMask = "99.999.999/9999-99";
+  const cpfMask = "999.999.999-99";
+
+  const [selectedMask, setSelectedMask] = useState(cnpjMask);
+  const cepWatchedValue = useWatch({
+    control,
+    name: "clientType",
+  });
+
+  useEffect(() => {
+    if (cepWatchedValue === "fisica") {
+      setSelectedMask(cpfMask);
+      return;
+    }
+    setSelectedMask(cnpjMask);
+  }, [cepWatchedValue]);
+
+  const { getCNPJInfos } = useCNPJInfos();
   return (
     <HStack w={"100%"}>
       <VStack align={"start"} w={"100%"}>
         <SelectInput
           label={"Pessoa * "}
-          {...register("clientType")}
-          error={errors.clientType?.message}
+          {...register("personType")}
+          error={errors.personType?.message}
           options={[
             {
               label: "Jurídica",
@@ -22,8 +48,8 @@ const PersonDocument = ({ register, errors, formValues }) => {
             },
           ]}
           defaultValue={{
-            label: formValues?.clientType,
-            value: formValues?.clientType,
+            label: formValues?.personType,
+            value: formValues?.personType,
           }}
         />
       </VStack>
@@ -32,7 +58,20 @@ const PersonDocument = ({ register, errors, formValues }) => {
           label={"CNPJ/CPF * "}
           {...register("document")}
           error={errors.document?.message}
-          defaultValue={formValues?.document}
+          defaultValue={formValues?.cnpjCpf}
+          placeholder={`Ex: ${selectedMask}`}
+          mask={selectedMask}
+          onChange={async (e) => {
+            const document = e.target.value;
+            if (document.length === 18 && selectedMask === cnpjMask) {
+              const cnpjInfos = await getCNPJInfos(document);
+              setValue("socialReason", cnpjInfos.socialReason);
+              setValue("cep", cnpjInfos.cep);
+              setValue("number", cnpjInfos.number);
+              setValue("celphone", cnpjInfos.celphone);
+              setValue("email", cnpjInfos.email);
+            }
+          }}
         />
       </VStack>
     </HStack>

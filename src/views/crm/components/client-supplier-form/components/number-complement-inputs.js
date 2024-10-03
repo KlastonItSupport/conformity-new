@@ -11,15 +11,16 @@ const NumberComplement = ({ register, errors, formValues }) => {
           {...register("number")}
           error={errors.number?.message}
           defaultValue={formValues?.number}
-          options={[]}
+          placeholder="Ex: 123"
         />
       </VStack>
       <VStack align={"start"} w={"100%"}>
         <FormInput
           label={"Complemento * "}
-          {...register("complement")}
-          error={errors.complement?.message}
-          defaultValue={formValues?.complement}
+          {...register("addressComplement")}
+          error={errors.addressComplement?.message}
+          defaultValue={formValues?.addressComplement}
+          placeholder="Ex: Apto 123"
         />
       </VStack>
     </HStack>

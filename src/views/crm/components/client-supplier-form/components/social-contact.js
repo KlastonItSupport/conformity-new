@@ -9,9 +9,10 @@ const SocialContact = ({ register, errors, formValues }) => {
       <VStack align={"start"} w={"100%"}>
         <FormInput
           label={"Razão Social * "}
-          {...register("fantasyName")}
-          error={errors.fantasyName?.message}
-          defaultValue={formValues?.fantasyName}
+          {...register("socialReason")}
+          error={errors.socialReason?.message}
+          defaultValue={formValues?.socialReason}
+          placeHolder="Ex: Klaston Management"
         />
       </VStack>
       <VStack align={"start"} w={"100%"} mt={"5px"}>
@@ -20,6 +21,7 @@ const SocialContact = ({ register, errors, formValues }) => {
           {...register("contact")}
           error={errors.contact?.message}
           defaultValue={formValues?.contact}
+          placeHolder="Ex: (99)99999-9999"
         />
       </VStack>
     </HStack>

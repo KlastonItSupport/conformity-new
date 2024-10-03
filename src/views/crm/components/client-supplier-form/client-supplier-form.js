@@ -1,12 +1,10 @@
 import { VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { DepartamentContext } from "providers/departament";
-import moment from "moment";
-import { sleep } from "helpers/sleep";
+import { useForm, useWatch } from "react-hook-form";
+
 import TypeStatus from "./components/type-status-inputs";
 import PersonDocument from "./components/person-document-inputs";
 import SocialContact from "./components/social-contact";
@@ -15,25 +13,32 @@ import EmailCelphone from "./components/email-contact-inputs";
 import ZipCodeStates from "./components/zipcode-state-inputs";
 import CityNeihborhood from "./components/city-neighborhood-input";
 import NumberComplement from "./components/number-complement-inputs";
+import { states } from "helpers/addresses";
+import { useAddress } from "hooks/address";
+import { cityAccordingToState } from "helpers/addresses";
 
 const equipmentSchema = Yup.object().shape({
   status: Yup.string(),
   clientType: Yup.string(),
-  document: Yup.string(),
-  password: Yup.string(),
-  name: Yup.string(),
+  socialReason: Yup.string(),
   fantasyName: Yup.string(),
-  contact: Yup.string(),
+  cnpjCpf: Yup.string(),
+  passport: Yup.string(),
+  nacionality: Yup.string(),
+  password: Yup.string(),
   citySubscription: Yup.string(),
   stateSubscription: Yup.string(),
-  email: Yup.string(),
+  contact: Yup.string(),
+  email: Yup.string().email("Email inválido"),
   celphone: Yup.string(),
-  zipcode: Yup.string(),
-  state: Yup.string(),
+  cep: Yup.string(),
   city: Yup.string(),
-  neighborhood: Yup.string(),
+  state: Yup.string(),
+  address: Yup.string(),
   number: Yup.string(),
-  complement: Yup.string(),
+  addressComplement: Yup.string(),
+  supplier: Yup.boolean(),
+  client: Yup.boolean(),
 });
 
 const ClientSupplierForm = ({
@@ -46,34 +51,91 @@ const ClientSupplierForm = ({
   onClose,
   id,
 }) => {
+  const { zipCodeDetails } = useAddress();
+  const cepRef = useRef();
+
+  const [statesOptions] = useState(
+    states.map((state) => {
+      return {
+        label: state.initials,
+        value: state.initials,
+      };
+    })
+  );
+  const [cityOptions, setCityOptions] = useState([]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm({ resolver: yupResolver(equipmentSchema) });
+
+  const cepWatchedValue = useWatch({
+    control,
+    name: "cep",
+  });
 
   const onSubmit = async (data) => {
     setLoading(true);
-
     if (event === "add") {
-      sleep(1000);
+      const res = await onAdd(data);
       setLoading(false);
-      onClose();
+      onClose(res);
       return;
     }
 
-    console.log("b0", data.departamentId);
-    await onEdit();
+    const res = await onEdit({ ...data, id: id });
     setLoading(false);
-    onClose();
+    onClose(res);
   };
 
   useEffect(() => {
     if (!formValues) {
       setValue("status", "Ativo");
-      setValue("type", "client");
-      setValue("clientType", "juridica");
+      setValue("type", "cliente");
+      setValue("clientType", "cliente");
+      setValue("personType", "juridica");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!cepWatchedValue) return;
+    if (cepWatchedValue && cepWatchedValue.length !== 9) return;
+    zipCodeDetails(cepWatchedValue).then((addressDetails) => {
+      const citiesOptions = cityAccordingToState.estados
+        .find((state) => state.sigla === addressDetails.stateInitials)
+        .cidades.map((city) => {
+          return {
+            label: city,
+            value: city,
+          };
+        });
+
+      setCityOptions(citiesOptions);
+      setValue("neighborhood", addressDetails.neighborhood);
+      setValue("city", addressDetails.city);
+      setValue("state", addressDetails.stateInitials);
+      setValue("cep", cepWatchedValue);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cepWatchedValue]);
+
+  useEffect(() => {
+    if (event === "edit") {
+      setValue("state", formValues.state);
+      const citiesOptions = cityAccordingToState.estados
+        .find((state) => state.sigla === formValues.state)
+        .cidades.map((city) => {
+          return {
+            label: city,
+            value: city,
+          };
+        });
+      setCityOptions(citiesOptions);
+      setValue("city", "Praia Grande");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -91,6 +153,9 @@ const ClientSupplierForm = ({
         register={register}
         errors={errors}
         formValues={formValues}
+        setValue={setValue}
+        cepRef={cepRef}
+        control={control}
       />
 
       <FormInput
@@ -99,12 +164,14 @@ const ClientSupplierForm = ({
         type={"password"}
         error={errors.password?.message}
         defaultValue={formValues?.password}
+        placeHolder="Ex: M!nh@SENH@"
       />
       <FormInput
         label={"Nome * "}
-        {...register("name")}
-        error={errors.name?.message}
-        defaultValue={formValues?.name}
+        {...register("fantasyName")}
+        error={errors.fantasyName?.message}
+        defaultValue={formValues?.fantasyName}
+        placeHolder="Ex: Klaston Management"
       />
       <SocialContact
         register={register}
@@ -125,11 +192,16 @@ const ClientSupplierForm = ({
         register={register}
         errors={errors}
         formValues={formValues}
+        setValue={setValue}
+        statesOptions={statesOptions}
+        cityOptions={cityOptions}
+        setCityOptions={setCityOptions}
       />
       <CityNeihborhood
         register={register}
         errors={errors}
         formValues={formValues}
+        cityOptions={cityOptions}
       />
       <NumberComplement
         register={register}

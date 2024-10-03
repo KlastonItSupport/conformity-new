@@ -12,6 +12,7 @@ const EmailCelphone = ({ register, errors, formValues }) => {
           {...register("email")}
           error={errors.email?.message}
           defaultValue={formValues?.email}
+          placeholder="Ex: it.support@klaston.com"
         />
       </VStack>
       <VStack align={"start"} w={"100%"} mt={"5px"}>
@@ -20,6 +21,7 @@ const EmailCelphone = ({ register, errors, formValues }) => {
           {...register("celphone")}
           error={errors.celphone?.message}
           defaultValue={formValues?.celphone}
+          placeholder="Ex: +55 11 99999-9999"
         />
       </VStack>
     </HStack>
