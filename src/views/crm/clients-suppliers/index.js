@@ -113,7 +113,7 @@ const ClientsSuppliers = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("crm", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -129,7 +129,7 @@ const ClientsSuppliers = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const editIcon = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -142,7 +142,7 @@ const ClientsSuppliers = () => {
           }
         : null;
 
-      const mapIcon = checkPermissionForAction("tasks", "canEdit")
+      const mapIcon = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <MapPin size={20} />,
             onClickRow: (item) => {
@@ -222,7 +222,7 @@ const ClientsSuppliers = () => {
             _active={{ bgColor: "primary.200" }}
             label={"NOVO CLIENTE / FORNECEDOR"}
             onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
+            disabled={!checkPermissionForAction("crm", "canAdd")}
           />
         </HStack>
 
