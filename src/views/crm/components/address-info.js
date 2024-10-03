@@ -1,7 +1,6 @@
 import React from "react";
 
 import {
-  HStack,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,7 +11,6 @@ import {
   VStack,
   Text,
 } from "@chakra-ui/react";
-import { ButtonPrimary } from "components/button-primary";
 
 export const AddressModal = ({
   isOpen,
@@ -22,8 +20,6 @@ export const AddressModal = ({
   modalSize = "xl",
   addressInfo,
 }) => {
-  const onSubmit = () => {};
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={modalSize} trapFocus={false}>
       <ModalOverlay />
@@ -54,41 +50,7 @@ export const AddressModal = ({
             </Text>
           </VStack>
         </ModalBody>
-        <ModalFooter>
-          <HStack justifyContent={"center"} w={"100%"}>
-            <ButtonPrimary
-              fontSize="sm"
-              fontWeight="bold"
-              h="50"
-              bgColor={"red.600"}
-              _hover={{ bgColor: "red.800" }}
-              textColor={"white"}
-              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-              borderRadius="7px"
-              _active={{ bgColor: "red.800" }}
-              type="submit"
-              label={"leftButtonLabel"}
-              onClick={onClose}
-              width="150px"
-              marginRight="20px"
-            />
-            <ButtonPrimary
-              fontSize="sm"
-              fontWeight="bold"
-              h="50"
-              bgColor={"primary.100"}
-              _hover={{ bgColor: "primary.200" }}
-              textColor={"white"}
-              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-              borderRadius="7px"
-              _active={{ bgColor: "primary.200" }}
-              label={"rightButtonLabel"}
-              onClick={onSubmit}
-              width="150px"
-              isLoading={false}
-            />
-          </HStack>
-        </ModalFooter>
+        <ModalFooter></ModalFooter>
       </ModalContent>
     </Modal>
   );
