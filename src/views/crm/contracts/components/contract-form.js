@@ -1,25 +1,26 @@
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import moment from "moment";
-import { sleep } from "helpers/sleep";
 import SelectInput from "components/select";
 import { FormTextArea } from "components/components";
 import { CalendarCustom } from "components/calendar";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { handlingMultipleFilesToBase64 } from "helpers/buffer-to-base-64";
+import { CrmContext } from "providers/crm";
 
 const contractSchema = Yup.object().shape({
-  documents: Yup.array().of(Yup.string().required("Required")),
-  title: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
-  clientType: Yup.string().required("Required"),
-  startDate: Yup.string().required("Required"),
-  endDate: Yup.string().required("Required"),
-  value: Yup.string().required("Required"),
-  description: Yup.string().required("Required"),
+  document: Yup.mixed(),
+  title: Yup.string(),
+  status: Yup.string(),
+  crmCompaniesId: Yup.string(),
+  initialDate: Yup.string(),
+  endDate: Yup.string(),
+  value: Yup.string(),
+  description: Yup.string(),
 });
 
 const ContractForm = ({
@@ -35,6 +36,8 @@ const ContractForm = ({
   const [isShowingCalendarCreate, setIsShowingCalendarCreate] = useState(false);
   const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
   const { isDesktop } = useBreakpoint();
+  const { getCrm } = useContext(CrmContext);
+  const [clientTypeOptions, setClientTypeOptions] = useState([]);
   const initialDateRef = useRef(null);
   const endDateRef = useRef(null);
   const {
@@ -47,17 +50,30 @@ const ContractForm = ({
   const onSubmit = async (data) => {
     setLoading(true);
 
+    if (data.initialDate) {
+      data.initialDate = moment(data?.initialDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
+    if (data.endDate) {
+      data.endDate = moment(data.endDate, "DD/MM/YYYY").format("YYYY-MM-DD");
+    }
+
+    if (data.document) {
+      const files = await handlingMultipleFilesToBase64(data.document);
+      data.document = files[0];
+    }
+
     if (event === "add") {
-      sleep(1000);
       setLoading(false);
-      onClose();
+      const response = await onAdd(data);
+      onClose(response);
       return;
     }
 
-    console.log("b0", data.departamentId);
-    await onEdit();
+    const res = await onEdit({ ...data, id });
     setLoading(false);
-    onClose();
+    onClose(res);
   };
 
   const initialDateInput = (
@@ -78,18 +94,17 @@ const ContractForm = ({
         borderRadius="6px"
         bgColor={"primary.50"}
         label={"Data de inicio"}
-        {...register("date")}
+        {...register("initialDate")}
         onClick={() => setIsShowingCalendarCreate(!isShowingCalendarCreate)}
         width="100%"
         autocomplete="off"
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarCreate(false);
         }}
-        {...register("date")}
         error={errors.date?.message}
         defaultValue={
-          formValues && formValues.startDate
-            ? moment(formValues.startDate).format("DD/MM/YYYY")
+          formValues && formValues.initialDate
+            ? moment(formValues.initialDate).format("DD/MM/YYYY")
             : null
         }
       />
@@ -103,7 +118,7 @@ const ContractForm = ({
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("date", formattedDate);
+              setValue("initialDate", formattedDate);
               setIsShowingCalendarCreate(!isShowingCalendarCreate);
             }}
           />
@@ -136,7 +151,7 @@ const ContractForm = ({
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarEnd(false);
         }}
-        {...register("startDate")}
+        {...register("endDate")}
         error={errors.endDate?.message}
         defaultValue={
           formValues && formValues.endDate
@@ -154,7 +169,7 @@ const ContractForm = ({
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("date", formattedDate);
+              setValue("endDate", formattedDate);
               setIsShowingCalendarEnd(!isShowingCalendarEnd);
             }}
           />
@@ -167,9 +182,16 @@ const ContractForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Status * "}
-        {...register("state")}
+        {...register("status")}
         error={errors.state?.message}
-        defaultValue={{ label: formValues?.status, value: formValues?.status }}
+        defaultValue={
+          formValues
+            ? { label: formValues?.status, value: formValues?.status }
+            : {
+                label: "Selecione um status",
+                value: "not-selected",
+              }
+        }
         options={[
           {
             label: "Ativo",
@@ -192,34 +214,35 @@ const ContractForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Cliente / Fornecedor * "}
-        {...register("state")}
-        error={errors.state?.message}
-        defaultValue={{
-          label: formValues?.clientType,
-          value: formValues?.clientType,
-        }}
+        {...register("crmCompaniesId")}
+        error={errors.crmCompaniesId?.message}
+        defaultValue={
+          formValues
+            ? {
+                label: formValues?.clientSupplier,
+                value: formValues?.crmCompaniesId,
+              }
+            : {
+                label: "Selecione um cliente/fornecedor",
+                value: "not-selected",
+              }
+        }
         margin
-        options={[
-          {
-            label: "Ativo",
-            value: "Ativo",
-          },
-          {
-            label: "Inativo",
-            value: "Inativo",
-          },
-          {
-            label: "Cancelado",
-            value: "Cancelado",
-          },
-        ]}
+        options={clientTypeOptions}
       />
     </VStack>
   );
 
+  const handlingClientTypeOptions = async () => {
+    const crm = await getCrm(10000, "");
+    const options = crm.items.map((item) => {
+      return { label: item.socialReason, value: item.id };
+    });
+
+    setClientTypeOptions(options);
+  };
   useEffect(() => {
-    console.log("formvalues", formValues);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    handlingClientTypeOptions();
   }, []);
 
   return (
@@ -243,14 +266,13 @@ const ContractForm = ({
         label={"Insira seu documento"}
         className="center-file-input"
         {...register("document")}
-        multiple
         error={errors.document?.message}
       />
       <FormInput
         variant="auth"
         fontSize="sm"
         type="text"
-        placeholder="Nome"
+        placeholder="Ex: Importação com a empresa X"
         margin="0 0 10px 0 "
         fontWeight="500"
         size="lg"
@@ -286,12 +308,14 @@ const ContractForm = ({
       )}
       <FormInput
         label={"Valor: * "}
-        {...register("stateSubscription")}
-        error={errors.stateSubscription?.message}
+        placeholder="EX: R$278"
+        {...register("value")}
+        error={errors.value?.message}
         defaultValue={formValues?.value}
       />
       <FormTextArea
         label={"Detalhes * "}
+        placeholder="Descreve os detalhes do contrato, como por exemplo clausulas extremamente importantes"
         {...register("details")}
         error={errors.details?.message}
         defaultValue={formValues?.details}

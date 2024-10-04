@@ -51,6 +51,7 @@ import ProjectsPage from "views/crm/projects";
 import ServicesPage from "views/crm/services";
 import { CrmServicesProvider } from "providers/crm-services";
 import { CrmProvider } from "providers/crm";
+import { ContractProvider } from "providers/contract";
 
 const routes = createBrowserRouter([
   {
@@ -183,12 +184,14 @@ ReactDOM.render(
                               <IndicatorsAnswerProvider>
                                 <CrmProvider>
                                   <CrmServicesProvider>
-                                    <ToastContainer />
-                                    <React.StrictMode>
-                                      <ThemeEditorProvider>
-                                        <RouterProvider router={routes} />
-                                      </ThemeEditorProvider>
-                                    </React.StrictMode>
+                                    <ContractProvider>
+                                      <ToastContainer />
+                                      <React.StrictMode>
+                                        <ThemeEditorProvider>
+                                          <RouterProvider router={routes} />
+                                        </ThemeEditorProvider>
+                                      </React.StrictMode>
+                                    </ContractProvider>
                                   </CrmServicesProvider>
                                 </CrmProvider>
                               </IndicatorsAnswerProvider>

@@ -22,10 +22,10 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import ContractForm from "./components/contract-form";
 import SquareInfos from "../components/squares-info";
+import { ContractContext } from "providers/contract";
 
 const ContractsPage = () => {
   const { t } = useTranslation();
@@ -39,12 +39,18 @@ const ContractsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [types, setTypes] = useState([]);
+  const [contracts, setContracts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getTypes, deleteType, deleteMultipleTypes } =
-    useContext(TasksContext);
+  const {
+    getContracts,
+    deleteContract,
+    deleteMultipleContracts,
+    contractsByStatus,
+    createContract,
+    editContract,
+  } = useContext(ContractContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -86,12 +92,12 @@ const ContractsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getTypes(
+    getContracts(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setTypes(res.items);
+      setContracts(res.items);
       setPagination(res.pages);
     });
 
@@ -100,7 +106,7 @@ const ContractsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("crm", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -116,7 +122,7 @@ const ContractsPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const editIcon = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -129,17 +135,16 @@ const ContractsPage = () => {
           }
         : null;
 
-      const downloadIcon = checkPermissionForAction("tasks", "canEdit")
+      const downloadIcon = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <DownloadSimple size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
-              // onEditModalOpen();
+              window.open(item.link);
             },
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
-            title: "Vizualizar endereços",
+            title: "Vizualizar Documento",
           }
         : null;
       const icons = [downloadIcon, editIcon, deleteIcon].filter(
@@ -158,13 +163,13 @@ const ContractsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTypes(
+    const res = await getContracts(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setTypes(res.items);
+    setContracts(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -173,14 +178,14 @@ const ContractsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTypes(
+      const res = await getContracts(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setTypes(res.items);
+      setContracts(res.items);
     }
   }, 500);
 
@@ -195,9 +200,18 @@ const ContractsPage = () => {
           justifyContent={"space-between"}
           w={"95vw"}
         >
-          <SquareInfos label={"Contratos Ativos"} value={"10"} />
-          <SquareInfos label={"Contratos Inativos"} value={"5"} />
-          <SquareInfos label={"Contratos Cancelados"} value={"2"} />
+          <SquareInfos
+            label={"Contratos Ativos"}
+            value={contractsByStatus.active}
+          />
+          <SquareInfos
+            label={"Contratos Inativos"}
+            value={contractsByStatus.unactive}
+          />
+          <SquareInfos
+            label={"Contratos Cancelados"}
+            value={contractsByStatus.cancelled}
+          />
         </Box>
 
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
@@ -214,12 +228,12 @@ const ContractsPage = () => {
             label={"Adicionar"}
             width="150px"
             onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
+            disabled={!checkPermissionForAction("crm", "canAdd")}
           />
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={contracts}
           columns={columns}
           title={t("Contratos")}
           icons={tableIcons}
@@ -242,7 +256,7 @@ const ContractsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={types}
+              data={contracts}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -261,9 +275,11 @@ const ContractsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteType(deleteId);
+          const response = await deleteContract(deleteId);
           if (response) {
-            setTypes(types.filter((category) => category.id !== deleteId));
+            setContracts(
+              contracts.filter((category) => category.id !== deleteId)
+            );
           }
 
           setIsLoading(false);
@@ -278,7 +294,7 @@ const ContractsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTypes(selected, setTypes, types);
+          await deleteMultipleContracts(selected, setContracts, contracts);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -290,16 +306,17 @@ const ContractsPage = () => {
         form={
           <ContractForm
             formRef={categoryRef}
-            onClose={(origin) => {
+            onClose={(contract) => {
               onEditModalClose();
-              const originsCopy = [...types];
-              const index = originsCopy.findIndex(
-                (item) => item.id === origin.id
+              const contractsCopy = [...contracts];
+              const index = contractsCopy.findIndex(
+                (item) => item.id === contract.id
               );
-              originsCopy[index] = origin;
-              setTypes(originsCopy);
+              contractsCopy[index] = contract;
+              setContracts(contractsCopy);
             }}
             event="edit"
+            onEdit={editContract}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -321,9 +338,10 @@ const ContractsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setTypes([origin, ...types]);
+              setContracts([origin, ...contracts]);
             }}
             setLoading={setIsLoading}
+            onAdd={createContract}
           />
         }
         formRef={categoryRef}
