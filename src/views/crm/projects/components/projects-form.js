@@ -1,25 +1,24 @@
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import moment from "moment";
-import { sleep } from "helpers/sleep";
 import SelectInput from "components/select";
 import { CalendarCustom } from "components/calendar";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import TextEditor from "components/text-editor-mce";
+import { CrmContext } from "providers/crm";
 
 const contractSchema = Yup.object().shape({
-  documents: Yup.array().of(Yup.string().required("Required")),
-  title: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
-  clientType: Yup.string().required("Required"),
-  startDate: Yup.string().required("Required"),
-  endDate: Yup.string().required("Required"),
-  value: Yup.string().required("Required"),
-  description: Yup.string().required("Required"),
+  title: Yup.string(),
+  status: Yup.string(),
+  crmCompanyId: Yup.string(),
+  initialDate: Yup.string(),
+  finalDate: Yup.string(),
+  value: Yup.string(),
+  description: Yup.string(),
 });
 
 const ProjectsForm = ({
@@ -35,8 +34,11 @@ const ProjectsForm = ({
   const [isShowingCalendarCreate, setIsShowingCalendarCreate] = useState(false);
   const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
   const [description, setDescription] = useState("");
+  const [clientTypeOptions, setClientTypeOptions] = useState([]);
   const richTextRef = useRef(null);
   const { isDesktop } = useBreakpoint();
+  const { getCrm } = useContext(CrmContext);
+
   const initialDateRef = useRef(null);
   const endDateRef = useRef(null);
   const {
@@ -49,17 +51,27 @@ const ProjectsForm = ({
   const onSubmit = async (data) => {
     setLoading(true);
 
+    if (data.initialDate) {
+      data.initialDate = moment(data?.initialDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
+    if (data.finalDate) {
+      data.finalDate = moment(data.finalDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
+
     if (event === "add") {
-      sleep(1000);
+      const response = await onAdd({ ...data, text: description });
       setLoading(false);
-      onClose();
+      onClose(response);
       return;
     }
 
-    console.log("b0", data.departamentId);
-    await onEdit();
+    const res = await onEdit(id, { ...data, text: description });
     setLoading(false);
-    onClose();
+    onClose(res);
   };
 
   const initialDateInput = (
@@ -86,13 +98,13 @@ const ProjectsForm = ({
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarCreate(false);
         }}
-        {...register("startDate")}
-        error={errors.date?.message}
-        // defaultValue={
-        //   formValues && formValues.startDate
-        //     ? moment(formValues.startDate).format("DD/MM/YYYY")
-        //     : null
-        // }
+        {...register("initialDate")}
+        error={errors.initialDate?.message}
+        defaultValue={
+          formValues && formValues.initialDate
+            ? moment(formValues.initialDate).format("DD/MM/YYYY")
+            : null
+        }
       />
       {isShowingCalendarCreate && (
         <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
@@ -104,7 +116,7 @@ const ProjectsForm = ({
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("date", formattedDate);
+              setValue("initialDate", formattedDate);
               setIsShowingCalendarCreate(!isShowingCalendarCreate);
             }}
           />
@@ -137,13 +149,13 @@ const ProjectsForm = ({
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendarEnd(false);
         }}
-        {...register("endDate")}
-        error={errors.endDate?.message}
-        // defaultValue={
-        //   formValues && formValues.endDate
-        //     ? moment(formValues.endDate).format("DD/MM/YYYY")
-        //     : null
-        // }
+        {...register("finalDate")}
+        error={errors.finalDate?.message}
+        defaultValue={
+          formValues && formValues.finalDate
+            ? moment(formValues.finalDate).format("DD/MM/YYYY")
+            : null
+        }
       />
       {isShowingCalendarEnd && (
         <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
@@ -155,7 +167,7 @@ const ProjectsForm = ({
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("date", formattedDate);
+              setValue("finalDate", formattedDate);
               setIsShowingCalendarEnd(!isShowingCalendarEnd);
             }}
           />
@@ -170,18 +182,23 @@ const ProjectsForm = ({
         label={"Status * "}
         {...register("status")}
         error={errors.status?.message}
+        defaultValue={{ label: "Iniciado", value: "iniciado" }}
         options={[
           {
-            label: "Ativo",
-            value: "Ativo",
+            label: "Iniciado",
+            value: "Iniciado",
           },
           {
-            label: "Inativo",
-            value: "Inativo",
+            label: "Parado",
+            value: "Parado",
           },
           {
-            label: "Cancelado",
-            value: "Cancelado",
+            label: "Finalizado",
+            value: "Finalizado",
+          },
+          {
+            label: "Em andamento",
+            value: "Em andamento",
           },
         ]}
       />
@@ -203,43 +220,40 @@ const ProjectsForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Cliente / Fornecedor * "}
-        {...register("clientType")}
-        error={errors.clientType?.message}
-        margin
-        options={[
-          {
-            label: "-",
-            value: "not-selected",
-          },
-          {
-            label: "Ativo",
-            value: "Ativo",
-          },
-          {
-            label: "Inativo",
-            value: "Inativo",
-          },
-          {
-            label: "Cancelado",
-            value: "Cancelado",
-          },
-        ]}
+        {...register("crmCompanyId")}
+        error={errors.crmCompanyId?.message}
+        options={clientTypeOptions}
+        defaultValue={{
+          label: "-",
+          value: "not-selected",
+        }}
       />
     </VStack>
   );
 
   useEffect(() => {
+    setValue("status", "Iniciado");
     if (formValues) {
+      getCrm(10000, "").then((crm) => {
+        const options = crm.items.map((item) => {
+          return { label: item.socialReason, value: item.id };
+        });
+        setClientTypeOptions(options);
+        setValue("crmCompanyId", formValues.crmCompanyId);
+      });
       setValue("status", formValues.status);
       setValue("startDate", moment(formValues.startDate).format("DD/MM/YYYY"));
       setValue("endDate", moment(formValues.endDate).format("DD/MM/YYYY"));
       setValue("value", formValues.value);
       setValue("progress", formValues.progress);
-      setDescription(formValues.description);
+      setDescription(formValues.text);
     } else {
-      setValue("status", "Ativo");
-      setValue("clientType", "not-selected");
-      setValue("progress", 0);
+      getCrm(10000, "").then((crm) => {
+        const options = crm.items.map((item) => {
+          return { label: item.socialReason, value: item.id };
+        });
+        setClientTypeOptions(options);
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValue]);

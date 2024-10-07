@@ -29,11 +29,11 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import ProjectsForm from "./components/projects-form";
 import SquareInfos from "../components/squares-info";
 import Filters from "./components/filters";
+import { ProjectContext } from "providers/projects";
 
 const ProjectsPage = () => {
   const { t } = useTranslation();
@@ -47,12 +47,18 @@ const ProjectsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [types, setTypes] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getTypes, deleteType, deleteMultipleTypes } =
-    useContext(TasksContext);
+  const {
+    getProjects,
+    deleteProject,
+    deleteMultipleProjects,
+    createProject,
+    status,
+    editProject,
+  } = useContext(ProjectContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -94,12 +100,11 @@ const ProjectsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getTypes(
+    getProjects(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
+      searchParams.get("search") ?? ""
     ).then((res) => {
-      setTypes(res.items);
+      setProjects(res.items);
       setPagination(res.pages);
     });
 
@@ -108,7 +113,7 @@ const ProjectsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("crm", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -125,7 +130,7 @@ const ProjectsPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const editIcon = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -139,7 +144,7 @@ const ProjectsPage = () => {
           }
         : null;
 
-      const tasks = checkPermissionForAction("tasks", "canEdit")
+      const tasks = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <CheckFat size={20} />,
             onClickRow: (item) => {
@@ -153,7 +158,7 @@ const ProjectsPage = () => {
           }
         : null;
 
-      const documents = checkPermissionForAction("tasks", "canEdit")
+      const documents = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <Folder size={20} />,
             onClickRow: (item) => {
@@ -167,7 +172,7 @@ const ProjectsPage = () => {
           }
         : null;
 
-      const shareWithUsers = checkPermissionForAction("tasks", "canEdit")
+      const shareWithUsers = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <User size={20} />,
             onClickRow: (item) => {
@@ -181,7 +186,7 @@ const ProjectsPage = () => {
           }
         : null;
 
-      const description = checkPermissionForAction("tasks", "canEdit")
+      const description = checkPermissionForAction("crm", "canEdit")
         ? {
             icon: <Chat size={20} />,
 
@@ -217,13 +222,13 @@ const ProjectsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTypes(
+    const res = await getProjects(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setTypes(res.items);
+    setProjects(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -232,14 +237,14 @@ const ProjectsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTypes(
+      const res = await getProjects(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setTypes(res.items);
+      setProjects(res.items);
     }
   }, 500);
 
@@ -254,10 +259,13 @@ const ProjectsPage = () => {
           justifyContent={"space-between"}
           w={"95vw"}
         >
-          <SquareInfos label={"Projetos iniciados"} value={"10"} />
-          <SquareInfos label={"Projetos em pausa"} value={"5"} />
-          <SquareInfos label={"Projetos finalizados"} value={"2"} />
-          <SquareInfos label={"Projetos em andamento"} value={"2"} />
+          <SquareInfos label={"Projetos iniciados"} value={status.started} />
+          <SquareInfos label={"Projetos em pausa"} value={status.stopped} />
+          <SquareInfos label={"Projetos finalizados"} value={status.ended} />
+          <SquareInfos
+            label={"Projetos em andamento"}
+            value={status.inProgress}
+          />
         </Box>
 
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
@@ -274,12 +282,17 @@ const ProjectsPage = () => {
             label={"Adicionar"}
             width="150px"
             onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
+            disabled={!checkPermissionForAction("crm", "canAdd")}
           />
         </HStack>
-        <Filters />
+        <Filters
+          onSearch={(projects, paginations) => {
+            setPagination(paginations);
+            setProjects(projects);
+          }}
+        />
         <CustomTable
-          data={mockedData}
+          data={projects}
           columns={columns}
           title={t("Projetos")}
           icons={tableIcons}
@@ -302,7 +315,7 @@ const ProjectsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={types}
+              data={projects}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -321,9 +334,11 @@ const ProjectsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteType(deleteId);
+          const response = await deleteProject(deleteId);
           if (response) {
-            setTypes(types.filter((category) => category.id !== deleteId));
+            setProjects(
+              projects.filter((category) => category.id !== deleteId)
+            );
           }
 
           setIsLoading(false);
@@ -338,7 +353,7 @@ const ProjectsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTypes(selected, setTypes, types);
+          await deleteMultipleProjects(selected, setProjects, projects);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -352,17 +367,18 @@ const ProjectsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const originsCopy = [...types];
+              const originsCopy = [...projects];
               const index = originsCopy.findIndex(
                 (item) => item.id === origin.id
               );
               originsCopy[index] = origin;
-              setTypes(originsCopy);
+              setProjects(originsCopy);
             }}
             event="edit"
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
+            onEdit={editProject}
           />
         }
         formRef={categoryRef}
@@ -379,10 +395,11 @@ const ProjectsPage = () => {
         form={
           <ProjectsForm
             formRef={categoryRef}
-            onClose={(origin) => {
+            onClose={(project) => {
+              setProjects([project, ...projects]);
               onAddModalClose();
-              setTypes([origin, ...types]);
             }}
+            onAdd={createProject}
             setLoading={setIsLoading}
           />
         }

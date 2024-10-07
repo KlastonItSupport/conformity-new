@@ -65,8 +65,8 @@ const ContractForm = ({
     }
 
     if (event === "add") {
-      setLoading(false);
       const response = await onAdd(data);
+      setLoading(false);
       onClose(response);
       return;
     }

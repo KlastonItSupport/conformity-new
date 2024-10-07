@@ -2,69 +2,54 @@ import { HStack, VStack } from "@chakra-ui/react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import SelectInput from "components/select";
-import { notSelectedCleaning } from "helpers/not-selected-cleaning";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import React, { useEffect, useState } from "react";
+import { CrmContext } from "providers/crm";
+import { ProjectContext } from "providers/projects";
+import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 
 export const filtersSchema = Yup.object().shape({
-  origin: Yup.string(),
-  type: Yup.string(),
-  classification: Yup.string(),
   status: Yup.string(),
-  departament: Yup.string(),
+  clientSupplier: Yup.string(),
 });
 
-const Filters = () => {
+const Filters = ({ onSearch }) => {
   const { isMobile } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
+  const { getCrm } = useContext(CrmContext);
+  const { getProjects } = useContext(ProjectContext);
+  const [clientTypeOptions, setClientTypeOptions] = useState([]);
+
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm(filtersSchema);
 
-  useEffect(() => {
-    // setFormDefaultValues(queryParams);
-  }, []);
-
   const clientSupplier = (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
         label="Cliente / Fornecedor"
-        {...register("status")}
-        errors={errors.status}
+        {...register("clientSupplier")}
+        errors={errors.clientSupplier}
         defaultValue={{
-          label: "Selecione um status",
+          label: "Selecione um Cliente/Fornecedor",
           value: "not-selected",
         }}
-        options={[
-          {
-            label: "Aberta",
-            value: "Aberta",
-          },
-          {
-            label: "Fechada",
-            value: "Fechada",
-          },
-          {
-            label: "Reaberta",
-            value: "Reaberta",
-          },
-        ]}
+        options={clientTypeOptions}
       />
     </VStack>
   );
 
-  const originInput = (
+  const status = (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
-        label="Origem "
-        {...register("origin")}
-        errors={errors.origin}
+        label="Status "
+        {...register("status")}
+        errors={errors.status}
         defaultValue={{
-          label: "Selecione uma origem",
+          label: "Selecione um status",
           value: "not-selected",
         }}
         options={[
@@ -90,18 +75,33 @@ const Filters = () => {
   );
 
   const onSubmit = async (data) => {
-    notSelectedCleaning(data);
     setIsLoading(true);
 
-    // const tasks = await getTasks(1, "", data);
+    const res = await getProjects(1, "", data);
+    onSearch(res.items, res.pages);
 
-    // setTasks(tasks.items);
     setIsLoading(false);
   };
+
+  useEffect(() => {
+    getCrm(10000, "").then((crm) => {
+      const options = crm.items.map((item) => {
+        return { label: item.socialReason, value: item.id };
+      });
+      setClientTypeOptions(options);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return isMobile ? (
-    <VStack w={"100%"} paddingX={"20px"} as="form">
+    <VStack
+      w={"100%"}
+      paddingX={"20px"}
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       {clientSupplier}
-      {originInput}
+      {status}
 
       <ButtonPrimary
         fontSize="sm"
@@ -129,7 +129,7 @@ const Filters = () => {
       onSubmit={handleSubmit(onSubmit)}
     >
       {clientSupplier}
-      {originInput}
+      {status}
 
       <ButtonPrimary
         fontSize="sm"

@@ -52,6 +52,7 @@ import ServicesPage from "views/crm/services";
 import { CrmServicesProvider } from "providers/crm-services";
 import { CrmProvider } from "providers/crm";
 import { ContractProvider } from "providers/contract";
+import { ProjectProvider } from "providers/projects";
 
 const routes = createBrowserRouter([
   {
@@ -172,38 +173,40 @@ ReactDOM.render(
       <CompanyProvider>
         <UserProvider>
           <GroupProvider>
-            <DocumentProvider>
-              <AnalysisProvider>
-                <DetailsDocumentsProvider>
-                  <CategoryProvider>
-                    <DepartamentProvider>
-                      <TasksProvider>
-                        <DetailsTaskProvider>
-                          <EquipmentProvider>
-                            <IndicatorsProvider>
-                              <IndicatorsAnswerProvider>
-                                <CrmProvider>
-                                  <CrmServicesProvider>
-                                    <ContractProvider>
-                                      <ToastContainer />
-                                      <React.StrictMode>
-                                        <ThemeEditorProvider>
-                                          <RouterProvider router={routes} />
-                                        </ThemeEditorProvider>
-                                      </React.StrictMode>
-                                    </ContractProvider>
-                                  </CrmServicesProvider>
-                                </CrmProvider>
-                              </IndicatorsAnswerProvider>
-                            </IndicatorsProvider>
-                          </EquipmentProvider>
-                        </DetailsTaskProvider>
-                      </TasksProvider>
-                    </DepartamentProvider>
-                  </CategoryProvider>
-                </DetailsDocumentsProvider>
-              </AnalysisProvider>
-            </DocumentProvider>
+            <ProjectProvider>
+              <DocumentProvider>
+                <AnalysisProvider>
+                  <DetailsDocumentsProvider>
+                    <CategoryProvider>
+                      <DepartamentProvider>
+                        <TasksProvider>
+                          <DetailsTaskProvider>
+                            <EquipmentProvider>
+                              <IndicatorsProvider>
+                                <IndicatorsAnswerProvider>
+                                  <CrmProvider>
+                                    <CrmServicesProvider>
+                                      <ContractProvider>
+                                        <ToastContainer />
+                                        <React.StrictMode>
+                                          <ThemeEditorProvider>
+                                            <RouterProvider router={routes} />
+                                          </ThemeEditorProvider>
+                                        </React.StrictMode>
+                                      </ContractProvider>
+                                    </CrmServicesProvider>
+                                  </CrmProvider>
+                                </IndicatorsAnswerProvider>
+                              </IndicatorsProvider>
+                            </EquipmentProvider>
+                          </DetailsTaskProvider>
+                        </TasksProvider>
+                      </DepartamentProvider>
+                    </CategoryProvider>
+                  </DetailsDocumentsProvider>
+                </AnalysisProvider>
+              </DocumentProvider>
+            </ProjectProvider>
           </GroupProvider>
         </UserProvider>
       </CompanyProvider>

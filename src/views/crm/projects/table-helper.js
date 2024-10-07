@@ -16,19 +16,18 @@ export const columns = [
   },
   {
     header: "Data de início",
-    access: "startDate",
+    access: "initialDate",
     formatData: (data) => moment(data).format("DD/MM/YYYY"),
   },
   {
     header: "Data para finalização",
-    access: "endDate",
+    access: "finalDate",
     formatData: (data) => moment(data).format("DD/MM/YYYY"),
   },
   {
     header: "Progresso",
     access: "progress",
     customCell: (data) => {
-      console.log(data.progress);
       return (
         <HStack alignItems={"center"}>
           <Box position="relative" width={"100%"}>
