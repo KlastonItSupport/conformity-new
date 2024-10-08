@@ -221,6 +221,10 @@ const ListTasksPage = () => {
       params.categoryId = searchParams.get("categoryId");
     }
 
+    if (searchParams.get("projectId")) {
+      params.projectId = searchParams.get("projectId");
+    }
+
     return params;
   };
 
@@ -375,9 +379,9 @@ const ListTasksPage = () => {
           />
         }
         formRef={formRef}
-        title={t("Criar Tarefa")}
+        title={t("Editar Tarefa")}
         leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Criar")}
+        rightButtonLabel={t("Editar")}
         modalSize="2xl"
         isLoading={isLoading}
       />

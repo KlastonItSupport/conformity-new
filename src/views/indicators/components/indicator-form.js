@@ -63,7 +63,6 @@ const IndicatorForm = ({
       return;
     }
 
-    console.log("b0", data.departamentId);
     await onEdit(
       {
         ...data,
@@ -87,7 +86,6 @@ const IndicatorForm = ({
     });
 
     if (formValues) {
-      console.log("formvalues", formValues);
       setImproveDirection(formValues.direction);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

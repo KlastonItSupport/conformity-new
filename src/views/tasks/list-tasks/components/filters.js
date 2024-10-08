@@ -5,6 +5,7 @@ import SelectInput from "components/select";
 import { notSelectedCleaning } from "helpers/not-selected-cleaning";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { DepartamentContext } from "providers/departament";
+import { ProjectContext } from "providers/projects";
 import { TasksContext } from "providers/tasks";
 import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -30,9 +31,11 @@ const Filters = ({
 }) => {
   const { isMobile } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
+  const [projectOptions, setProjectsOptions] = useState([]);
   const { getOrigins, getClassifications, getTypes, getTasks, setTasks } =
     useContext(TasksContext);
   const { getDepartaments } = useContext(DepartamentContext);
+  const { getProjects } = useContext(ProjectContext);
   const {
     handleSubmit,
     register,
@@ -44,32 +47,42 @@ const Filters = ({
     const classifications = getClassifications();
     const types = getTypes();
     const departaments = getDepartaments();
+    const projects = getProjects(1, "", 10000);
 
-    await Promise.all([origins, classifications, types, departaments]).then(
-      (data) => {
-        setOrigins(
-          data[0].items.map((item) => {
-            return { label: item.name, value: item.id };
-          })
-        );
-        setClassifications(
-          data[1].items.map((item) => {
-            return { label: item.name, value: item.id };
-          })
-        );
-        setTypes(
-          data[2].items.map((item) => {
-            return { label: item.name, value: item.id };
-          })
-        );
+    await Promise.all([
+      origins,
+      classifications,
+      types,
+      departaments,
+      projects,
+    ]).then((data) => {
+      setOrigins(
+        data[0].items.map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
+      setClassifications(
+        data[1].items.map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
+      setTypes(
+        data[2].items.map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
 
-        setDepartaments(
-          data[3].map((item) => {
-            return { label: item.name, value: item.id };
-          })
-        );
-      }
-    );
+      setDepartaments(
+        data[3].map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
+      setProjectsOptions(
+        data[4].items.map((project) => {
+          return { label: project.title, value: project.id };
+        })
+      );
+    });
   };
 
   useEffect(() => {
@@ -139,26 +152,13 @@ const Filters = ({
     <VStack w={"100%"} align={"start"}>
       <SelectInput
         label="Projeto"
-        {...register("project")}
-        errors={errors.project}
+        {...register("projectId")}
+        errors={errors.projectId}
         defaultValue={{
           label: "Selecione um projeto",
           value: "not-selected",
         }}
-        options={[
-          {
-            label: "Aberta",
-            value: "open",
-          },
-          {
-            label: "Fechada",
-            value: "closed",
-          },
-          {
-            label: "Reaberta",
-            value: "reopened",
-          },
-        ]}
+        options={projectOptions}
       />
     </VStack>
   );

@@ -21,6 +21,7 @@ import TaskClassification from "../task-classification/task-classification";
 import DepartamentForm from "../departaments/create-departament";
 import { AddUserForm } from "../components";
 import { toast } from "react-toastify";
+import { ProjectContext } from "providers/projects";
 
 const TaskForm = ({
   formRef,
@@ -32,6 +33,7 @@ const TaskForm = ({
 }) => {
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [projectsOptions, setProjectsOptions] = useState([]);
 
   const richTextRef = useRef(null);
   const originRef = useRef();
@@ -61,6 +63,7 @@ const TaskForm = ({
     setResponsables,
   } = useContext(TasksContext);
   const { getDepartaments } = useContext(DepartamentContext);
+  const { getProjects } = useContext(ProjectContext);
   const { getCompanyUsers } = useContext(CompanyContext);
   const {
     handleSubmit,
@@ -77,6 +80,7 @@ const TaskForm = ({
     const types = getTypes();
     const departaments = getDepartaments();
     const companyUsers = getCompanyUsers();
+    const projects = getProjects(1, "", 1000);
 
     await Promise.all([
       origins,
@@ -84,6 +88,7 @@ const TaskForm = ({
       types,
       departaments,
       companyUsers,
+      projects,
     ]).then((data) => {
       setOrigins(
         data[0].items.map((item) => {
@@ -112,8 +117,15 @@ const TaskForm = ({
           return { label: item.name, value: item.name };
         })
       );
+
+      setProjectsOptions(
+        data[5].items.map((item) => {
+          return { label: item.title, value: item.id };
+        })
+      );
     });
   };
+
   useEffect(() => {
     if (formValues && event !== "add") {
       setDescription(formValues.description);
@@ -226,6 +238,7 @@ const TaskForm = ({
           errors={errors}
           register={register}
           setValue={setValue}
+          projectOptions={projectsOptions}
         />
         <PrevisionAndDepartament
           register={register}

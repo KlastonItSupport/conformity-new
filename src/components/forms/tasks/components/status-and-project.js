@@ -7,7 +7,13 @@ import moment from "moment";
 import React, { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const StatusAndProject = ({ formValues, errors, register, setValue }) => {
+const StatusAndProject = ({
+  formValues,
+  errors,
+  register,
+  setValue,
+  projectOptions,
+}) => {
   const { t } = useTranslation();
   const [isShowingCalendarInclusion, setIsShowingCalendarInclusion] =
     useState(false);
@@ -79,31 +85,27 @@ const StatusAndProject = ({ formValues, errors, register, setValue }) => {
       <HStack>
         <VStack w={"100%"} mt={"20px"} align={"start"}>
           <SelectInput
-            errors={errors.project}
+            errors={errors.projectId}
             label={t("Projeto")}
-            options={[
-              { label: "Qualidade", value: "1" },
-              { label: "Compras", value: "2" },
-              { label: "Admin", value: "3" },
-            ]}
+            options={projectOptions}
             defaultValue={
               formValues?.project
                 ? { label: formValues?.project, value: formValues?.projectId }
                 : { label: "Selecione um projeto", value: "not-selected" }
             }
-            {...register("project")}
+            {...register("projectId")}
           />
         </VStack>
-        <Flex
+        {/* <Flex
           bgColor={"primary.100"}
           cursor={"pointer"}
-          // borderRadius={"50%"}
+          borderRadius={"50%"}
           style={{ marginTop: "60px" }}
-          // onClick={onCreateGroupOpen}
+          onClick={onCreateGroupOpen}
           padding={"5px"}
         >
           <Plus color="white" size={20} weight="bold" />
-        </Flex>
+        </Flex> */}
       </HStack>
     </>
   );

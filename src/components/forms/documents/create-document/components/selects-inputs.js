@@ -35,7 +35,7 @@ const SelectsInputs = ({
     const [categoriesRes, departamentRes, projectsRes] = await Promise.all([
       getCategories(),
       getDepartaments(),
-      getProjects(),
+      getProjects(1, "", 10000),
     ]);
 
     if (formValues.categoryId) {

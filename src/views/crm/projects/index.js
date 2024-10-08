@@ -148,7 +148,7 @@ const ProjectsPage = () => {
         ? {
             icon: <CheckFat size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
+              window.open(`/tasks?projectId=${item.id}`, "_blank");
               // onEditModalOpen();
             },
             onClickHeader: () => {},

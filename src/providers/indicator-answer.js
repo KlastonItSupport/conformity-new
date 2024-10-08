@@ -39,7 +39,6 @@ const IndicatorsAnswerProvider = ({ children }) => {
     });
 
     if (response.status === 200) {
-      console.log("entrei");
       if (showToast) {
         toast.success("Resposta excluída com sucesso");
       }

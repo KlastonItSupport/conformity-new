@@ -92,7 +92,6 @@ const Filters = ({
           const indicator = indicatorsOptions.find(
             (item) => item.value === Number(indicatorId)
           );
-          console.log("indicator", indicator);
 
           if (indicator) {
             setTitles({

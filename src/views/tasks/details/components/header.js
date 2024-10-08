@@ -170,7 +170,7 @@ const Header = ({
           )}
         </HStack>
         {label("Autor", task.responsable)}
-        {label("Projeto", task.project)}
+        {label("Projeto", task.projectName)}
         {label("Origem", task.origin)}
         {label("Classificação", task.classification)}
         {label("Tipo", task.type)}
