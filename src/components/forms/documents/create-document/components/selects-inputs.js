@@ -10,6 +10,7 @@ import { Plus } from "@phosphor-icons/react";
 import SelectInput from "components/select";
 import { CategoryContext } from "providers/category";
 import { DepartamentContext } from "providers/departament";
+import { ProjectContext } from "providers/projects";
 import React, { useContext, useEffect, useState } from "react";
 import {} from "react-i18next";
 
@@ -23,14 +24,18 @@ const SelectsInputs = ({
   const [isLoading, setIsLoading] = useState(true);
   const { getCategories, categories, setCategories } =
     useContext(CategoryContext);
+  const { getProjects } = useContext(ProjectContext);
 
   const { getDepartaments, departaments, setDepartaments } =
     useContext(DepartamentContext);
 
+  const [projectsOptions, setProjectsOptions] = useState([]);
+
   const handlingSelects = async () => {
-    const [categoriesRes, departamentRes] = await Promise.all([
+    const [categoriesRes, departamentRes, projectsRes] = await Promise.all([
       getCategories(),
       getDepartaments(),
+      getProjects(),
     ]);
 
     if (formValues.categoryId) {
@@ -63,6 +68,12 @@ const SelectsInputs = ({
         return { label: departament.name, value: departament.id };
       })
     );
+
+    setProjectsOptions(
+      projectsRes.items.map((project) => {
+        return { label: project.title, value: project.id };
+      })
+    );
     setIsLoading(false);
   };
   useEffect(() => {
@@ -82,20 +93,11 @@ const SelectsInputs = ({
         label="Projetos"
         {...register("project")}
         errors={errors.project}
-        options={[
-          {
-            label: "Rigrabas",
-            value: "ativo",
-          },
-          {
-            label: "Unimed",
-            value: "inativo",
-          },
-          {
-            label: "Klaston",
-            value: "inativo",
-          },
-        ]}
+        options={projectsOptions}
+        defaultValue={{
+          label: "Selecione um projeto",
+          value: "",
+        }}
       />
       {!isLoading ? (
         <HStack

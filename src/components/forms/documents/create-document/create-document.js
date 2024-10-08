@@ -71,6 +71,9 @@ const DocumentForm = ({ formRef, onClose, setIsLoading, event = "add" }) => {
       "DD/MM/YYYY"
     ).format("YYYY-MM-DD");
 
+    if (data.project) {
+      data.projectId = data.project;
+    }
     if (event === "add") {
       const document = await createDocument({
         ...data,

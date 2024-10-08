@@ -2,7 +2,7 @@ import * as Yup from "yup";
 
 export const documentSchema = Yup.object().shape({
   name: Yup.string().required("Nome  obrigatório"),
-  project: Yup.string().required("Projeto obrigatório"),
+  project: Yup.string(),
   owner: Yup.string().required("Autor obrigatório"),
   departamentId: Yup.string().required("Departamento obrigatório"),
   categoryId: Yup.string().required("Categoria obrigatória"),

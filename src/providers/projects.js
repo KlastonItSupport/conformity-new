@@ -53,7 +53,6 @@ const ProjectProvider = ({ children }) => {
   };
 
   const getProjects = async (page = 1, search = "", filters = {}) => {
-    console.log("filters, ", filters);
     const filterParamsParsed = handlingFilterParams(filters);
 
     const response = await api.get(

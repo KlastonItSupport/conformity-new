@@ -162,8 +162,7 @@ const ProjectsPage = () => {
         ? {
             icon: <Folder size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
-              // onEditModalOpen();
+              window.open(`/documents?projectId=${item.id}`);
             },
             onClickHeader: () => {},
             isDisabled: false,

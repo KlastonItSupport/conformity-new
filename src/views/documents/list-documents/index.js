@@ -187,6 +187,9 @@ const ListDocumentsPage = () => {
     if (searchParams.get("categoryId")) {
       params.categoryId = searchParams.get("categoryId");
     }
+    if (searchParams.get("projectId")) {
+      params.projectId = searchParams.get("projectId");
+    }
 
     return params;
   };
