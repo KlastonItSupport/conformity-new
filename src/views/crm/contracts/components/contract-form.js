@@ -234,7 +234,7 @@ const ContractForm = ({
   );
 
   const handlingClientTypeOptions = async () => {
-    const crm = await getCrm(10000, "");
+    const crm = await getCrm(1, "", 10000);
     const options = crm.items.map((item) => {
       return { label: item.socialReason, value: item.id };
     });

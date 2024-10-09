@@ -1,26 +1,25 @@
 import { HStack, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
-import { sleep } from "helpers/sleep";
 import SelectInput from "components/select";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import TextEditor from "components/text-editor-mce";
+import { CrmContext } from "providers/crm";
 
 const contractSchema = Yup.object().shape({
-  documents: Yup.array().of(Yup.string().required("Required")),
-  title: Yup.string().required("Required"),
-  status: Yup.string().required("Required"),
-  clientType: Yup.string().required("Required"),
-  startDate: Yup.string().required("Required"),
-  endDate: Yup.string().required("Required"),
-  value: Yup.string().required("Required"),
-  description: Yup.string().required("Required"),
-  dealIsClosed: Yup.string().required("Required"),
-  solicitationMonth: Yup.string().required("Required"),
-  solicitationYear: Yup.string().required("Required"),
+  title: Yup.string(),
+  status: Yup.string(),
+  crmCompanyId: Yup.string(),
+  startDate: Yup.string(),
+  endDate: Yup.string(),
+  value: Yup.string(),
+  description: Yup.string(),
+  contract: Yup.string(),
+  solicitationMonth: Yup.string(),
+  solicitationYear: Yup.string(),
 });
 
 const LeadsForm = ({
@@ -37,6 +36,8 @@ const LeadsForm = ({
   const [yearsSolicitations, setYearsSolicitations] = useState([]);
   const [description, setDescription] = useState("");
   const richTextRef = useRef(null);
+  const { getCrm } = useContext(CrmContext);
+  const [crmOptions, setCrmOptions] = useState([]);
 
   const {
     register,
@@ -49,15 +50,16 @@ const LeadsForm = ({
     setLoading(true);
 
     if (event === "add") {
-      sleep(1000);
+      const res = await onAdd(data);
       setLoading(false);
-      onClose();
+      onClose(res);
       return;
     }
 
-    await onEdit();
+    const res = await onEdit(id, { ...data, description });
+
     setLoading(false);
-    onClose();
+    onClose(res);
   };
 
   const currentMonth =
@@ -71,25 +73,28 @@ const LeadsForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Status * "}
-        {...register("state")}
-        error={errors.state?.message}
-        defaultValue={
-          formValues
-            ? { label: formValues?.status, value: formValues?.status }
-            : { label: "Ativo", value: "Ativo" }
-        }
+        {...register("status")}
+        error={errors.status?.message}
         options={[
           {
-            label: "Ativo",
-            value: "Ativo",
+            label: "Solicitado",
+            value: "solicitado",
           },
           {
-            label: "Inativo",
-            value: "Inativo",
+            label: "Em Andamento",
+            value: "em andamento",
           },
           {
             label: "Cancelado",
             value: "Cancelado",
+          },
+          {
+            label: "Recusado",
+            value: "recusado",
+          },
+          {
+            label: "Concluído",
+            value: "concluido",
           },
         ]}
       />
@@ -100,8 +105,8 @@ const LeadsForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Contrato Celebrado * "}
-        {...register("dealIsClosed")}
-        error={errors.dealIsClosed?.message}
+        {...register("contract")}
+        error={errors.contract?.message}
         options={[
           {
             label: "Sim",
@@ -120,27 +125,20 @@ const LeadsForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Cliente / Fornecedor * "}
-        {...register("clientName")}
-        error={errors.clientName?.message}
-        defaultValue={{
-          label: formValues?.clientName,
-          value: formValues?.clientName,
-        }}
-        margin
-        options={[
-          {
-            label: "Ativo",
-            value: "Ativo",
-          },
-          {
-            label: "Inativo",
-            value: "Inativo",
-          },
-          {
-            label: "Cancelado",
-            value: "Cancelado",
-          },
-        ]}
+        {...register("crmCompanyId")}
+        error={errors.crmCompanyId?.message}
+        defaultValue={
+          formValues
+            ? {
+                label: formValues?.clientName,
+                value: formValues?.clientName,
+              }
+            : {
+                label: "-",
+                value: "",
+              }
+        }
+        options={crmOptions}
       />
     </VStack>
   );
@@ -242,18 +240,34 @@ const LeadsForm = ({
     }
     setYearsSolicitations(options);
 
+    getCrm(1, "", 10000).then((res) => {
+      setCrmOptions(
+        res.items.map((item) => {
+          return { label: item.socialReason, value: item.id };
+        })
+      );
+    });
+
+    if (formValues && event === "edit") {
+      setValue("status", formValues.status);
+      setValue("solicitationMonth", formValues.solicitationMonth);
+      setValue("contract", formValues.contract);
+      setDescription(formValues.description);
+
+      getCrm(1, "", 10000).then((res) => {
+        setCrmOptions(
+          res.items.map((item) => {
+            return { label: item.socialReason, value: item.id };
+          })
+        );
+
+        setValue("crmCompanyId", formValues.crmCompanyId);
+      });
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (formValues) {
-      setValue("dealIsClosed", "Não");
-      setValue("solicitationMonth", formValues.solicitationMonth.toLowerCase());
-      setValue("solicitationYear", formValues.solicitationMonth.toLowerCase());
-      setDescription(formValues.description);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setValue]);
   return (
     <VStack
       as={"form"}
@@ -290,19 +304,21 @@ const LeadsForm = ({
         {...register("value")}
         error={errors.value?.message}
         defaultValue={formValues?.value}
+        placeholder={"EX: R$349,99"}
       />
       <FormInput
         label={"Responsável: * "}
-        {...register("user")}
-        error={errors.user?.message}
-        defaultValue={formValues?.user}
+        {...register("responsable")}
+        error={errors.responsable?.message}
+        defaultValue={formValues?.responsable}
+        placeholder={"Ex: Bruno - Head of Operations"}
       />
       {supplierInput}
       <FormInput
         variant="auth"
         fontSize="sm"
         type="text"
-        placeholder="Email"
+        placeholder="Ex: bruno@example.com"
         margin="0 0 10px 0 "
         fontWeight="500"
         size="lg"
@@ -319,7 +335,7 @@ const LeadsForm = ({
         variant="auth"
         fontSize="sm"
         type="text"
-        placeholder="Telefone"
+        placeholder="EX: (99) 99999-9999"
         margin="0 0 10px 0 "
         fontWeight="500"
         size="lg"
@@ -327,15 +343,15 @@ const LeadsForm = ({
         bgColor={"primary.50"}
         label="Telefone: "
         width="100%"
-        {...register("phone")}
-        error={errors.phone?.message}
-        defaultValue={formValues?.phone}
+        {...register("celphone")}
+        error={errors.celphone?.message}
+        defaultValue={formValues?.celphone}
       />
       <FormInput
         variant="auth"
         fontSize="sm"
         type="text"
-        placeholder="Referência"
+        placeholder="Ex: José"
         margin="0 0 10px 0 "
         fontWeight="500"
         size="lg"

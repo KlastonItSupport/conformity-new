@@ -9,10 +9,13 @@ const CrmContext = createContext();
 const CrmProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
 
-  const getCrm = async (page = 1, search = "") => {
-    const response = await api.get(`/crm?page=${page}&search=${search}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  const getCrm = async (page = 1, search = "", pageSize = 10) => {
+    const response = await api.get(
+      `/crm?page=${page}&search=${search}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
 
     return response.data;
   };

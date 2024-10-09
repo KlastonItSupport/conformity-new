@@ -22,13 +22,13 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TasksContext } from "providers/tasks";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import LeadsForm from "./components/leads-form";
 import LeadsStatus from "./components/leads-status";
 import SelectTableType from "./components/select-table-type";
 import { tasksMockedData } from "./table-helper";
 import { tasksColumns } from "./table-helper";
+import { LeadsContext } from "providers/leads";
 
 const LeadsPage = () => {
   const { t } = useTranslation();
@@ -41,14 +41,20 @@ const LeadsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [types, setTypes] = useState([]);
+  const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
   const [selectedTable, setSelectedTable] = useState("leads");
   const [tableIcons, setTableIcons] = useState([]);
 
-  const { getTypes, deleteType, deleteMultipleTypes } =
-    useContext(TasksContext);
+  const {
+    getLeads,
+    deleteLead,
+    deleteMultipleLeads,
+    createLead,
+    editLead,
+    contractStatus,
+  } = useContext(LeadsContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -90,12 +96,12 @@ const LeadsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getTypes(
+    getLeads(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setTypes(res.items);
+      setLeads(res.items);
       setPagination(res.pages);
     });
 
@@ -171,13 +177,13 @@ const LeadsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTypes(
+    const res = await getLeads(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setTypes(res.items);
+    setLeads(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -186,14 +192,14 @@ const LeadsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTypes(
+      const res = await getLeads(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setTypes(res.items);
+      setLeads(res.items);
     }
   }, 500);
 
@@ -203,11 +209,11 @@ const LeadsPage = () => {
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
         <LeadsStatus
-          cancelled={150}
-          requested={100}
-          refused={504}
-          inProgress={231}
-          completed={173}
+          cancelled={contractStatus.cancelled}
+          requested={contractStatus.requested}
+          refused={contractStatus.refused}
+          inProgress={contractStatus.inProgress}
+          completed={contractStatus.completed}
         />
         <SelectTableType
           selectedTable={selectedTable}
@@ -236,7 +242,7 @@ const LeadsPage = () => {
 
         {selectedTable === "leads" && (
           <CustomTable
-            data={mockedData}
+            data={leads}
             columns={columns}
             title={t("Leads cadastradas")}
             icons={tableIcons}
@@ -270,7 +276,7 @@ const LeadsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={types}
+              data={leads}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -289,9 +295,9 @@ const LeadsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteType(deleteId);
+          const response = await deleteLead(deleteId);
           if (response) {
-            setTypes(types.filter((category) => category.id !== deleteId));
+            setLeads(leads.filter((category) => category.id !== deleteId));
           }
 
           setIsLoading(false);
@@ -306,7 +312,7 @@ const LeadsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTypes(selected, setTypes, types);
+          await deleteMultipleLeads(selected, setLeads, leads);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -320,17 +326,18 @@ const LeadsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const originsCopy = [...types];
+              const originsCopy = [...leads];
               const index = originsCopy.findIndex(
                 (item) => item.id === origin.id
               );
               originsCopy[index] = origin;
-              setTypes(originsCopy);
+              setLeads(originsCopy);
             }}
             event="edit"
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
+            onEdit={editLead}
           />
         }
         formRef={categoryRef}
@@ -349,9 +356,10 @@ const LeadsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setTypes([origin, ...types]);
+              setLeads([origin, ...leads]);
             }}
             setLoading={setIsLoading}
+            onAdd={createLead}
           />
         }
         formRef={categoryRef}

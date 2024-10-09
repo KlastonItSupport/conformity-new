@@ -53,6 +53,7 @@ import { CrmServicesProvider } from "providers/crm-services";
 import { CrmProvider } from "providers/crm";
 import { ContractProvider } from "providers/contract";
 import { ProjectProvider } from "providers/projects";
+import { LeadsProvider } from "providers/leads";
 
 const routes = createBrowserRouter([
   {
@@ -185,16 +186,18 @@ ReactDOM.render(
                               <IndicatorsProvider>
                                 <IndicatorsAnswerProvider>
                                   <CrmProvider>
-                                    <CrmServicesProvider>
-                                      <ContractProvider>
-                                        <ToastContainer />
-                                        <React.StrictMode>
-                                          <ThemeEditorProvider>
-                                            <RouterProvider router={routes} />
-                                          </ThemeEditorProvider>
-                                        </React.StrictMode>
-                                      </ContractProvider>
-                                    </CrmServicesProvider>
+                                    <LeadsProvider>
+                                      <CrmServicesProvider>
+                                        <ContractProvider>
+                                          <ToastContainer />
+                                          <React.StrictMode>
+                                            <ThemeEditorProvider>
+                                              <RouterProvider router={routes} />
+                                            </ThemeEditorProvider>
+                                          </React.StrictMode>
+                                        </ContractProvider>
+                                      </CrmServicesProvider>
+                                    </LeadsProvider>
                                   </CrmProvider>
                                 </IndicatorsAnswerProvider>
                               </IndicatorsProvider>

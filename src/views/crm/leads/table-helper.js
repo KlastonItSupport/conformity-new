@@ -1,13 +1,15 @@
+import { Text } from "@chakra-ui/react";
 import moment from "moment";
+import HtmlParser from "react-html-parser";
 
 export const columns = [
   {
     header: "Usuário",
-    access: "user",
+    access: "username",
   },
   {
     header: "Cliente / Fornecedor",
-    access: "clientName",
+    access: "crmCompanyName",
   },
   {
     header: "Status",
@@ -23,16 +25,20 @@ export const columns = [
   },
   {
     header: "Telefone",
-    access: "phone",
+    access: "celphone",
   },
   {
     header: "Descrição",
     access: "description",
+    formatData: (data) => {
+      return <Text>{HtmlParser(data)}</Text>;
+    },
   },
   {
     header: "Última atualização",
     access: "updatedAt",
-    formatData: (data) => moment(data).format("DD/MM/YYYY"),
+    formatData: (data) =>
+      data ? moment(data).format("DD/MM/YYYY HH:mm") : "Não houve atualizações",
   },
 ];
 
