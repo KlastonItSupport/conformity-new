@@ -177,7 +177,7 @@ export const tasksColumns = [
   },
   {
     header: "Usuário",
-    access: "user",
+    access: "userName",
   },
   {
     header: "Descrição",

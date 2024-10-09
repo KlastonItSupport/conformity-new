@@ -54,6 +54,7 @@ import { CrmProvider } from "providers/crm";
 import { ContractProvider } from "providers/contract";
 import { ProjectProvider } from "providers/projects";
 import { LeadsProvider } from "providers/leads";
+import { LeadTaskProvider } from "providers/leads-task";
 
 const routes = createBrowserRouter([
   {
@@ -187,16 +188,20 @@ ReactDOM.render(
                                 <IndicatorsAnswerProvider>
                                   <CrmProvider>
                                     <LeadsProvider>
-                                      <CrmServicesProvider>
-                                        <ContractProvider>
-                                          <ToastContainer />
-                                          <React.StrictMode>
-                                            <ThemeEditorProvider>
-                                              <RouterProvider router={routes} />
-                                            </ThemeEditorProvider>
-                                          </React.StrictMode>
-                                        </ContractProvider>
-                                      </CrmServicesProvider>
+                                      <LeadTaskProvider>
+                                        <CrmServicesProvider>
+                                          <ContractProvider>
+                                            <ToastContainer />
+                                            <React.StrictMode>
+                                              <ThemeEditorProvider>
+                                                <RouterProvider
+                                                  router={routes}
+                                                />
+                                              </ThemeEditorProvider>
+                                            </React.StrictMode>
+                                          </ContractProvider>
+                                        </CrmServicesProvider>
+                                      </LeadTaskProvider>
                                     </LeadsProvider>
                                   </CrmProvider>
                                 </IndicatorsAnswerProvider>

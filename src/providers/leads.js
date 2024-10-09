@@ -8,7 +8,7 @@ const LeadsContext = createContext();
 
 const LeadsProvider = ({ children }) => {
   const { getToken } = useContext(AuthContext);
-  const [contractStatus, setContractStatus] = useState([]);
+  const [leadsStatus, setLeadsStatus] = useState([]);
 
   const getLeads = async (page = 1, search = "") => {
     const response = await api.get(`/leads?page=${page}&search=${search}`, {
@@ -76,7 +76,7 @@ const LeadsProvider = ({ children }) => {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setContractStatus(res.data);
+    setLeadsStatus(res.data);
   };
   return (
     <LeadsContext.Provider
@@ -86,7 +86,7 @@ const LeadsProvider = ({ children }) => {
         deleteMultipleLeads,
         createLead,
         editLead,
-        contractStatus,
+        leadsStatus,
       }}
     >
       {children}

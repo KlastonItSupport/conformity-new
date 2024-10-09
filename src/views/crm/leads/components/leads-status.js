@@ -9,6 +9,7 @@ const LeadsStatus = ({
   cancelled,
   inProgress,
   completed,
+  total,
 }) => {
   const bgColor = useColorModeValue("gray.100", "gray.700");
   const { isDesktop } = useBreakpoint();
@@ -53,7 +54,7 @@ const LeadsStatus = ({
         color={"header.100"}
         mb={{ sm: "10px", md: "1px", lg: "0px" }}
       >
-        (2061) Leads Por Status
+        ({total}) Leads Por Status
       </Text>
       {isDesktop ? (
         <>

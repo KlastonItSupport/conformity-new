@@ -2,7 +2,7 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NotePencil, Trash, CheckFat, Gear } from "@phosphor-icons/react";
+import { NotePencil, Trash, CheckFat, Gear, Info } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Box,
@@ -26,9 +26,10 @@ import { columns } from "./table-helper";
 import LeadsForm from "./components/leads-form";
 import LeadsStatus from "./components/leads-status";
 import SelectTableType from "./components/select-table-type";
-import { tasksMockedData } from "./table-helper";
 import { tasksColumns } from "./table-helper";
 import { LeadsContext } from "providers/leads";
+import { LeadTaskContext } from "providers/leads-task";
+import TaskModal from "./components/task-modal";
 
 const LeadsPage = () => {
   const { t } = useTranslation();
@@ -44,8 +45,13 @@ const LeadsPage = () => {
   const [leads, setLeads] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
+  const [paginationTasks, setPaginationTasks] = useState(null);
   const [selectedTable, setSelectedTable] = useState("leads");
+  const [tasksLeads, setTasksLeads] = useState([]);
   const [tableIcons, setTableIcons] = useState([]);
+
+  const isLeadsSelected = selectedTable === "leads";
+  const { getLeadsTasks } = useContext(LeadTaskContext);
 
   const {
     getLeads,
@@ -53,7 +59,7 @@ const LeadsPage = () => {
     deleteMultipleLeads,
     createLead,
     editLead,
-    contractStatus,
+    leadsStatus,
   } = useContext(LeadsContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
@@ -90,6 +96,12 @@ const LeadsPage = () => {
   } = useDisclosure();
 
   const {
+    isOpen: isTasksModalOpen,
+    onOpen: onTasksModalOpen,
+    onClose: onTasksModalClose,
+  } = useDisclosure();
+
+  const {
     isOpen: isAddModalOpen,
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
@@ -103,6 +115,14 @@ const LeadsPage = () => {
     ).then((res) => {
       setLeads(res.items);
       setPagination(res.pages);
+    });
+
+    getLeadsTasks(
+      searchParams.get("pageTasks") ?? 1,
+      searchParams.get("searchTasks") ?? ""
+    ).then((res) => {
+      setTasksLeads(res.items);
+      setPaginationTasks(res.pages);
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,7 +164,6 @@ const LeadsPage = () => {
             icon: <CheckFat size={20} />,
             onClickRow: (item) => {
               setEditSelected(item);
-              // onEditModalOpen();
             },
             onClickHeader: () => {},
             isDisabled: false,
@@ -163,7 +182,22 @@ const LeadsPage = () => {
             title: "Ir para serviços",
           }
         : null;
-      const icons = [tasks, services, editIcon, deleteIcon].filter(
+
+      const tasksModal = checkPermissionForAction("tasks", "canEdit")
+        ? {
+            icon: <Info size={20} />,
+            onClickRow: (item) => {
+              setSelected(item);
+              onTasksModalOpen();
+            },
+            onClickHeader: () => {},
+            isDisabled: false,
+            shouldShow: false,
+            title: "Vizualizar tarefas",
+          }
+        : null;
+
+      const icons = [tasks, services, tasksModal, editIcon, deleteIcon].filter(
         (icon) => icon !== null
       );
 
@@ -177,13 +211,21 @@ const LeadsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getLeads(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
+
+    const res = await getLeads(page, queryParams.get("search") ?? "");
+
     setPagination(res.pages);
     setLeads(res.items);
+  };
+
+  const updateDataLeadsTasks = async (page) => {
+    searchParams.set("pageTasks", page);
+    setSearchParams(searchParams);
+
+    const res = await getLeadsTasks(page, queryParams.get("searchTasks") ?? "");
+
+    setPaginationTasks(res.pages);
+    setTasksLeads(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -203,17 +245,33 @@ const LeadsPage = () => {
     }
   }, 500);
 
+  const debouncedSearchTasks = debounce(async (inputValue) => {
+    if (inputValue.length >= 1 || !inputValue.length) {
+      searchParams.set("searchTasks", inputValue);
+      searchParams.set("pageTasks", 1);
+
+      const res = await getLeadsTasks(
+        searchParams.get("pageTasks") ?? 1,
+        searchParams.get("searchTasks") ?? ""
+      );
+
+      setPaginationTasks(res.pages);
+      setTasksLeads(res.items);
+    }
+  }, 500);
+
   return (
     <>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
         <LeadsStatus
-          cancelled={contractStatus.cancelled}
-          requested={contractStatus.requested}
-          refused={contractStatus.refused}
-          inProgress={contractStatus.inProgress}
-          completed={contractStatus.completed}
+          cancelled={leadsStatus.cancelled}
+          requested={leadsStatus.requested}
+          refused={leadsStatus.refused}
+          inProgress={leadsStatus.inProgress}
+          completed={leadsStatus.completed}
+          total={leadsStatus.total}
         />
         <SelectTableType
           selectedTable={selectedTable}
@@ -261,11 +319,11 @@ const LeadsPage = () => {
         )}
         {selectedTable === "tasks" && (
           <CustomTable
-            data={tasksMockedData}
+            data={tasksLeads}
             columns={tasksColumns}
             title={t("Tarefas cadastradas")}
-            searchInputValue={searchParams.get("search") ?? ""}
-            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+            searchInputValue={searchParams.get("searchTasks") ?? ""}
+            onChangeSearchInput={(e) => debouncedSearchTasks(e.target.value)}
             iconsHasMaxW={true}
           />
         )}
@@ -276,13 +334,27 @@ const LeadsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={leads}
-              onClickPagination={updateData}
+              data={isLeadsSelected ? leads : tasksLeads}
+              onClickPagination={
+                isLeadsSelected ? updateData : updateDataLeadsTasks
+              }
               itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+              totalPages={
+                isLeadsSelected
+                  ? pagination.totalPages
+                  : paginationTasks.totalPages
+              }
+              currentPage={
+                isLeadsSelected
+                  ? pagination.currentPage
+                  : paginationTasks.currentPage
+              }
+              nextPage={
+                isLeadsSelected ? pagination.next : paginationTasks.next
+              }
+              lastPage={
+                isLeadsSelected ? pagination.last : paginationTasks.last
+              }
             />
           )}
         </Flex>
@@ -369,6 +441,14 @@ const LeadsPage = () => {
         modalSize="2xl"
         isLoading={isLoading}
       />
+      {isTasksModalOpen && (
+        <TaskModal
+          isOpen={isTasksModalOpen}
+          onClose={onTasksModalClose}
+          isLoading={isDeleteLoading}
+          id={selected.id}
+        />
+      )}
     </>
   );
 };
