@@ -50,7 +50,7 @@ const LeadsForm = ({
     setLoading(true);
 
     if (event === "add") {
-      const res = await onAdd(data);
+      const res = await onAdd({ ...data, description });
       setLoading(false);
       onClose(res);
       return;

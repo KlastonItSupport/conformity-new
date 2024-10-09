@@ -34,6 +34,11 @@ const TaskModal = ({ isOpen, onClose, id }) => {
         <ModalCloseButton />
         <ModalBody maxH={"500px"} overflowY={"scroll"}>
           <VStack alignItems={"start"}>
+            {tasks.length === 0 && (
+              <Text fontWeight={"normal"} fontSize={"lg"}>
+                Ainda não há tarefas relacionadas ao Lead
+              </Text>
+            )}
             {tasks.map((task) => (
               <HStack key={task.id} margin={"10px 0px !important"}>
                 <Text fontWeight={"bold"}>
