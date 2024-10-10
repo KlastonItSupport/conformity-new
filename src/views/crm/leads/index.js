@@ -162,9 +162,7 @@ const LeadsPage = () => {
       const tasks = checkPermissionForAction("tasks", "canEdit")
         ? {
             icon: <CheckFat size={20} />,
-            onClickRow: (item) => {
-              setEditSelected(item);
-            },
+            onClickRow: (item) => {},
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
@@ -175,7 +173,11 @@ const LeadsPage = () => {
       const services = checkPermissionForAction("tasks", "canEdit")
         ? {
             icon: <Gear size={20} />,
-            onClickRow: (item) => {},
+            onClickRow: (item) => {
+              window.open(
+                `/crm/leads/tasks/${item.id}?name=${item.crmCompanyName}`
+              );
+            },
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,

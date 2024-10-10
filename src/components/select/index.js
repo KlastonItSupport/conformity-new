@@ -29,6 +29,7 @@ const SelectInput = forwardRef(
           mb={errors ? "0" : "24px"}
           borderRadius="6px"
           bgColor={"primary.50"}
+          cursor={"pointer"}
           {...rest}
         >
           {defaultValue && (
