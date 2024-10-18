@@ -217,8 +217,8 @@ export const NavBar = () => {
           icon={<Users size={28} />}
           itemsList={[
             {
-              src: "/",
-              label: "N/A",
+              src: "/trainings",
+              label: "Treinamentos",
             },
           ]}
           key={"admin-users"}

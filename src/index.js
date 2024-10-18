@@ -56,6 +56,7 @@ import { ProjectProvider } from "providers/projects";
 import { LeadsProvider } from "providers/leads";
 import { LeadTaskProvider } from "providers/leads-task";
 import LeadsTaskDetailsPage from "views/crm/lead-task-details/lead-task-details";
+import TrainingsPage from "views/trainings/trainings";
 
 const routes = createBrowserRouter([
   {
@@ -171,6 +172,10 @@ const routes = createBrowserRouter([
   {
     path: "crm/leads/tasks/:id",
     element: <LeadsTaskDetailsPage />,
+  },
+  {
+    path: "trainings",
+    element: <TrainingsPage />,
   },
 ]);
 
