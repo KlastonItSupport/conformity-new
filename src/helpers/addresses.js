@@ -27,6 +27,7 @@ export const states = [
   { state: "Sergipe", initials: "SE" },
   { state: "Tocantins", initials: "TO" },
 ];
+
 export const cityAccordingToState = {
   estados: [
     {
