@@ -221,6 +221,10 @@ export const NavBar = () => {
               label: "Treinamentos",
             },
             {
+              src: "/trainings/users-training",
+              label: "Meus treinamentos",
+            },
+            {
               src: "/trainings/schools",
               label: "Escolas",
             },
