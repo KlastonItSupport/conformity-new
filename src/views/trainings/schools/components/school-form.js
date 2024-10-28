@@ -67,7 +67,7 @@ const SchoolForm = ({
         error={errors.state?.message}
         options={statesOptions}
         defaultValue={
-          formValues && formValues.state
+          formValues && formValues?.state
             ? {
                 label: states.find(
                   (state) => state.initials === formValues.state
@@ -76,7 +76,7 @@ const SchoolForm = ({
               }
             : {
                 label: "Selecione um estado",
-                value: "not-selected",
+                value: "",
               }
         }
         onChange={(e) => {
@@ -115,7 +115,7 @@ const SchoolForm = ({
               }
             : {
                 label: "Selecione uma empresa",
-                value: "not-selected",
+                value: "",
               }
         }
         options={companyOptions}
@@ -195,7 +195,7 @@ const SchoolForm = ({
               }
             : {
                 label: "Selecione uma cidade",
-                value: "not-selected",
+                value: "",
               }
         }
         options={cityOptions}
