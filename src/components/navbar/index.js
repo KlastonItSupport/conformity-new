@@ -228,6 +228,10 @@ export const NavBar = () => {
               src: "/trainings/schools",
               label: "Escolas",
             },
+            {
+              src: "/trainings/matriz",
+              label: "Matriz",
+            },
           ]}
           key={"admin-users"}
         />

@@ -59,6 +59,7 @@ import LeadsTaskDetailsPage from "views/crm/lead-task-details/lead-task-details"
 import TrainingsPage from "views/trainings/trainings";
 import SchoolsPage from "views/trainings/schools";
 import TrainingUsers from "views/trainings/users-training";
+import MatrizPage from "views/trainings/matriz";
 
 const routes = createBrowserRouter([
   {
@@ -186,6 +187,10 @@ const routes = createBrowserRouter([
   {
     path: "/trainings/users-training",
     element: <TrainingUsers />,
+  },
+  {
+    path: "/trainings/matriz",
+    element: <MatrizPage />,
   },
 ]);
 

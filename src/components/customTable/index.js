@@ -202,7 +202,10 @@ const TableCustom = ({
             border={"1px solid #ddd"}
           >
             <Text display={"flex"} alignItems={"center"}>
-              {column.header} {checkSortDirection(column.access)}
+              {column.customHeader
+                ? column.customHeader(column)
+                : column.header}{" "}
+              {checkSortDirection(column.access)}
             </Text>
           </Th>
         )
