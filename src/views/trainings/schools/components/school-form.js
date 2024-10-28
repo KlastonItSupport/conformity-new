@@ -1,25 +1,24 @@
 import { HStack, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import SelectInput from "components/select";
 import { states } from "helpers/addresses";
 import { cityAccordingToState } from "helpers/addresses";
+import { AuthContext } from "providers/auth";
+import { CompanyContext } from "providers/company";
 
-const contractSchema = Yup.object().shape({
-  title: Yup.string(),
-  status: Yup.string(),
-  crmCompanyId: Yup.string(),
-  startDate: Yup.string(),
-  endDate: Yup.string(),
-  value: Yup.string(),
-  description: Yup.string(),
-  contract: Yup.string(),
-  solicitationMonth: Yup.string(),
-  solicitationYear: Yup.string(),
-});
+const schoolSchema = (isAdmin) =>
+  Yup.object().shape({
+    companyId: Yup.string()
+      .notOneOf(["not-selected"], "Por favor, selecione uma empresa válida.")
+      .when("isAdmin", {
+        is: true,
+        then: Yup.string().required("Campo obrigatório"),
+      }),
+  });
 
 const SchoolForm = ({
   formValues,
@@ -33,15 +32,20 @@ const SchoolForm = ({
 }) => {
   const [statesOptions, setStatesOptions] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
+  const [companyOptions, setCompanyOptions] = useState([]);
+  const { userAccessRule, getUserInfo } = useContext(AuthContext);
+  const { getCompanies } = useContext(CompanyContext);
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-  } = useForm({ resolver: yupResolver(contractSchema) });
+  } = useForm({ resolver: yupResolver(schoolSchema(userAccessRule.isAdmin)) });
 
   const onSubmit = async (data) => {
     setLoading(true);
+    if (!data.companyId) {
+      data.companyId = getUserInfo().companyId;
+    }
 
     if (event === "add") {
       const res = await onAdd(data);
@@ -50,8 +54,7 @@ const SchoolForm = ({
       return;
     }
 
-    const res = await onEdit(id, data);
-
+    const res = await onEdit(data, id);
     setLoading(false);
     onClose(res);
   };
@@ -63,6 +66,19 @@ const SchoolForm = ({
         {...register("state")}
         error={errors.state?.message}
         options={statesOptions}
+        defaultValue={
+          formValues && formValues.state
+            ? {
+                label: states.find(
+                  (state) => state.initials === formValues.state
+                ).state,
+                value: formValues.state,
+              }
+            : {
+                label: "Selecione um estado",
+                value: "not-selected",
+              }
+        }
         onChange={(e) => {
           const stateInput = e.target.value;
 
@@ -89,50 +105,21 @@ const SchoolForm = ({
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
         label={"Empresa"}
-        {...register("companyName")}
-        error={errors.companyName?.message}
-        options={[
-          {
-            label: "Empresa 1",
-            value: "Empresa 1",
-          },
-          {
-            label: "Empresa 2",
-            value: "Empresa 2",
-          },
-          {
-            label: "Empresa 3",
-            value: "Empresa 3",
-          },
-          {
-            label: "Empresa 4",
-            value: "Empresa 4",
-          },
-          {
-            label: "Empresa 5",
-            value: "Empresa 5",
-          },
-          {
-            label: "Empresa 6",
-            value: "Empresa 6",
-          },
-          {
-            label: "Empresa 7",
-            value: "Empresa 7",
-          },
-          {
-            label: "Empresa 8",
-            value: "Empresa 8",
-          },
-          {
-            label: "Empresa 9",
-            value: "Empresa 9",
-          },
-          {
-            label: "Empresa 10",
-            value: "Empresa 10",
-          },
-        ]}
+        {...register("companyId")}
+        error={errors.companyId?.message}
+        defaultValue={
+          formValues && formValues.companyId
+            ? {
+                label: formValues.companyName,
+                value: formValues.companyId,
+              }
+            : {
+                label: "Selecione uma empresa",
+                value: "not-selected",
+              }
+        }
+        options={companyOptions}
+        errors={errors.companyId}
       />
     </VStack>
   );
@@ -200,6 +187,17 @@ const SchoolForm = ({
         label={"Cidade"}
         {...register("city")}
         error={errors.city?.message}
+        defaultValue={
+          formValues && formValues.city
+            ? {
+                label: formValues.city,
+                value: formValues.city,
+              }
+            : {
+                label: "Selecione uma cidade",
+                value: "not-selected",
+              }
+        }
         options={cityOptions}
       />
     </VStack>
@@ -217,9 +215,16 @@ const SchoolForm = ({
       }),
     ]);
 
-    if (event === "edit") {
-      setValue();
-    }
+    getCompanies("", 1, 10000).then((companies) => {
+      setCompanyOptions(
+        companies.map((company) => {
+          return {
+            label: company.name,
+            value: company.id,
+          };
+        })
+      );
+    });
   }, []);
 
   return (
@@ -230,7 +235,7 @@ const SchoolForm = ({
       w={"100%"}
       alignItems={"start"}
     >
-      {companySelect}
+      {userAccessRule.isAdmin && companySelect}
       {schoolNameInput}
       {emailInput}
       {celphoneInput}

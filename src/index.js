@@ -60,6 +60,7 @@ import TrainingsPage from "views/trainings/trainings";
 import SchoolsPage from "views/trainings/schools";
 import TrainingUsers from "views/trainings/users-training";
 import MatrizPage from "views/trainings/matriz";
+import { SchoolProvider } from "providers/schools";
 
 const routes = createBrowserRouter([
   {
@@ -212,22 +213,24 @@ ReactDOM.render(
                               <IndicatorsProvider>
                                 <IndicatorsAnswerProvider>
                                   <CrmProvider>
-                                    <LeadsProvider>
-                                      <LeadTaskProvider>
-                                        <CrmServicesProvider>
-                                          <ContractProvider>
-                                            <ToastContainer />
-                                            <React.StrictMode>
-                                              <ThemeEditorProvider>
-                                                <RouterProvider
-                                                  router={routes}
-                                                />
-                                              </ThemeEditorProvider>
-                                            </React.StrictMode>
-                                          </ContractProvider>
-                                        </CrmServicesProvider>
-                                      </LeadTaskProvider>
-                                    </LeadsProvider>
+                                    <SchoolProvider>
+                                      <LeadsProvider>
+                                        <LeadTaskProvider>
+                                          <CrmServicesProvider>
+                                            <ContractProvider>
+                                              <ToastContainer />
+                                              <React.StrictMode>
+                                                <ThemeEditorProvider>
+                                                  <RouterProvider
+                                                    router={routes}
+                                                  />
+                                                </ThemeEditorProvider>
+                                              </React.StrictMode>
+                                            </ContractProvider>
+                                          </CrmServicesProvider>
+                                        </LeadTaskProvider>
+                                      </LeadsProvider>
+                                    </SchoolProvider>
                                   </CrmProvider>
                                 </IndicatorsAnswerProvider>
                               </IndicatorsProvider>

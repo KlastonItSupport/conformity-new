@@ -22,9 +22,9 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { CrmServicesContext } from "providers/crm-services";
 import { mockedData } from "./table-helper";
 import SchoolForm from "./components/school-form";
+import { SchoolContext } from "providers/schools";
 
 const SchoolsPage = () => {
   const { t } = useTranslation();
@@ -38,17 +38,17 @@ const SchoolsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [services, setServices] = useState([]);
+  const [schools, setSchools] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
   const {
-    getServices,
-    createService,
-    deleteService,
-    deleteMultipleservices,
-    editService,
-  } = useContext(CrmServicesContext);
+    getSchools,
+    deleteSchool,
+    deleteMultipleSchools,
+    createSchool,
+    editSchool,
+  } = useContext(SchoolContext);
 
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
@@ -90,12 +90,12 @@ const SchoolsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getServices(
+    getSchools(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setServices(res.items);
+      setSchools(res.items);
       setPagination(res.pages);
     });
 
@@ -147,13 +147,13 @@ const SchoolsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getServices(
+    const res = await getSchools(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setServices(res.items);
+    setSchools(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -162,14 +162,14 @@ const SchoolsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getServices(
+      const res = await getSchools(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setServices(res.items);
+      setSchools(res.items);
     }
   }, 500);
 
@@ -197,7 +197,7 @@ const SchoolsPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={schools}
           columns={columns}
           title={t("Escolas")}
           icons={tableIcons}
@@ -239,11 +239,9 @@ const SchoolsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteService(deleteId);
+          const response = await deleteSchool(deleteId);
           if (response) {
-            setServices(
-              services.filter((category) => category.id !== deleteId)
-            );
+            setSchools(schools.filter((category) => category.id !== deleteId));
           }
 
           setIsLoading(false);
@@ -258,7 +256,7 @@ const SchoolsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleservices(selected, setServices, services);
+          await deleteMultipleSchools(selected, setSchools, schools);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -272,15 +270,15 @@ const SchoolsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const servicesCopy = [...services];
+              const servicesCopy = [...schools];
               const index = servicesCopy.findIndex(
                 (item) => item.id === origin.id
               );
               servicesCopy[index] = origin;
-              setServices(servicesCopy);
+              setSchools(servicesCopy);
             }}
             event="edit"
-            onEdit={editService}
+            onEdit={editSchool}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -302,10 +300,10 @@ const SchoolsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setServices([origin, ...services]);
+              setSchools([origin, ...schools]);
             }}
             event="add"
-            onAdd={createService}
+            onAdd={createSchool}
             setLoading={setIsLoading}
           />
         }
