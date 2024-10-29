@@ -22,7 +22,6 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { mockedData } from "./table-helper";
 import TrainingForm from "./components/training-form";
 import { TrainingContext } from "providers/trainings";
 
@@ -219,7 +218,7 @@ const TrainingsPage = () => {
         >
           {pagination && (
             <Pagination
-              data={mockedData}
+              data={trainings}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
