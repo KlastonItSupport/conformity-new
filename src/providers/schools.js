@@ -8,10 +8,13 @@ const SchoolContext = createContext();
 const SchoolProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
 
-  const getSchools = async (page = 1, search = "") => {
-    const response = await api.get(`/schools?page=${page}&search=${search}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    });
+  const getSchools = async (page = 1, search = "", limit = 10) => {
+    const response = await api.get(
+      `/schools?page=${page}&search=${search}&pageSize=${limit}`,
+      {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }
+    );
 
     return response.data;
   };

@@ -22,9 +22,9 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { CrmServicesContext } from "providers/crm-services";
 import { mockedData } from "./table-helper";
 import TrainingForm from "./components/training-form";
+import { TrainingContext } from "providers/trainings";
 
 const TrainingsPage = () => {
   const { t } = useTranslation();
@@ -38,18 +38,17 @@ const TrainingsPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [services, setServices] = useState([]);
+  const [trainings, setTrainings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
   const {
-    getServices,
-    createService,
-    deleteService,
-    deleteMultipleservices,
-    editService,
-  } = useContext(CrmServicesContext);
-
+    getTrainings,
+    deleteTraining,
+    deleteMultipleTrainings,
+    createTraining,
+    editTraining,
+  } = useContext(TrainingContext);
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
 
@@ -90,12 +89,12 @@ const TrainingsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    getServices(
+    getTrainings(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
     ).then((res) => {
-      setServices(res.items);
+      setTrainings(res.items);
       setPagination(res.pages);
     });
 
@@ -147,13 +146,13 @@ const TrainingsPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getServices(
+    const res = await getTrainings(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setServices(res.items);
+    setTrainings(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -162,14 +161,14 @@ const TrainingsPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getServices(
+      const res = await getTrainings(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setServices(res.items);
+      setTrainings(res.items);
     }
   }, 500);
 
@@ -197,7 +196,7 @@ const TrainingsPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={trainings}
           columns={columns}
           title={t("Treinamentos")}
           icons={tableIcons}
@@ -239,10 +238,10 @@ const TrainingsPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteService(deleteId);
+          const response = await deleteTraining(deleteId);
           if (response) {
-            setServices(
-              services.filter((category) => category.id !== deleteId)
+            setTrainings(
+              trainings.filter((category) => category.id !== deleteId)
             );
           }
 
@@ -258,7 +257,7 @@ const TrainingsPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleservices(selected, setServices, services);
+          await deleteMultipleTrainings(selected, setTrainings, trainings);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -272,15 +271,15 @@ const TrainingsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const servicesCopy = [...services];
+              const servicesCopy = [...trainings];
               const index = servicesCopy.findIndex(
                 (item) => item.id === origin.id
               );
               servicesCopy[index] = origin;
-              setServices(servicesCopy);
+              setTrainings(servicesCopy);
             }}
             event="edit"
-            onEdit={editService}
+            onEdit={editTraining}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -302,10 +301,10 @@ const TrainingsPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setServices([origin, ...services]);
+              setTrainings([origin, ...trainings]);
             }}
             event="add"
-            onAdd={createService}
+            onAdd={createTraining}
             setLoading={setIsLoading}
           />
         }
