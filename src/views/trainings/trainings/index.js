@@ -102,7 +102,7 @@ const TrainingsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("tasks", "canDelete")
+      const deleteIcon = checkPermissionForAction("trainings", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -118,7 +118,7 @@ const TrainingsPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("tasks", "canEdit")
+      const editIcon = checkPermissionForAction("trainings", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -190,7 +190,7 @@ const TrainingsPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             minW="150px"
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
+            disabled={!checkPermissionForAction("trainings", "canAdd")}
           />
         </HStack>
 
