@@ -2,8 +2,13 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns } from "./table-helper";
-import { Folder, NotePencil, Trash } from "@phosphor-icons/react";
+import { columns, mockedData } from "./table-helper";
+import {
+  Download,
+  DownloadSimple,
+  NotePencil,
+  Trash,
+} from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -22,10 +27,11 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import MyTrainingForm from "./components/my-training-form";
-import { TrainingsUserContext } from "providers/trainings-user";
+import { TrainingContext } from "providers/trainings";
+import FileForm from "components/forms/file-form";
+import CertificateDetails from "./components/certificate-details";
 
-const TrainingUsers = () => {
+const TrainingCertificatesPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,33 +43,34 @@ const TrainingUsers = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [usersTrainings, setUsersTrainings] = useState([]);
+  const [trainings, setTrainings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
   const {
-    getUserTrainings,
+    getTrainings,
     deleteTraining,
     deleteMultipleTrainings,
     createTraining,
     editTraining,
-  } = useContext(TrainingsUserContext);
-
-  const {
-    userPermissions,
-    userAccessRule,
-    checkPermissionForAction,
-    getUserInfo,
-  } = useContext(AuthContext);
+  } = useContext(TrainingContext);
+  const { userPermissions, userAccessRule, checkPermissionForAction } =
+    useContext(AuthContext);
 
   const routeTreePaths = [
     {
       path: "/",
       label: "Dashboard",
+      isCurrent: false,
     },
     {
-      path: "/trainings/users-training",
-      label: "Meus Treinamentos",
+      path: "/trainings",
+      label: "Meus treinamentos",
+      isCurrent: false,
+    },
+    {
+      path: "/trainings/certificates",
+      label: "Certificados",
       isCurrent: true,
     },
   ];
@@ -81,46 +88,25 @@ const TrainingUsers = () => {
   } = useDisclosure();
 
   const {
-    isOpen: isEditModalOpen,
-    onOpen: onEditModalOpen,
-    onClose: onEditModalClose,
-  } = useDisclosure();
-
-  const {
     isOpen: isAddModalOpen,
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
   } = useDisclosure();
 
   useEffect(() => {
-    getUserTrainings(
-      searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
-    ).then((res) => {
-      setUsersTrainings(res.items);
-      setPagination(res.pages);
-    });
-
+    // getTrainings(
+    //   searchParams.get("page") ?? 1,
+    //   searchParams.get("search") ?? "",
+    //   setPagination
+    // ).then((res) => {
+    //   setTrainings(res.items);
+    //   setPagination(res.pages);
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     const updateIcons = () => {
-      const folderIcon = checkPermissionForAction("trainings", "canAdd")
-        ? {
-            icon: <Folder size={20} />,
-            onClickRow: (item) =>
-              window.open(`/trainings/certificates/${item.id}`),
-
-            onClickHeader: (selecteds) => {
-              setSelected(selecteds);
-              onDeleteMultipleModalOpen();
-            },
-            isDisabled: false,
-            shouldShow: true,
-          }
-        : null;
       const deleteIcon = checkPermissionForAction("trainings", "canDelete")
         ? {
             icon: <Trash size={20} />,
@@ -137,22 +123,20 @@ const TrainingUsers = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("trainings", "canEdit")
+      const downloadItem = checkPermissionForAction("trainings", "canDownload")
         ? {
-            icon: <NotePencil size={20} />,
+            icon: <DownloadSimple size={20} />,
             onClickRow: (item) => {
-              setEditSelected(item);
-              onEditModalOpen();
+              window.open(`/trainings/certificates/${item.id}`);
             },
             onClickHeader: () => {},
+
             isDisabled: false,
             shouldShow: false,
           }
         : null;
 
-      const icons = [folderIcon, editIcon, deleteIcon].filter(
-        (icon) => icon !== null
-      );
+      const icons = [downloadItem, deleteIcon].filter((icon) => icon !== null);
 
       setTableIcons(icons);
     };
@@ -166,13 +150,13 @@ const TrainingUsers = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getUserTrainings(
+    const res = await getTrainings(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setUsersTrainings(res.items);
+    setTrainings(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -181,14 +165,14 @@ const TrainingUsers = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getUserTrainings(
+      const res = await getTrainings(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setUsersTrainings(res.items);
+      setTrainings(res.items);
     }
   }, 500);
 
@@ -214,11 +198,12 @@ const TrainingUsers = () => {
             disabled={!checkPermissionForAction("trainings", "canAdd")}
           />
         </HStack>
+        <CertificateDetails />
 
         <CustomTable
-          data={usersTrainings}
+          data={mockedData}
           columns={columns}
-          title={t(`Treinamentos de ${getUserInfo().name}`)}
+          title={t("Certificados")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -239,7 +224,7 @@ const TrainingUsers = () => {
         >
           {pagination && (
             <Pagination
-              data={usersTrainings}
+              data={trainings}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -251,8 +236,8 @@ const TrainingUsers = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Treinamento")}
-        subtitle={t("Tem certeza de que deseja excluir esta Treinamento?")}
+        title={t("Excluir Certificado")}
+        subtitle={t("Tem certeza de que deseja excluir este Certificado?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -260,8 +245,8 @@ const TrainingUsers = () => {
 
           const response = await deleteTraining(deleteId);
           if (response) {
-            setUsersTrainings(
-              usersTrainings.filter((category) => category.id !== deleteId)
+            setTrainings(
+              trainings.filter((category) => category.id !== deleteId)
             );
           }
 
@@ -271,69 +256,34 @@ const TrainingUsers = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Treinamentos")}
-        subtitle={t("Tem certeza de que deseja excluir estas Treinamentos?")}
+        title={t("Excluir Certificados?")}
+        subtitle={t("Tem certeza de que deseja excluir estes Certificados?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTrainings(
-            selected,
-            setUsersTrainings,
-            usersTrainings
-          );
+          await deleteMultipleTrainings(selected, setTrainings, trainings);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
         isLoading={isDeleteLoading}
-      />
-      <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
-        form={
-          <MyTrainingForm
-            formRef={categoryRef}
-            onClose={(origin) => {
-              onEditModalClose();
-              const servicesCopy = [...usersTrainings];
-              const index = servicesCopy.findIndex(
-                (item) => item.id === origin.id
-              );
-              servicesCopy[index] = origin;
-              setUsersTrainings(servicesCopy);
-            }}
-            event="edit"
-            onEdit={editTraining}
-            id={editSelected.id}
-            formValues={editSelected}
-            setLoading={setIsLoading}
-          />
-        }
-        formRef={categoryRef}
-        title={t("Editar Treinamento")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Editar")}
-        modalSize="lg"
-        isLoading={isLoading}
       />
 
       <ModalForm
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <MyTrainingForm
+          <FileForm
             formRef={categoryRef}
-            onClose={(origin) => {
-              onAddModalClose();
-              setUsersTrainings([origin, ...usersTrainings]);
-            }}
-            event="add"
-            onAdd={createTraining}
-            setLoading={setIsLoading}
+            onClose={onAddModalClose}
+            setIsLoading={setIsLoading}
+            onSubmitForm={createTraining}
+            label={"Adicionar Certificado"}
+            acceptMultipleFiles={false}
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Treinamento")}
+        title={t("Adicionar Certificado")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
         modalSize="lg"
@@ -343,4 +293,4 @@ const TrainingUsers = () => {
   );
 };
 
-export default TrainingUsers;
+export default TrainingCertificatesPage;

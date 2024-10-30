@@ -63,6 +63,7 @@ import MatrizPage from "views/trainings/matriz";
 import { SchoolProvider } from "providers/schools";
 import { TrainingProvider } from "providers/trainings";
 import { TrainingsUserProvider } from "providers/trainings-user";
+import TrainingCertificatesPage from "views/trainings/certificates";
 
 const routes = createBrowserRouter([
   {
@@ -194,6 +195,10 @@ const routes = createBrowserRouter([
   {
     path: "/trainings/matriz",
     element: <MatrizPage />,
+  },
+  {
+    path: "/trainings/certificates/:id",
+    element: <TrainingCertificatesPage />,
   },
 ]);
 
