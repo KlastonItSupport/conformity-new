@@ -1,24 +1,23 @@
 import { Box, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import SelectInput from "components/select";
 import { CalendarCustom } from "components/calendar";
 import moment from "moment";
+import { TrainingContext } from "providers/trainings";
 
-const contractSchema = Yup.object().shape({
-  title: Yup.string(),
-  status: Yup.string(),
-  crmCompanyId: Yup.string(),
-  startDate: Yup.string(),
-  endDate: Yup.string(),
-  value: Yup.string(),
-  description: Yup.string(),
-  contract: Yup.string(),
-  solicitationMonth: Yup.string(),
-  solicitationYear: Yup.string(),
+const usersTrainingSchema = Yup.object().shape({
+  date: Yup.string().matches(
+    /^([0-2]\d|3[01])\/(0\d|1[0-2])\/\d{4}$/,
+    "Formato inválido. Use o formato dd/mm/yyyy"
+  ),
+  trainingId: Yup.string().notOneOf(
+    [""],
+    "Por favor, selecione um Treinamento válido."
+  ),
 });
 
 const MyTrainingForm = ({
@@ -33,16 +32,19 @@ const MyTrainingForm = ({
 }) => {
   const initialDateRef = useRef();
   const [isShowingCalendarCreate, setIsShowingCalendarCreate] = useState(false);
+  const { getTrainings } = useContext(TrainingContext);
+  const [trainingsOptions, setTrainingsOptions] = useState([]);
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({ resolver: yupResolver(contractSchema) });
+  } = useForm({ resolver: yupResolver(usersTrainingSchema) });
 
   const onSubmit = async (data) => {
     setLoading(true);
 
+    data.date = moment.utc(data.date, "DD/MM/YYYY").format("YYYY-MM-DD");
     if (event === "add") {
       const res = await onAdd(data);
       setLoading(false);
@@ -50,7 +52,7 @@ const MyTrainingForm = ({
       return;
     }
 
-    const res = await onEdit(id, data);
+    const res = await onEdit(data, id);
 
     setLoading(false);
     onClose(res);
@@ -59,51 +61,21 @@ const MyTrainingForm = ({
   const trainingNameInput = (
     <VStack align={"start"} w={"100%"} mt={"5px"}>
       <SelectInput
-        label={"Empresa"}
-        {...register("trainingName")}
-        error={errors.trainingName?.message}
-        options={[
-          {
-            label: "Empresa 1",
-            value: "Empresa 1",
-          },
-          {
-            label: "Empresa 2",
-            value: "Empresa 2",
-          },
-          {
-            label: "Empresa 3",
-            value: "Empresa 3",
-          },
-          {
-            label: "Empresa 4",
-            value: "Empresa 4",
-          },
-          {
-            label: "Empresa 5",
-            value: "Empresa 5",
-          },
-          {
-            label: "Empresa 6",
-            value: "Empresa 6",
-          },
-          {
-            label: "Empresa 7",
-            value: "Empresa 7",
-          },
-          {
-            label: "Empresa 8",
-            value: "Empresa 8",
-          },
-          {
-            label: "Empresa 9",
-            value: "Empresa 9",
-          },
-          {
-            label: "Empresa 10",
-            value: "Empresa 10",
-          },
-        ]}
+        label={"Treinamento"}
+        {...register("trainingId")}
+        defaultValue={
+          formValues && formValues.trainingId
+            ? {
+                label: formValues.trainingName,
+                value: formValues.trainingId,
+              }
+            : {
+                label: "Selecione um treinamento",
+                value: "",
+              }
+        }
+        options={trainingsOptions}
+        errors={errors.trainingId}
       />
     </VStack>
   );
@@ -126,7 +98,7 @@ const MyTrainingForm = ({
         borderRadius="6px"
         bgColor={"primary.50"}
         label={"Data de inicio"}
-        {...register("realizationDate")}
+        {...register("date")}
         onClick={() => setIsShowingCalendarCreate(!isShowingCalendarCreate)}
         width="100%"
         autocomplete="off"
@@ -135,8 +107,8 @@ const MyTrainingForm = ({
         }}
         error={errors.date?.message}
         defaultValue={
-          formValues && formValues.realizationDate
-            ? moment(formValues.realizationDate).format("DD/MM/YYYY")
+          formValues && formValues.date
+            ? moment(formValues.date).format("DD/MM/YYYY")
             : null
         }
       />
@@ -150,7 +122,7 @@ const MyTrainingForm = ({
 
               const formattedDate = `${day}/${month}/${year}`;
 
-              setValue("realizationDate", formattedDate);
+              setValue("date", formattedDate);
               setIsShowingCalendarCreate(!isShowingCalendarCreate);
             }}
           />
@@ -160,12 +132,17 @@ const MyTrainingForm = ({
   );
 
   useEffect(() => {
+    getTrainings(1, "", 10000).then((trainings) => {
+      setTrainingsOptions(
+        trainings.items.map((training) => {
+          return {
+            label: training.name,
+            value: training.id,
+          };
+        })
+      );
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-
-    if (event === "edit") {
-      setValue("companyName", formValues.companyName);
-      setValue("school", formValues.school);
-    }
   }, []);
 
   return (

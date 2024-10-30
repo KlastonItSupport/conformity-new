@@ -4,14 +4,14 @@ import { AuthContext } from "./auth";
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
 
-const TrainingContext = createContext();
+const TrainingsUserContext = createContext();
 
-const TrainingProvider = ({ children }) => {
-  const { getToken } = useContext(AuthContext);
+const TrainingsUserProvider = ({ children }) => {
+  const { getToken, getUserInfo } = useContext(AuthContext);
 
-  const getTrainings = async (page = 1, search = "", limit = 10) => {
+  const getUserTrainings = async (page = 1, search = "") => {
     const response = await api.get(
-      `/trainings?page=${page}&search=${search}&pageSize=${limit}`,
+      `/user-trainings?page=${page}&search=${search}`,
       {
         headers: { Authorization: `Bearer ${getToken()}` },
       }
@@ -22,8 +22,9 @@ const TrainingProvider = ({ children }) => {
 
   const createTraining = async (data) => {
     try {
-      const response = await api.post("/trainings", {
+      const response = await api.post("/user-trainings", {
         ...data,
+        userId: getUserInfo().id,
       });
 
       if (response.status === 201) {
@@ -36,7 +37,7 @@ const TrainingProvider = ({ children }) => {
   };
 
   const editTraining = async (data, id) => {
-    const response = await api.patch(`trainings/${id}`, data, {
+    const response = await api.patch(`user-trainings/${id}`, data, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
@@ -49,7 +50,7 @@ const TrainingProvider = ({ children }) => {
 
   const deleteTraining = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/trainings/${id}`);
+      const response = await api.delete(`/user-trainings/${id}`);
 
       if (response.status === 200) {
         if (showToast) {
@@ -80,9 +81,9 @@ const TrainingProvider = ({ children }) => {
   };
 
   return (
-    <TrainingContext.Provider
+    <TrainingsUserContext.Provider
       value={{
-        getTrainings,
+        getUserTrainings,
         deleteTraining,
         deleteMultipleTrainings,
         createTraining,
@@ -90,8 +91,8 @@ const TrainingProvider = ({ children }) => {
       }}
     >
       {children}
-    </TrainingContext.Provider>
+    </TrainingsUserContext.Provider>
   );
 };
 
-export { TrainingContext, TrainingProvider };
+export { TrainingsUserContext, TrainingsUserProvider };
