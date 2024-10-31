@@ -90,8 +90,7 @@ const TrainingsPage = () => {
   useEffect(() => {
     getTrainings(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
+      searchParams.get("search") ?? ""
     ).then((res) => {
       setTrainings(res.items);
       setPagination(res.pages);
@@ -138,18 +137,14 @@ const TrainingsPage = () => {
 
     updateIcons();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userPermissions, userAccessRule]); // Atualiza os ícones quando userPermissions muda
+  }, [userPermissions, userAccessRule]);
 
   const [tableIcons, setTableIcons] = useState([]);
 
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTrainings(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
+    const res = await getTrainings(page, queryParams.get("search") ?? "");
     setPagination(res.pages);
     setTrainings(res.items);
   };
@@ -162,8 +157,7 @@ const TrainingsPage = () => {
       setSearchParams(searchParams);
       const res = await getTrainings(
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? "",
-        setPagination
+        searchParams.get("search") ?? ""
       );
 
       setPagination(res.pages);
