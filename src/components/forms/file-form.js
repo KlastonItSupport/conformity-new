@@ -1,7 +1,6 @@
 import { FormInput } from "components/components";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useLocation } from "react-router-dom";
 import { handlingMultipleFilesToBase64 } from "helpers/buffer-to-base-64";
 import * as Yup from "yup";
 
@@ -16,6 +15,7 @@ const FileForm = ({
   onSubmitForm,
   label,
   acceptMultipleFiles = true,
+  id,
 }) => {
   const {
     handleSubmit,
@@ -25,20 +25,17 @@ const FileForm = ({
     resolver: yupResolver(extraDocumentsSchema),
   });
 
-  const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-
   const onSubmit = async (data) => {
     setIsLoading(true);
 
     const fileTreated = await handlingMultipleFilesToBase64(data.documents);
-    await onSubmitForm({
+    const res = await onSubmitForm({
       documents: fileTreated,
-      id: queryParams.get("id"),
+      id,
     });
 
     setIsLoading(false);
-    onClose();
+    onClose(res);
   };
   return (
     <form

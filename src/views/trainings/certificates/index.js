@@ -2,13 +2,8 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns, mockedData } from "./table-helper";
-import {
-  Download,
-  DownloadSimple,
-  NotePencil,
-  Trash,
-} from "@phosphor-icons/react";
+import { columns } from "./table-helper";
+import { DownloadSimple, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -22,14 +17,14 @@ import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
 
 import { ModalForm } from "components/components";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
-import { TrainingContext } from "providers/trainings";
 import FileForm from "components/forms/file-form";
 import CertificateDetails from "./components/certificate-details";
+import { CertificatesContext } from "providers/certificates";
 
 const TrainingCertificatesPage = () => {
   const { t } = useTranslation();
@@ -37,23 +32,24 @@ const TrainingCertificatesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
   const categoryRef = useRef();
+  const { id } = useParams();
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
-  const [editSelected, setEditSelected] = useState(false);
-  const [trainings, setTrainings] = useState([]);
+  const [certificates, setCertificates] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
   const {
-    getTrainings,
-    deleteTraining,
-    deleteMultipleTrainings,
-    createTraining,
-    editTraining,
-  } = useContext(TrainingContext);
+    getCertificates,
+    deleteCertificate,
+    deleteMultipleCertificates,
+    createCertificate,
+    getCertificatesDetails,
+  } = useContext(CertificatesContext);
+
   const { userPermissions, userAccessRule, checkPermissionForAction } =
     useContext(AuthContext);
 
@@ -64,7 +60,7 @@ const TrainingCertificatesPage = () => {
       isCurrent: false,
     },
     {
-      path: "/trainings",
+      path: "/trainings/users-training",
       label: "Meus treinamentos",
       isCurrent: false,
     },
@@ -94,14 +90,14 @@ const TrainingCertificatesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    // getTrainings(
-    //   searchParams.get("page") ?? 1,
-    //   searchParams.get("search") ?? "",
-    //   setPagination
-    // ).then((res) => {
-    //   setTrainings(res.items);
-    //   setPagination(res.pages);
-    // });
+    getCertificates(
+      searchParams.get("page") ?? 1,
+      searchParams.get("search") ?? "",
+      id
+    ).then((res) => {
+      setCertificates(res.items);
+      setPagination(res.pages);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -127,7 +123,7 @@ const TrainingCertificatesPage = () => {
         ? {
             icon: <DownloadSimple size={20} />,
             onClickRow: (item) => {
-              window.open(`/trainings/certificates/${item.id}`);
+              window.open(item.link, "_blank");
             },
             onClickHeader: () => {},
 
@@ -150,13 +146,13 @@ const TrainingCertificatesPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getTrainings(
+    const res = await getCertificates(
       page,
       queryParams.get("search") ?? "",
-      setPagination
+      id
     );
     setPagination(res.pages);
-    setTrainings(res.items);
+    setCertificates(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -165,14 +161,14 @@ const TrainingCertificatesPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getTrainings(
+      const res = await getCertificates(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
-        setPagination
+        id
       );
 
       setPagination(res.pages);
-      setTrainings(res.items);
+      setCertificates(res.items);
     }
   }, 500);
 
@@ -198,10 +194,13 @@ const TrainingCertificatesPage = () => {
             disabled={!checkPermissionForAction("trainings", "canAdd")}
           />
         </HStack>
-        <CertificateDetails />
+        <CertificateDetails
+          getCertificatesDetails={getCertificatesDetails}
+          id={id}
+        />
 
         <CustomTable
-          data={mockedData}
+          data={certificates}
           columns={columns}
           title={t("Certificados")}
           icons={tableIcons}
@@ -224,7 +223,7 @@ const TrainingCertificatesPage = () => {
         >
           {pagination && (
             <Pagination
-              data={trainings}
+              data={certificates}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -243,10 +242,10 @@ const TrainingCertificatesPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteTraining(deleteId);
+          const response = await deleteCertificate(deleteId);
           if (response) {
-            setTrainings(
-              trainings.filter((category) => category.id !== deleteId)
+            setCertificates(
+              certificates.filter((category) => category.id !== deleteId)
             );
           }
 
@@ -262,7 +261,11 @@ const TrainingCertificatesPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleTrainings(selected, setTrainings, trainings);
+          await deleteMultipleCertificates(
+            selected,
+            setCertificates,
+            certificates
+          );
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -277,9 +280,15 @@ const TrainingCertificatesPage = () => {
             formRef={categoryRef}
             onClose={onAddModalClose}
             setIsLoading={setIsLoading}
-            onSubmitForm={createTraining}
+            onSubmitForm={async (uploads) => {
+              const newCertificates = await createCertificate({
+                documents: uploads.documents,
+                id,
+              });
+              setCertificates([...newCertificates, ...certificates]);
+            }}
+            id={id}
             label={"Adicionar Certificado"}
-            acceptMultipleFiles={false}
           />
         }
         formRef={categoryRef}

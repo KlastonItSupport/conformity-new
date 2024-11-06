@@ -1,9 +1,23 @@
 import { Box, Text } from "@chakra-ui/react";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import React from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 
-const CertificateDetails = () => {
+const CertificateDetails = ({ getCertificatesDetails, id }) => {
   const { isMobile } = useBreakpoint();
+  const [details, setDetails] = useState({
+    userName: "",
+    date: "",
+    name: "",
+  });
+
+  useEffect(() => {
+    getCertificatesDetails(id).then((res) => {
+      setDetails(res);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <Box
       w={"95vw"}
@@ -19,19 +33,19 @@ const CertificateDetails = () => {
         <Text as={"span"} fontWeight={"bold"}>
           Usuário:{" "}
         </Text>
-        Gustavo
+        {details.userName}
       </Text>
       <Text py={"5px"}>
         <Text as={"span"} fontWeight={"bold"}>
           Treinamento:{" "}
         </Text>
-        ISO-9001
+        {details.name}
       </Text>
       <Text py={"5px"}>
         <Text as={"span"} fontWeight={"bold"}>
           Vencimento:{" "}
         </Text>
-        12/12/2021
+        {moment(details.date).format("DD/MM/YYYY")}
       </Text>
     </Box>
   );
