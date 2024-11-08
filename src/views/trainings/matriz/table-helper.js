@@ -95,31 +95,3 @@ export const columns = [
   },
   ...trainings,
 ];
-
-export const mockedData = [
-  {
-    employee: "Alan Jeronymo",
-    trainingName1: "Nome 1",
-    trainingName2: "Telefone 1",
-    email: "Email 1",
-    trainingName3: "Email 1",
-  },
-  {
-    employee: "Gustavo Oliveira",
-    trainingName1: "Nome 2",
-    trainingName2: "Telefone 2",
-    trainingName3: "trainingName3 2",
-  },
-  {
-    employee: "Cristiano Barros",
-    trainingName1: "Nome 3",
-    trainingName2: "Telefone 3",
-    trainingName3: "trainingName3 3",
-  },
-  {
-    employee: "Bruno",
-    trainingName1: "Nome 4",
-    trainingName2: "Telefone 4",
-    trainingName3: "trainingName3 4",
-  },
-];

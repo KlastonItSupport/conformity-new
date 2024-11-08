@@ -28,11 +28,14 @@ const UserProvider = ({ children }) => {
     setDeleteId(id);
   };
 
-  const getUsersFromThisCompany = async (page = 1, search = "") => {
+  const getUsersFromThisCompany = async (page = 1, search = "", limit = 10) => {
     try {
-      const response = await api.get(`/users?page=${page}&search=${search}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const response = await api.get(
+        `/users?page=${page}&search=${search}&pageSize=${limit}`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
 
       setUsers(response.data.items);
       setPagination(response.data.pages);

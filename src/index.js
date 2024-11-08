@@ -65,6 +65,7 @@ import { TrainingProvider } from "providers/trainings";
 import { TrainingsUserProvider } from "providers/trainings-user";
 import TrainingCertificatesPage from "views/trainings/certificates";
 import { CertificatesProvider } from "providers/certificates";
+import { MatrizProvider } from "providers/matriz";
 
 const routes = createBrowserRouter([
   {
@@ -222,28 +223,30 @@ ReactDOM.render(
                                 <IndicatorsAnswerProvider>
                                   <CrmProvider>
                                     <TrainingProvider>
-                                      <TrainingsUserProvider>
-                                        <SchoolProvider>
-                                          <LeadsProvider>
-                                            <CertificatesProvider>
-                                              <LeadTaskProvider>
-                                                <CrmServicesProvider>
-                                                  <ContractProvider>
-                                                    <ToastContainer />
-                                                    <React.StrictMode>
-                                                      <ThemeEditorProvider>
-                                                        <RouterProvider
-                                                          router={routes}
-                                                        />
-                                                      </ThemeEditorProvider>
-                                                    </React.StrictMode>
-                                                  </ContractProvider>
-                                                </CrmServicesProvider>
-                                              </LeadTaskProvider>
-                                            </CertificatesProvider>
-                                          </LeadsProvider>
-                                        </SchoolProvider>
-                                      </TrainingsUserProvider>
+                                      <MatrizProvider>
+                                        <TrainingsUserProvider>
+                                          <SchoolProvider>
+                                            <LeadsProvider>
+                                              <CertificatesProvider>
+                                                <LeadTaskProvider>
+                                                  <CrmServicesProvider>
+                                                    <ContractProvider>
+                                                      <ToastContainer />
+                                                      <React.StrictMode>
+                                                        <ThemeEditorProvider>
+                                                          <RouterProvider
+                                                            router={routes}
+                                                          />
+                                                        </ThemeEditorProvider>
+                                                      </React.StrictMode>
+                                                    </ContractProvider>
+                                                  </CrmServicesProvider>
+                                                </LeadTaskProvider>
+                                              </CertificatesProvider>
+                                            </LeadsProvider>
+                                          </SchoolProvider>
+                                        </TrainingsUserProvider>
+                                      </MatrizProvider>
                                     </TrainingProvider>
                                   </CrmProvider>
                                 </IndicatorsAnswerProvider>

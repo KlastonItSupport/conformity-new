@@ -1,4 +1,4 @@
-import { Box, HStack, VStack } from "@chakra-ui/react";
+import { Box, HStack, Link, VStack } from "@chakra-ui/react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import { CalendarCustom } from "components/calendar";
@@ -7,10 +7,14 @@ import SelectInput from "components/select";
 import { notSelectedCleaning } from "helpers/not-selected-cleaning";
 import { sleep } from "helpers/sleep";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import { set } from "lodash";
 import moment from "moment";
-import { DepartamentContext } from "providers/departament";
+
 import { IndicatorsAnswerContext } from "providers/indicator-answer";
 import { IndicatorsContext } from "providers/indicators";
+import { MatrizContext } from "providers/matriz";
+import { TrainingContext } from "providers/trainings";
+import { UserContext } from "providers/users";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
@@ -23,7 +27,12 @@ export const filtersSchema = Yup.object().shape({
   endDate: Yup.string(),
 });
 
-const Filters = ({ formDefaultValues }) => {
+const Filters = ({
+  formDefaultValues,
+  setTrainings,
+  setPagination,
+  setColumns,
+}) => {
   const { isMobile } = useBreakpoint();
   const [isLoading, setIsLoading] = useState(false);
   const [isShowingCalendarInitial, setIsShowingCalendarInitial] =
@@ -32,13 +41,13 @@ const Filters = ({ formDefaultValues }) => {
   const endDateRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [userOptions, setUserOptions] = useState([]);
-  const [departaments, setDepartaments] = useState([]);
+  const [trainingOptions, setTrainingOptions] = useState([]);
 
   const [isShowingCalendarEnd, setIsShowingCalendarEnd] = useState(false);
-  const { getIndicators } = useContext(IndicatorsContext);
-  const { getIndicatorsAnswers } = useContext(IndicatorsAnswerContext);
+  const { getTrainings } = useContext(TrainingContext);
+  const { getMatriz, handleTableColumns } = useContext(MatrizContext);
+  const { getUsersFromThisCompany } = useContext(UserContext);
 
-  const { getDepartaments } = useContext(DepartamentContext);
   const {
     handleSubmit,
     register,
@@ -47,23 +56,24 @@ const Filters = ({ formDefaultValues }) => {
   } = useForm(filtersSchema);
 
   const handlingSelects = async () => {
-    const departaments = getDepartaments();
-    const indicators = getIndicators(1, "", 1000);
+    const users = getUsersFromThisCompany(1, "", 1000);
+    const trainings = getTrainings(1, "", 1000);
 
-    await Promise.all([departaments, indicators]).then((data) => {
-      setDepartaments(
-        data[0].map((item) => {
-          return { label: item.name, value: item.id };
+    await Promise.all([users, trainings]).then((data) => {
+      setUserOptions(
+        data[0].items.map((item) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
         })
       );
 
-      setUserOptions(
+      setTrainingOptions(
         data[1].items.map((item) => {
           return {
-            label: item.goal,
+            label: item.name,
             value: item.id,
-            dataType: item.dataType,
-            frequency: item.frequency,
           };
         })
       );
@@ -105,7 +115,7 @@ const Filters = ({ formDefaultValues }) => {
         label="Treinamento"
         {...register("trainingId")}
         errors={errors.trainingId}
-        options={departaments}
+        options={trainingOptions}
         onChange={async (e) => {
           const departamentId = e.target.value;
           const selectedOption = e.target.options[e.target.selectedIndex];
@@ -118,17 +128,17 @@ const Filters = ({ formDefaultValues }) => {
             // });
           }
 
-          const indicators = await getIndicators(
-            1,
-            "",
-            1000,
-            departamentId === "not-selected" ? "" : departamentId
-          );
-          setUserOptions(
-            indicators.items.map((item) => {
-              return { label: item.goal, value: item.id };
-            })
-          );
+          // const indicators = await getIndicators(
+          //   1,
+          //   "",
+          //   1000,
+          //   departamentId === "not-selected" ? "" : departamentId
+          // );
+          // setUserOptions(
+          //   indicators.items.map((item) => {
+          //     return { label: item.goal, value: item.id };
+          //   })
+          // );
         }}
         defaultValue={{
           label: "Selecione um Treinamento",
@@ -266,10 +276,17 @@ const Filters = ({ formDefaultValues }) => {
       );
     }
 
-    getIndicatorsAnswers(data.indicator ?? "", 1, "", 1000, {
+    const res = await getMatriz(1, "", 1000, {
       initialDate: initialFormatedDate ?? "",
       finalDate: finalFormatedDate ?? "",
+      trainingId: data.trainingId,
+      userId: data.userId,
     });
+
+    setTrainings(res.usersTrainings);
+    setPagination(res.pages);
+    setColumns(handleTableColumns(res.columnsName, setColumns));
+
     await sleep(1000);
 
     setIsLoading(false);
@@ -313,7 +330,7 @@ const Filters = ({ formDefaultValues }) => {
       as={"form"}
       onSubmit={handleSubmit(onSubmit)}
     >
-      {trainingInput} {userInput}
+      {userInput} {trainingInput}
       {initialDateInput}
       {finalDateInput}
       <ButtonPrimary

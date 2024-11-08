@@ -1,49 +1,29 @@
 import { CustomTable } from "components/components";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns } from "./table-helper";
 import { NavBar } from "components/navbar";
-import { Flex, VStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
+import { Flex, VStack, useBreakpoint } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
-import { DeleteModal } from "components/components";
 
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
-import { AuthContext } from "providers/auth";
-import { CrmServicesContext } from "providers/crm-services";
-import { mockedData } from "./table-helper";
 import Filters from "./components/filter";
-// import SchoolForm from "./components/school-form";
+import { MatrizContext } from "providers/matriz";
 
 const MatrizPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const categoryRef = useRef();
 
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
-
-  const [deleteId, setDeleteId] = useState(false);
-  const [selected, setSelected] = useState([]);
-  const [editSelected, setEditSelected] = useState(false);
-  const [services, setServices] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [trainings, setTrainings] = useState([]);
   const [pagination, setPagination] = useState(null);
+  const [columns, setColumns] = useState([]);
 
-  const {
-    getServices,
-    createService,
-    deleteService,
-    deleteMultipleservices,
-    editService,
-  } = useContext(CrmServicesContext);
-
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const { getMatriz, handleTableColumns } = useContext(MatrizContext);
 
   const routeTreePaths = [
     {
@@ -57,38 +37,14 @@ const MatrizPage = () => {
     },
   ];
 
-  const {
-    isOpen: isDeleteModalOpen,
-    onOpen: onDeleteModalOpen,
-    onClose: onDeleteModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isDeleteMultipleModalOpen,
-    onOpen: onDeleteMultipleModalOpen,
-    onClose: onDeleteMultipleModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isEditModalOpen,
-    onOpen: onEditModalOpen,
-    onClose: onEditModalClose,
-  } = useDisclosure();
-
-  const {
-    isOpen: isAddModalOpen,
-    onOpen: onAddModalOpen,
-    onClose: onAddModalClose,
-  } = useDisclosure();
-
   useEffect(() => {
-    getServices(
+    getMatriz(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
+      searchParams.get("search") ?? ""
     ).then((res) => {
-      setServices(res.items);
+      setTrainings(res.usersTrainings);
       setPagination(res.pages);
+      setColumns(handleTableColumns(res.columnsName, setColumns));
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,13 +53,9 @@ const MatrizPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getServices(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
+    const res = await getMatriz(page, queryParams.get("search") ?? "");
     setPagination(res.pages);
-    setServices(res.items);
+    setTrainings(res.usersTrainings);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -112,14 +64,13 @@ const MatrizPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getServices(
+      const res = await getMatriz(
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? "",
-        setPagination
+        searchParams.get("search") ?? ""
       );
 
       setPagination(res.pages);
-      setServices(res.items);
+      setTrainings(res.usersTrainings);
     }
   }, 500);
 
@@ -128,16 +79,22 @@ const MatrizPage = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <Filters />
-        <CustomTable
-          data={mockedData}
-          columns={columns}
-          title={t("Matriz de treinamentos")}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {}}
+        <Filters
+          setTrainings={setTrainings}
+          setPagination={setPagination}
+          setColumns={setColumns}
         />
+        {columns.length > 0 && (
+          <CustomTable
+            data={trainings}
+            columns={columns}
+            title={t("Matriz de treinamentos")}
+            searchInputValue={searchParams.get("search") ?? ""}
+            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+            iconsHasMaxW={true}
+            onCheckItems={(show) => {}}
+          />
+        )}
         <Flex
           justifyContent={"end"}
           w={isMobile ? "99vw" : "95vw"}
@@ -145,7 +102,7 @@ const MatrizPage = () => {
         >
           {pagination && (
             <Pagination
-              data={mockedData}
+              data={trainings}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -156,39 +113,6 @@ const MatrizPage = () => {
           )}
         </Flex>
       </VStack>
-      <DeleteModal
-        title={t("Excluir Escola")}
-        subtitle={t("Tem certeza de que deseja excluir esta Escola?")}
-        isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
-        onConfirm={async () => {
-          setIsLoading(true);
-
-          const response = await deleteService(deleteId);
-          if (response) {
-            setServices(
-              services.filter((category) => category.id !== deleteId)
-            );
-          }
-
-          setIsLoading(false);
-          onDeleteModalClose();
-        }}
-        isLoading={isLoading}
-      />
-      <DeleteModal
-        title={t("Excluir Escolas")}
-        subtitle={t("Tem certeza de que deseja excluir estas Escolas?")}
-        isOpen={isDeleteMultipleModalOpen}
-        onClose={onDeleteMultipleModalClose}
-        onConfirm={async () => {
-          setIsDeleteLoading(true);
-          await deleteMultipleservices(selected, setServices, services);
-          setIsDeleteLoading(false);
-          onDeleteMultipleModalClose();
-        }}
-        isLoading={isDeleteLoading}
-      />
     </>
   );
 };
