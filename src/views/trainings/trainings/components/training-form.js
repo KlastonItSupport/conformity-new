@@ -151,7 +151,7 @@ const TrainingForm = ({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
-    getSchools("", 1, 10000).then((schools) => {
+    getSchools(1, "", 10000).then((schools) => {
       setSchoolsOptions(
         schools.items.map((school) => {
           return {
@@ -162,7 +162,7 @@ const TrainingForm = ({
       );
     });
 
-    getCompanies("", 1, 10000).then((companies) => {
+    getCompanies(1, "", 10000).then((companies) => {
       setCompanyOptions(
         companies.map((company) => {
           return {
