@@ -61,7 +61,10 @@ const MatrizProvider = ({ children }) => {
             return (
               <Link
                 onClick={() =>
-                  window.open(`/tasks/details?id=${item.id}`, "_blank")
+                  window.open(
+                    `/trainings/certificates/${item[`${column}-id`]}`,
+                    "_blank"
+                  )
                 }
                 color={dateParam < today ? "red.500" : "primary.100"}
                 cursor={"pointer"}
