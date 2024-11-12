@@ -66,6 +66,8 @@ import { TrainingsUserProvider } from "providers/trainings-user";
 import TrainingCertificatesPage from "views/trainings/certificates";
 import { CertificatesProvider } from "providers/certificates";
 import { MatrizProvider } from "providers/matriz";
+import RolesPage from "views/companies/roles";
+import { RolesProvider } from "providers/roles";
 
 const routes = createBrowserRouter([
   {
@@ -84,6 +86,7 @@ const routes = createBrowserRouter([
     path: "companies",
     element: <CompaniesPage />,
   },
+  { path: "companies/roles", element: <RolesPage /> },
   {
     path: "groups",
     element: <GroupsPage />,
@@ -221,34 +224,36 @@ ReactDOM.render(
                             <EquipmentProvider>
                               <IndicatorsProvider>
                                 <IndicatorsAnswerProvider>
-                                  <CrmProvider>
-                                    <TrainingProvider>
-                                      <MatrizProvider>
-                                        <TrainingsUserProvider>
-                                          <SchoolProvider>
-                                            <LeadsProvider>
-                                              <CertificatesProvider>
-                                                <LeadTaskProvider>
-                                                  <CrmServicesProvider>
-                                                    <ContractProvider>
-                                                      <ToastContainer />
-                                                      <React.StrictMode>
-                                                        <ThemeEditorProvider>
-                                                          <RouterProvider
-                                                            router={routes}
-                                                          />
-                                                        </ThemeEditorProvider>
-                                                      </React.StrictMode>
-                                                    </ContractProvider>
-                                                  </CrmServicesProvider>
-                                                </LeadTaskProvider>
-                                              </CertificatesProvider>
-                                            </LeadsProvider>
-                                          </SchoolProvider>
-                                        </TrainingsUserProvider>
-                                      </MatrizProvider>
-                                    </TrainingProvider>
-                                  </CrmProvider>
+                                  <RolesProvider>
+                                    <CrmProvider>
+                                      <TrainingProvider>
+                                        <MatrizProvider>
+                                          <TrainingsUserProvider>
+                                            <SchoolProvider>
+                                              <LeadsProvider>
+                                                <CertificatesProvider>
+                                                  <LeadTaskProvider>
+                                                    <CrmServicesProvider>
+                                                      <ContractProvider>
+                                                        <ToastContainer />
+                                                        <React.StrictMode>
+                                                          <ThemeEditorProvider>
+                                                            <RouterProvider
+                                                              router={routes}
+                                                            />
+                                                          </ThemeEditorProvider>
+                                                        </React.StrictMode>
+                                                      </ContractProvider>
+                                                    </CrmServicesProvider>
+                                                  </LeadTaskProvider>
+                                                </CertificatesProvider>
+                                              </LeadsProvider>
+                                            </SchoolProvider>
+                                          </TrainingsUserProvider>
+                                        </MatrizProvider>
+                                      </TrainingProvider>
+                                    </CrmProvider>
+                                  </RolesProvider>
                                 </IndicatorsAnswerProvider>
                               </IndicatorsProvider>
                             </EquipmentProvider>

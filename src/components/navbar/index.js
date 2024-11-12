@@ -20,6 +20,7 @@ import {
   Users,
   List,
   X,
+  Buildings,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -234,6 +235,21 @@ export const NavBar = () => {
             },
           ]}
           key={"admin-users"}
+        />
+      ),
+    },
+    {
+      type: "companies",
+      icon: (
+        <ItemMenu
+          icon={<Buildings size={28} />}
+          itemsList={[
+            {
+              src: "/companies/roles",
+              label: "Cargos",
+            },
+          ]}
+          key={"admin-companies"}
         />
       ),
     },
