@@ -5,3 +5,11 @@ body.tox-fullscreen .tox.tox-tinymce.tox-fullscreen {
 .tox.tox-silver-sink.tox-tinymce-aux {
   z-index: 1401;
 }
+
+.tox-tinymce, .tox-edit-area__iframe {
+  width: 100% !important;
+}
+
+.tox .tox-editor-container {
+  width: 100%;
+}

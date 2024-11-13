@@ -68,6 +68,7 @@ import { CertificatesProvider } from "providers/certificates";
 import { MatrizProvider } from "providers/matriz";
 import RolesPage from "views/companies/roles";
 import { RolesProvider } from "providers/roles";
+import WarningsPage from "views/companies/warnings";
 
 const routes = createBrowserRouter([
   {
@@ -87,6 +88,10 @@ const routes = createBrowserRouter([
     element: <CompaniesPage />,
   },
   { path: "companies/roles", element: <RolesPage /> },
+  {
+    path: "companies/warnings",
+    element: <WarningsPage />,
+  },
   {
     path: "groups",
     element: <GroupsPage />,

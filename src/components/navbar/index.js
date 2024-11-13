@@ -248,6 +248,10 @@ export const NavBar = () => {
               src: "/companies/roles",
               label: "Cargos",
             },
+            {
+              src: "/companies/warnings",
+              label: "Avisos",
+            },
           ]}
           key={"admin-companies"}
         />
