@@ -1,29 +1,20 @@
 import { HStack, Text, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
-import { sleep } from "helpers/sleep";
 import SelectInput from "components/select";
 import { ButtonPrimary } from "components/button-primary";
 import TextEditor from "components/text-editor-mce";
+import { WarningsContext } from "providers/warnings";
 
 const warningSchema = Yup.object().shape({
-  //   name: Yup.string().required("Campo obrigatório"),
-  showWarning: Yup.boolean().required("Campo obrigatório"),
+  showWarning: Yup.string(),
 });
 
-const WarningsForm = ({
-  formValues,
-  formRef,
-  event = "add",
-  onAdd,
-  onEdit,
-  setLoading,
-  onClose,
-  id,
-}) => {
+const WarningsForm = ({ formRef }) => {
   const [description, setDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const richTextRef = useRef();
   const {
     register,
@@ -31,11 +22,19 @@ const WarningsForm = ({
     formState: { errors },
   } = useForm({ resolver: yupResolver(warningSchema) });
 
-  const onSubmit = async (data) => {};
+  const { createWarning } = useContext(WarningsContext);
+  const onSubmit = async (data) => {
+    setIsLoading(true);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const warning = await createWarning({
+      ...data,
+      warningMessage: description,
+    });
+    if (warning) {
+      setDescription("");
+    }
+    setIsLoading(false);
+  };
 
   return (
     <VStack
@@ -53,15 +52,15 @@ const WarningsForm = ({
         label="Exibir aviso?"
         {...register("showWarning")}
         errors={errors.showWarning}
-        defaultValue={{ label: "Sim", value: "sim" }}
+        defaultValue={{ label: "Sim", value: 1 }}
         options={[
           {
             label: "Sim",
-            value: "sim",
+            value: 1,
           },
           {
             label: "Não",
-            value: "não",
+            value: 0,
           },
         ]}
       />
@@ -85,9 +84,9 @@ const WarningsForm = ({
           borderRadius="7px"
           _active={{ bgColor: "primary.200" }}
           label={"Disparar Aviso"}
-          onClick={onSubmit}
+          type="submit"
           width="150px"
-          // isLoading={isLoading}
+          isLoading={isLoading}
         />
       </HStack>
     </VStack>
