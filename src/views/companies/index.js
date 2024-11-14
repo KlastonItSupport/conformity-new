@@ -19,8 +19,11 @@ import {
   NavigationLinks,
 } from "components/components";
 import { useTranslation } from "react-i18next";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
-export const CompaniesPage = () => {
+const CompaniesPage = () => {
   const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
   const { isMobile, isDesktop } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -218,3 +221,8 @@ export const CompaniesPage = () => {
     </>
   );
 };
+
+export default compose(
+  withAuthenticated("companies"),
+  withWarningCheck
+)(CompaniesPage);

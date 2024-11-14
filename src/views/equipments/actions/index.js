@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { FileArrowUp, Folder, NotePencil, Trash } from "@phosphor-icons/react";
+import { Folder, NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -16,15 +16,18 @@ import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
-import { debounce, set } from "lodash";
+import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { ModalForm } from "components/components";
 import ActionForm from "../forms/actions-form";
 import { EquipmentContext } from "providers/equipments";
 import ActionDocumentModal from "../components/documents-modal";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ActionsPage = () => {
   const { t } = useTranslation();
@@ -335,4 +338,7 @@ const ActionsPage = () => {
   );
 };
 
-export default ActionsPage;
+export default compose(
+  withAuthenticated("equipments"),
+  withWarningCheck
+)(ActionsPage);

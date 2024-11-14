@@ -26,6 +26,9 @@ import { columns } from "./table-helper";
 import ContractForm from "./components/contract-form";
 import SquareInfos from "../components/squares-info";
 import { ContractContext } from "providers/contract";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
+import withAuthenticated from "hoc/with-authenticated";
 
 const ContractsPage = () => {
   const { t } = useTranslation();
@@ -355,4 +358,7 @@ const ContractsPage = () => {
   );
 };
 
-export default ContractsPage;
+export default compose(
+  withAuthenticated("crm"),
+  withWarningCheck
+)(ContractsPage);

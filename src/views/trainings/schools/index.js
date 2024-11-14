@@ -25,6 +25,9 @@ import { ButtonPrimary } from "components/button-primary";
 import { mockedData } from "./table-helper";
 import SchoolForm from "./components/school-form";
 import { SchoolContext } from "providers/schools";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const SchoolsPage = () => {
   const { t } = useTranslation();
@@ -59,7 +62,7 @@ const SchoolsPage = () => {
       label: "Dashboard",
     },
     {
-      path: "/trainings/schools",
+      path: "/training/schools",
       label: "Escolas",
       isCurrent: true,
     },
@@ -104,7 +107,7 @@ const SchoolsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("trainings", "canDelete")
+      const deleteIcon = checkPermissionForAction("training", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -120,7 +123,7 @@ const SchoolsPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("trainings", "canEdit")
+      const editIcon = checkPermissionForAction("training", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -192,7 +195,7 @@ const SchoolsPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             minW="150px"
-            disabled={!checkPermissionForAction("trainings", "canAdd")}
+            disabled={!checkPermissionForAction("training", "canAdd")}
           />
         </HStack>
 
@@ -318,4 +321,7 @@ const SchoolsPage = () => {
   );
 };
 
-export default SchoolsPage;
+export default compose(
+  withAuthenticated("training"),
+  withWarningCheck
+)(SchoolsPage);

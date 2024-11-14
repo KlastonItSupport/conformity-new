@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { CategoryContext } from "providers/category";
 import CategoryForm from "components/forms/categories/create-category";
 import { ButtonPrimary } from "components/button-primary";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const CategoriesPage = () => {
   const { t } = useTranslation();
@@ -301,4 +304,7 @@ const CategoriesPage = () => {
   );
 };
 
-export default CategoriesPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(CategoriesPage);

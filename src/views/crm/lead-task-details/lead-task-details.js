@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { LeadTaskContext } from "providers/leads-task";
 import LeadTaskForm from "./components/lead-task-form";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const LeadsTaskDetailsPage = () => {
   const { t } = useTranslation();
@@ -322,4 +325,7 @@ const LeadsTaskDetailsPage = () => {
   );
 };
 
-export default LeadsTaskDetailsPage;
+export default compose(
+  withAuthenticated("crm"),
+  withWarningCheck
+)(LeadsTaskDetailsPage);

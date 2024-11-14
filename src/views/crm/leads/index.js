@@ -30,6 +30,9 @@ import { tasksColumns } from "./table-helper";
 import { LeadsContext } from "providers/leads";
 import { LeadTaskContext } from "providers/leads-task";
 import TaskModal from "./components/task-modal";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const LeadsPage = () => {
   const { t } = useTranslation();
@@ -455,4 +458,4 @@ const LeadsPage = () => {
   );
 };
 
-export default LeadsPage;
+export default compose(withAuthenticated("crm"), withWarningCheck)(LeadsPage);

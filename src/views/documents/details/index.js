@@ -21,6 +21,9 @@ import Feed from "components/feed";
 import { DetailsDocumentsContext } from "providers/details-documents";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "providers/auth";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
@@ -129,4 +132,7 @@ const DocumentsDetailsPage = () => {
   );
 };
 
-export default DocumentsDetailsPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(DocumentsDetailsPage);

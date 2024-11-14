@@ -61,6 +61,12 @@ const AuthProvider = ({ children }) => {
     history("/signin");
   };
 
+  const isAuthenticated = () => {
+    const hasAccessToken = localStorage.getItem(accessTokenKey);
+    const hasUser = localStorage.getItem(userKey);
+    return hasAccessToken && hasUser;
+  };
+
   const getToken = () => {
     const token = localStorage.getItem(accessTokenKey);
     if (token) {
@@ -134,6 +140,25 @@ const AuthProvider = ({ children }) => {
     return false;
   };
 
+  const hasPermissionToAccessThisPage = async (moduleName) => {
+    if (!userAccessRule) {
+      const accessRule = await getUserAccessRule();
+      setUserAccessRule(accessRule);
+      if (!userAccessRule) return false;
+    }
+    if (userAccessRule?.isAdmin || userAccessRule?.isSuperUser) {
+      console.log("entrei 1");
+      return true;
+    }
+
+    if (userPermissions) {
+      console.log("entrei");
+      const isAllowed = userPermissions[moduleName]["canRead"];
+      return isAllowed;
+    }
+    return false;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -153,6 +178,8 @@ const AuthProvider = ({ children }) => {
         userPermissions,
         setUserPermissions,
         checkPermissionForAction,
+        isAuthenticated,
+        hasPermissionToAccessThisPage,
       }}
     >
       {children}

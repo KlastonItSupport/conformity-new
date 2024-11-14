@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import EquipmentForm from "./forms/equipment-form";
 import { EquipmentContext } from "providers/equipments";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const EquipmmentsPage = () => {
   const { t } = useTranslation();
@@ -303,4 +306,7 @@ const EquipmmentsPage = () => {
   );
 };
 
-export default EquipmmentsPage;
+export default compose(
+  withAuthenticated("equipments"),
+  withWarningCheck
+)(EquipmmentsPage);

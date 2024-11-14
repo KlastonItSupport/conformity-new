@@ -21,6 +21,9 @@ import { debounce } from "lodash";
 import { AnalysisContext } from "providers/analysis";
 import AlertModal from "components/modals/alert-modal";
 import CancelDescription from "components/forms/analysis/cancel-description";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const AnalysisPage = () => {
   const { t } = useTranslation();
@@ -304,4 +307,7 @@ const AnalysisPage = () => {
   );
 };
 
-export default AnalysisPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(AnalysisPage);

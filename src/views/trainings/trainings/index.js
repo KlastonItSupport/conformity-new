@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import TrainingForm from "./components/training-form";
 import { TrainingContext } from "providers/trainings";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const TrainingsPage = () => {
   const { t } = useTranslation();
@@ -101,7 +104,7 @@ const TrainingsPage = () => {
 
   useEffect(() => {
     const updateIcons = () => {
-      const deleteIcon = checkPermissionForAction("trainings", "canDelete")
+      const deleteIcon = checkPermissionForAction("training", "canDelete")
         ? {
             icon: <Trash size={20} />,
             onClickRow: (item) => {
@@ -117,7 +120,7 @@ const TrainingsPage = () => {
           }
         : null;
 
-      const editIcon = checkPermissionForAction("trainings", "canEdit")
+      const editIcon = checkPermissionForAction("training", "canEdit")
         ? {
             icon: <NotePencil size={20} />,
             onClickRow: (item) => {
@@ -184,7 +187,7 @@ const TrainingsPage = () => {
             label={"Adicionar"}
             onClick={onAddModalOpen}
             minW="150px"
-            disabled={!checkPermissionForAction("trainings", "canAdd")}
+            disabled={!checkPermissionForAction("training", "canAdd")}
           />
         </HStack>
 
@@ -312,4 +315,7 @@ const TrainingsPage = () => {
   );
 };
 
-export default TrainingsPage;
+export default compose(
+  withAuthenticated("training"),
+  withWarningCheck
+)(TrainingsPage);

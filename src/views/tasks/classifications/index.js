@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
 import TaskClassification from "components/forms/task-classification/task-classification";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
+import { compose } from "recompose";
 
 const ClassificationPage = () => {
   const { t } = useTranslation();
@@ -314,4 +317,7 @@ const ClassificationPage = () => {
   );
 };
 
-export default ClassificationPage;
+export default compose(
+  withAuthenticated("tasks"),
+  withWarningCheck
+)(ClassificationPage);

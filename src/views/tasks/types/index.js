@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
 import TaskType from "components/forms/task-type/task-type";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const TypesPage = () => {
   const { t } = useTranslation();
@@ -309,4 +312,4 @@ const TypesPage = () => {
   );
 };
 
-export default TypesPage;
+export default compose(withAuthenticated("tasks"), withWarningCheck)(TypesPage);

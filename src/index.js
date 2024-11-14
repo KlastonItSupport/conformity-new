@@ -10,9 +10,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignInPage from "views/sign-in";
 import { UserProvider } from "providers/users";
-import { CompaniesPage } from "views/companies";
 import { CompanyProvider } from "providers/company";
-import { GroupsPage } from "views/groups";
 import { GroupProvider } from "providers/group";
 // eslint-disable-next-line no-unused-vars
 import i18n from "./i18n/index.js";
@@ -70,6 +68,8 @@ import RolesPage from "views/companies/roles";
 import { RolesProvider } from "providers/roles";
 import WarningsPage from "views/companies/warnings";
 import { WarningsProvider } from "providers/warnings";
+import CompaniesPage from "views/companies";
+import GroupsPage from "views/groups";
 
 const routes = createBrowserRouter([
   {
@@ -165,7 +165,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "indicators/graphs",
-    element: <GraphsPage />,
+    element: <GraphsPage />, // ERRO
   },
   {
     path: "crm/clients-suppliers",
@@ -189,7 +189,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "crm/leads/tasks/:id",
-    element: <LeadsTaskDetailsPage />,
+    element: <LeadsTaskDetailsPage />, // ERRO
   },
   {
     path: "trainings",

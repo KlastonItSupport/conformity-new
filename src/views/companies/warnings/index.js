@@ -4,6 +4,8 @@ import { HStack, VStack } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import WarningsForm from "./components/form";
 import withWarningCheck from "hoc/with-warning-check";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
 
 const WarningsPage = () => {
   const formRef = useRef();
@@ -34,4 +36,7 @@ const WarningsPage = () => {
   );
 };
 
-export default withWarningCheck(WarningsPage);
+export default compose(
+  withAuthenticated("companies"),
+  withWarningCheck
+)(WarningsPage);

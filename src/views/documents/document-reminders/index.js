@@ -31,6 +31,9 @@ import { DeleteModal } from "components/components";
 import { ModalForm } from "components/components";
 import ReminderForm from "components/forms/reminders/reminder-form";
 import { ButtonPrimary } from "components/button-primary";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const DocumentRemindersPage = () => {
   const { t } = useTranslation();
@@ -318,4 +321,7 @@ const DocumentRemindersPage = () => {
   );
 };
 
-export default DocumentRemindersPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(DocumentRemindersPage);

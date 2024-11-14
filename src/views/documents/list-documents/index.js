@@ -23,6 +23,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
@@ -280,4 +283,7 @@ const ListDocumentsPage = () => {
   );
 };
 
-export default ListDocumentsPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(ListDocumentsPage);

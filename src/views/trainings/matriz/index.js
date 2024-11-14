@@ -12,6 +12,9 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import Filters from "./components/filter";
 import { MatrizContext } from "providers/matriz";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const MatrizPage = () => {
   const { t } = useTranslation();
@@ -117,4 +120,7 @@ const MatrizPage = () => {
   );
 };
 
-export default MatrizPage;
+export default compose(
+  withAuthenticated("training"),
+  withWarningCheck
+)(MatrizPage);

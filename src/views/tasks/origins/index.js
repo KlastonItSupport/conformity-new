@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import { TasksContext } from "providers/tasks";
 import OriginForm from "./form/origin-form";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const OriginsPage = () => {
   const { t } = useTranslation();
@@ -309,4 +312,7 @@ const OriginsPage = () => {
   );
 };
 
-export default OriginsPage;
+export default compose(
+  withAuthenticated("tasks"),
+  withWarningCheck
+)(OriginsPage);

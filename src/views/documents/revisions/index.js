@@ -1,6 +1,6 @@
 import { CustomTable } from "components/components";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./helpers/table-helper";
 
@@ -14,6 +14,9 @@ import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { getRevisions } from "./helpers/helper";
 import { AuthContext } from "providers/auth";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const RevisionsPage = () => {
   const { t } = useTranslation();
@@ -124,4 +127,7 @@ const RevisionsPage = () => {
   );
 };
 
-export default RevisionsPage;
+export default compose(
+  withAuthenticated("documents"),
+  withWarningCheck
+)(RevisionsPage);

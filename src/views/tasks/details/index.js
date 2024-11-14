@@ -23,6 +23,9 @@ import EvaluatorsTasks from "./components/evaluators";
 import RelatedTasks from "./components/subtasks";
 import HtmlParser from "react-html-parser";
 import { DetailsTaskContext } from "providers/details-task";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const TaskDetailsPage = () => {
   const { t } = useTranslation();
@@ -203,4 +206,7 @@ const TaskDetailsPage = () => {
   );
 };
 
-export default TaskDetailsPage;
+export default compose(
+  withAuthenticated("tasks"),
+  withWarningCheck
+)(TaskDetailsPage);

@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import ServicesForm from "./components/service-form";
 import { CrmServicesContext } from "providers/crm-services";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ServicesPage = () => {
   const { t } = useTranslation();
@@ -324,4 +327,7 @@ const ServicesPage = () => {
   );
 };
 
-export default ServicesPage;
+export default compose(
+  withAuthenticated("crm"),
+  withWarningCheck
+)(ServicesPage);

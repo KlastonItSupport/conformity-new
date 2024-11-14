@@ -25,6 +25,9 @@ import { ButtonPrimary } from "components/button-primary";
 import FileForm from "components/forms/file-form";
 import CertificateDetails from "./components/certificate-details";
 import { CertificatesContext } from "providers/certificates";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const TrainingCertificatesPage = () => {
   const { t } = useTranslation();
@@ -302,4 +305,7 @@ const TrainingCertificatesPage = () => {
   );
 };
 
-export default TrainingCertificatesPage;
+export default compose(
+  withAuthenticated("training"),
+  withWarningCheck
+)(TrainingCertificatesPage);

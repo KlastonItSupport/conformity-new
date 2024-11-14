@@ -34,6 +34,9 @@ import ProjectsForm from "./components/projects-form";
 import SquareInfos from "../components/squares-info";
 import Filters from "./components/filters";
 import { ProjectContext } from "providers/projects";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ProjectsPage = () => {
   const { t } = useTranslation();
@@ -413,4 +416,7 @@ const ProjectsPage = () => {
   );
 };
 
-export default ProjectsPage;
+export default compose(
+  withAuthenticated("crm"),
+  withWarningCheck
+)(ProjectsPage);

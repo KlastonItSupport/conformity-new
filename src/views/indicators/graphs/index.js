@@ -11,6 +11,9 @@ import GraphContainer from "./components/graph-container";
 import ItemGraphTable from "./components/item-graph-table";
 import { IndicatorsAnswerContext } from "providers/indicator-answer";
 import { useBreakpoint } from "hooks/usebreakpoint";
+import withWarningCheck from "hoc/with-warning-check";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
 
 const GraphsPage = () => {
   const [searchParams] = useSearchParams();
@@ -101,4 +104,7 @@ const GraphsPage = () => {
   );
 };
 
-export default GraphsPage;
+export default compose(
+  withAuthenticated("indicators"),
+  withWarningCheck
+)(GraphsPage);

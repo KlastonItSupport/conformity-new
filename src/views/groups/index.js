@@ -17,8 +17,11 @@ import { debounce } from "lodash";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { AuthContext } from "providers/auth";
 import { useTranslation } from "react-i18next";
+import withWarningCheck from "hoc/with-warning-check";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
 
-export const GroupsPage = () => {
+const GroupsPage = () => {
   const formRef = useRef(null);
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -289,3 +292,8 @@ export const GroupsPage = () => {
     </>
   );
 };
+
+export default compose(
+  withAuthenticated("companies"),
+  withWarningCheck
+)(GroupsPage);

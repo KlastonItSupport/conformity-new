@@ -25,6 +25,9 @@ import { ButtonPrimary } from "components/button-primary";
 import RolesForm from "./components/form";
 
 import { RolesContext } from "providers/roles";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const RolesPage = () => {
   const { t } = useTranslation();
@@ -328,4 +331,7 @@ const RolesPage = () => {
   );
 };
 
-export default RolesPage;
+export default compose(
+  withAuthenticated("companies"),
+  withWarningCheck
+)(RolesPage);

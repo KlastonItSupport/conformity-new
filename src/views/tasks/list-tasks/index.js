@@ -30,6 +30,9 @@ import Filters from "./components/filters";
 import { ButtonPrimary } from "components/button-primary";
 import TaskForm from "components/forms/tasks/task-form";
 import { TasksContext } from "providers/tasks";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ListTasksPage = () => {
   const { t } = useTranslation();
@@ -261,7 +264,7 @@ const ListTasksPage = () => {
             _active={{ bgColor: "primary.200" }}
             label={"Detalhamento"}
             width="150px"
-            disabled={!checkPermissionForAction("documents", "canAdd")}
+            disabled={!checkPermissionForAction("tasks", "canAdd")}
           />
         </HStack>
         <Filters
@@ -389,4 +392,7 @@ const ListTasksPage = () => {
   );
 };
 
-export default ListTasksPage;
+export default compose(
+  withAuthenticated("tasks"),
+  withWarningCheck
+)(ListTasksPage);

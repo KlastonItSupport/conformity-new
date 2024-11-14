@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import MyTrainingForm from "./components/my-training-form";
 import { TrainingsUserContext } from "providers/trainings-user";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const TrainingUsers = () => {
   const { t } = useTranslation();
@@ -343,4 +346,7 @@ const TrainingUsers = () => {
   );
 };
 
-export default TrainingUsers;
+export default compose(
+  withAuthenticated("training"),
+  withWarningCheck
+)(TrainingUsers);

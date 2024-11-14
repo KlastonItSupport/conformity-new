@@ -25,6 +25,9 @@ import { ButtonPrimary } from "components/button-primary";
 import ClientSupplierForm from "../components/client-supplier-form/client-supplier-form";
 import { CrmContext } from "providers/crm";
 import { AddressModal } from "../components/address-info";
+import withAuthenticated from "hoc/with-authenticated";
+import { compose } from "recompose";
+import withWarningCheck from "hoc/with-warning-check";
 
 const ClientsSuppliers = () => {
   const { t } = useTranslation();
@@ -356,4 +359,7 @@ const ClientsSuppliers = () => {
   );
 };
 
-export default ClientsSuppliers;
+export default compose(
+  withAuthenticated("crm"),
+  withWarningCheck
+)(ClientsSuppliers);

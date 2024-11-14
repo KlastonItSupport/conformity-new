@@ -24,6 +24,9 @@ import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import IndicatorForm from "./components/indicator-form";
 import { IndicatorsContext } from "providers/indicators";
+import { compose } from "recompose";
+import withAuthenticated from "hoc/with-authenticated";
+import withWarningCheck from "hoc/with-warning-check";
 
 const IndicatorsPage = () => {
   const { t } = useTranslation();
@@ -328,4 +331,7 @@ const IndicatorsPage = () => {
   );
 };
 
-export default IndicatorsPage;
+export default compose(
+  withAuthenticated("indicators"),
+  withWarningCheck
+)(IndicatorsPage);
