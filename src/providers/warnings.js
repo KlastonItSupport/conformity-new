@@ -37,6 +37,20 @@ const WarningsProvider = ({ children }) => {
     return response.data;
   };
 
+  const getCompanyWarnings = async () => {
+    const userInfo = getUserInfo();
+    const response = await api.get(
+      `/warnings/get-company-warnings/${userInfo.companyId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      }
+    );
+
+    return response.data;
+  };
+
   const readWarning = async (warningId) => {
     const userInfo = getUserInfo();
     const response = await api.post(`/warnings/read-warning`, {
@@ -49,7 +63,7 @@ const WarningsProvider = ({ children }) => {
 
   return (
     <WarningsContext.Provider
-      value={{ createWarning, getWarnings, readWarning }}
+      value={{ createWarning, getWarnings, readWarning, getCompanyWarnings }}
     >
       {children}
     </WarningsContext.Provider>

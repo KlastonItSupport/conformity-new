@@ -6,7 +6,6 @@ import React, { useEffect, useContext, useState } from "react";
 const withWarningCheck = (WrappedComponent) => {
   return (props) => {
     const [warnings, setWarnings] = useState([]);
-    const [currentWarningIndex, setCurrentWarningIndex] = useState(0);
     const { getWarnings, readWarning } = useContext(WarningsContext);
 
     const {
@@ -18,19 +17,16 @@ const withWarningCheck = (WrappedComponent) => {
     const handleWarning = async () => {
       const fetchedWarnings = await getWarnings();
       setWarnings(fetchedWarnings);
-      if (fetchedWarnings.length > 0) {
-        onWarningModalOpen();
-      }
+      onWarningModalOpen();
     };
 
     const handleClose = async (warningId) => {
       onWarningModalClose();
-      await readWarning(warningId);
+    };
 
-      if (currentWarningIndex < warnings.length - 1) {
-        setCurrentWarningIndex((prevIndex) => prevIndex + 1);
-        onWarningModalOpen();
-      }
+    const onConfirm = async (warningId) => {
+      await readWarning(warningId);
+      handleClose(warningId);
     };
 
     useEffect(() => {
@@ -40,11 +36,12 @@ const withWarningCheck = (WrappedComponent) => {
 
     return (
       <>
-        {warnings.length > 0 && (
+        {warnings && !warnings.isExpired && (
           <WarningModal
             isOpen={isWarningModalOpen}
             onClose={handleClose}
-            warning={warnings[currentWarningIndex]}
+            warning={warnings}
+            onConfirm={onConfirm}
           />
         )}
         <WrappedComponent {...props} />

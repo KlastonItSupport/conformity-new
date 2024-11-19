@@ -7,20 +7,15 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text,
   VStack,
 } from "@chakra-ui/react";
 import { ButtonPrimary } from "components/button-primary";
 import React from "react";
 import ReactHtmlParser from "react-html-parser";
 
-const WarningModal = ({ isOpen, onClose, warning }) => {
+const WarningModal = ({ isOpen, onClose, onConfirm, warning }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={async () => await onClose(warning.id)}
-      rapFocus={false}
-    >
+    <Modal isOpen={isOpen} onClose={async () => onClose()} rapFocus={false}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Importante</ModalHeader>
@@ -42,9 +37,8 @@ const WarningModal = ({ isOpen, onClose, warning }) => {
               boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
               borderRadius="7px"
               _active={{ bgColor: "primary.200" }}
-              label={"Ok"}
-              onClick={async () => await onClose(warning.id)}
-              width="150px"
+              label={"Entendi e gostaria de não ver este aviso"}
+              onClick={async () => await onConfirm(warning.id)}
             />
           </HStack>
         </ModalFooter>
