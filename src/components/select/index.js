@@ -13,7 +13,7 @@ const SelectInput = forwardRef(
             fontSize="sm"
             fontWeight="500"
             pb={paddingLabel ? paddingLabel : "10px"}
-            pl={"5px"}
+            pl={paddingLabel ?? "5px"}
           >
             {label}
           </Text>

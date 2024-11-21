@@ -53,6 +53,8 @@ export const NavBar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const checkingPermission = (type) => {
@@ -316,7 +318,25 @@ export const NavBar = () => {
         zIndex={3}
       >
         <HStack w={"40%"}>
-          <Img src={whiteLogo} w={"128px"} />
+          <Img
+            src={whiteLogo}
+            w={"128px"}
+            onClick={() => navigate("/users")}
+            cursor={"pointer"}
+          />
+          <Box>
+            <Text
+              fontSize={"md"}
+              color={"#87A3BC"}
+              px={"15px"}
+              cursor={"pointer"}
+              // bgColor={"red"}
+              _hover={{ color: "white" }}
+              onClick={() => navigate("/support")}
+            >
+              Suporte
+            </Text>
+          </Box>
         </HStack>
         {isDesktop && (
           <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>

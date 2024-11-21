@@ -70,6 +70,7 @@ import WarningsPage from "views/companies/warnings";
 import { WarningsProvider } from "providers/warnings";
 import CompaniesPage from "views/companies";
 import GroupsPage from "views/groups";
+import SupportPage from "views/support";
 
 const routes = createBrowserRouter([
   {
@@ -209,7 +210,11 @@ const routes = createBrowserRouter([
   },
   {
     path: "/trainings/certificates/:id",
-    element: <TrainingCertificatesPage />,
+    element: <TrainingCertificatesPage />, // ERRO
+  },
+  {
+    path: "/support",
+    element: <SupportPage />,
   },
 ]);
 
