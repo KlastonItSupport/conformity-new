@@ -1,6 +1,7 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const { createContext, useContext, useState, useEffect } = require("react");
 
@@ -20,7 +21,10 @@ const CategoryProvider = ({ children }) => {
       "categories",
       { ...data, companyId: userInfo.companyId },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENTS_ADD_CATEGORY,
+        },
       }
     );
 
@@ -33,7 +37,10 @@ const CategoryProvider = ({ children }) => {
 
   const getCategories = async () => {
     const response = await api.get("categories", {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_LIST_CATEGORIES,
+      },
     });
 
     return response.data;
@@ -57,7 +64,10 @@ const CategoryProvider = ({ children }) => {
 
   const deleteCategory = async (id) => {
     const response = await api.delete(`categories/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DELETE_CATEGORY,
+      },
     });
 
     if (response.status === 200) {
@@ -86,7 +96,10 @@ const CategoryProvider = ({ children }) => {
 
   const editCategory = async (id, data) => {
     const response = await api.patch(`categories/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_UPDATE_CATEGORY,
+      },
     });
 
     if (response.status === 200) {

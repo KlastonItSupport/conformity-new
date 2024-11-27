@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 import { api } from "api/api";
 import { toast } from "react-toastify";
 import { notSelectedCleaning } from "helpers/not-selected-cleaning";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const TasksContext = createContext();
 
@@ -51,7 +52,10 @@ const TasksProvider = ({ children }) => {
       const response = await api.get(
         `/tasks?page=${page}&${searchParam}&${filterParamsParsed}`,
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TASKS_LIST,
+          },
         }
       );
       if (response.status === 200) {
@@ -67,7 +71,10 @@ const TasksProvider = ({ children }) => {
   const deleteTask = async (id) => {
     try {
       const response = await api.delete(`/tasks/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_DELETED,
+        },
       });
 
       if (response.status === 200) {
@@ -98,7 +105,10 @@ const TasksProvider = ({ children }) => {
     try {
       notSelectedCleaning(data);
       const response = await api.patch(`/tasks/${data.id}`, data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_UPDATED,
+        },
       });
 
       if (response.status === 200) {
@@ -114,7 +124,10 @@ const TasksProvider = ({ children }) => {
     try {
       notSelectedCleaning(data);
       const response = await api.post("/tasks", data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_ADD,
+        },
       });
 
       if (response.status === 201) {
@@ -131,7 +144,9 @@ const TasksProvider = ({ children }) => {
       const response = await api.get(
         `/types?page=${page}&search=${search}&pageSize=10`,
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+          },
         }
       );
 
