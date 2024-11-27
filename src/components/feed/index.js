@@ -40,7 +40,10 @@ const Feed = ({
     const response = await api.delete(`feed/${id}`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
-        "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_DELETED,
+        "x-audit-event":
+          moduleId === 1
+            ? AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_DELETED
+            : AUDIT_EVENTS.TASKS_DETAILS_FEED_DELETED,
       },
     });
 
@@ -54,7 +57,10 @@ const Feed = ({
     const response = await api.patch(`feed/${id}`, data, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
-        "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_UPDATED,
+        "x-audit-event":
+          moduleId === 1
+            ? AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_UPDATED
+            : AUDIT_EVENTS.TASKS_DETAILS_FEED_UPDATED,
       },
     });
 
@@ -80,7 +86,10 @@ const Feed = ({
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_CREATED,
+          "x-audit-event":
+            moduleId === 1
+              ? AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_CREATED
+              : AUDIT_EVENTS.TASKS_DETAILS_FEED_CREATED,
         },
       }
     );

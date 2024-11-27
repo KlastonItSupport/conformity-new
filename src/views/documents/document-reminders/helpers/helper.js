@@ -1,4 +1,5 @@
 import { api } from "api/api";
+import { AUDIT_EVENTS } from "constants/audit-events";
 import { toast } from "react-toastify";
 
 export const getReminders = async (token, id, page = 1, search = "") => {
@@ -18,6 +19,7 @@ export const createReminder = async (data, token) => {
   const response = await api.post(`/reminders`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_REMINDER_CREATED,
     },
     data: {
       ...data,
@@ -38,6 +40,7 @@ export const deleteReminder = async (
   const response = await api.delete(`/reminders/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_REMINDER_DELETED,
     },
   });
   if (response.status === 200) {
@@ -75,6 +78,7 @@ export const updateReminder = async (data, token, setReminders, reminders) => {
   const response = await api.patch(`/reminders/${data.id}`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_REMINDER_UPDATED,
     },
   });
 

@@ -13,6 +13,7 @@ import { api } from "api/api";
 import { toast } from "react-toastify";
 import { AuthContext } from "providers/auth";
 import { use } from "i18next";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 export const columns = [
   {
@@ -53,7 +54,12 @@ const CustomRootCausesTable = ({
   const { getToken } = useContext(AuthContext);
 
   const onDelete = async (id) => {
-    const res = await api.delete(`tasks-details/root-cause-analysis/${id}`);
+    const res = await api.delete(`tasks-details/root-cause-analysis/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_5WHY_DELETED,
+      },
+    });
 
     if (res.status === 200) {
       toast.success("Análise de causa raiz excluída com sucesso!");
@@ -78,7 +84,13 @@ const CustomRootCausesTable = ({
   const onEdit = async (data) => {
     const res = await api.patch(
       `tasks-details/root-cause-analysis/${editSelected.id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_5WHY_UPDATED,
+        },
+      }
     );
 
     if (res.status === 200) {
@@ -100,7 +112,10 @@ const CustomRootCausesTable = ({
         taskId,
       },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_5WHY_CREATED,
+        },
       }
     );
 

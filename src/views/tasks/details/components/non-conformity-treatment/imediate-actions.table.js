@@ -13,6 +13,7 @@ import { DeleteModal } from "components/components";
 import { api } from "api/api";
 import { toast } from "react-toastify";
 import { AuthContext } from "providers/auth";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 export const columns = [
   {
@@ -81,7 +82,10 @@ const ImediateActionsTable = ({
         taskId,
       },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_IMMEDIATE_ACTIONS_CREATED,
+        },
       }
     );
 
@@ -94,7 +98,13 @@ const ImediateActionsTable = ({
   const onEdit = async (data) => {
     const res = await api.patch(
       `tasks-details/immediate-actions/${editSelected.id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_IMMEDIATE_ACTIONS_UPDATED,
+        },
+      }
     );
 
     if (res.status === 200) {
@@ -109,7 +119,12 @@ const ImediateActionsTable = ({
   };
 
   const deleteItem = async (id) => {
-    const res = await api.delete(`tasks-details/immediate-actions/${id}`);
+    const res = await api.delete(`tasks-details/immediate-actions/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_IMMEDIATE_ACTIONS_DELETED,
+      },
+    });
 
     if (res.status === 200) {
       toast.success("Ação imediata excluída com sucesso!");

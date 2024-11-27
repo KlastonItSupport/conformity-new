@@ -13,6 +13,7 @@ import { sleep } from "helpers/sleep";
 import { api } from "api/api";
 import { toast } from "react-toastify";
 import { AuthContext } from "providers/auth";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 export const columns = [
   {
@@ -77,7 +78,12 @@ const CorrectiveActionsTable = ({
   } = useDisclosure();
 
   const deleteCorrectiveAction = async (id) => {
-    const res = await api.delete(`tasks-details/corrective-actions/${id}`);
+    const res = await api.delete(`tasks-details/corrective-actions/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_DETAILS_CORRECTIVE_ACTIONS_DELETED,
+      },
+    });
 
     if (res.status === 200) {
       toast.success("Ação corretiva excluída com sucesso!");
@@ -94,6 +100,8 @@ const CorrectiveActionsTable = ({
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
+          "x-audit-event":
+            AUDIT_EVENTS.TASKS_DETAILS_CORRECTIVE_ACTIONS_CREATED,
         },
       }
     );
@@ -107,7 +115,14 @@ const CorrectiveActionsTable = ({
   const editCorrectiveAction = async (data) => {
     const res = await api.patch(
       `tasks-details/corrective-actions/${editSelected.id}`,
-      data
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event":
+            AUDIT_EVENTS.TASKS_DETAILS_CORRECTIVE_ACTIONS_UPDATED,
+        },
+      }
     );
 
     if (res.status === 200) {
