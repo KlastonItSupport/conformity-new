@@ -1,4 +1,5 @@
 import { api } from "api/api";
+import { AUDIT_EVENTS } from "constants/audit-events";
 import { toast } from "react-toastify";
 
 export const getEvaluators = async (setEvaluators, documentId) => {
@@ -9,16 +10,31 @@ export const getEvaluators = async (setEvaluators, documentId) => {
 export const createEvaluator = async (
   setEvaluators,
   evaluators,
-  documentId,
-  data
+  data,
+  token
 ) => {
-  const response = await api.post(`/evaluators`, data);
+  const response = await api.post(`/evaluators`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_ADD_EVALUATOR,
+    },
+  });
   setEvaluators([response.data, ...evaluators]);
   toast.success("Avaliador adicionado com sucesso!");
 };
 
-export const deleteEvaluator = async (setEvaluators, evaluators, deleteId) => {
-  const response = await api.delete(`/evaluators/${deleteId}`);
+export const deleteEvaluator = async (
+  setEvaluators,
+  evaluators,
+  deleteId,
+  token
+) => {
+  const response = await api.delete(`/evaluators/${deleteId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_EVALUATOR,
+    },
+  });
   if (response.status === 200) {
     const newEvaluators = evaluators.filter((item) => item.id !== deleteId);
     setEvaluators(newEvaluators);

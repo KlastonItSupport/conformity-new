@@ -25,7 +25,7 @@ const DepartamentPermissions = ({ documentId }) => {
   const [departamentsPermissions, setDepartamentsPermissions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { getDepartaments } = useContext(DepartamentContext);
-  const { checkPermissionForAction } = useContext(AuthContext);
+  const { checkPermissionForAction, getToken } = useContext(AuthContext);
 
   const { handleSubmit, control, reset } = useForm({
     resolver: yupResolver(schema),
@@ -37,7 +37,8 @@ const DepartamentPermissions = ({ documentId }) => {
       documentId,
       data.departaments,
       departamentsPermissions,
-      setDepartamentsPermissions
+      setDepartamentsPermissions,
+      getToken()
     );
 
     reset({ departaments: [] });

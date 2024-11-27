@@ -1,4 +1,5 @@
 import { api } from "api/api";
+import { AUDIT_EVENTS } from "constants/audit-events";
 import { toast } from "react-toastify";
 
 export const columns = [
@@ -19,9 +20,15 @@ export const getRelatedDocuments = async (setRelatedDocuments, documentId) => {
 export const deleteRelatedDocument = async (
   relatedDocumentId,
   setRelatedDocuments,
-  relatedDocuments
+  relatedDocuments,
+  token
 ) => {
-  const response = await api.delete(`/document-relateds/${relatedDocumentId}`);
+  const response = await api.delete(`/document-relateds/${relatedDocumentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_RELATED,
+    },
+  });
   if (response.status === 200) {
     const filteredRelatedDocuments = relatedDocuments.filter(
       (relatedDocument) => {
@@ -30,7 +37,7 @@ export const deleteRelatedDocument = async (
     );
 
     setRelatedDocuments(filteredRelatedDocuments);
-    toast.success("Documento relacionado ");
+    toast.success("Documento relacionadsadasddo ");
     return response.data;
   }
 };
@@ -56,12 +63,22 @@ export const createRelatedDocument = async (
   documentId,
   relatedDocumentId,
   setRelatedDocuments,
-  relatedDocuments
+  relatedDocuments,
+  token
 ) => {
-  const response = await api.post(`/document-relateds`, {
-    mainDocId: documentId,
-    relatedDocId: relatedDocumentId,
-  });
+  const response = await api.post(
+    `/document-relateds`,
+    {
+      mainDocId: documentId,
+      relatedDocId: relatedDocumentId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_ADD_RELATED,
+      },
+    }
+  );
   if (response.status === 201) {
     setRelatedDocuments([response.data, ...relatedDocuments]);
     toast.success("Documento relacionado");
@@ -71,11 +88,17 @@ export const createRelatedDocument = async (
 export const deleteMultiple = async (
   selecteds,
   setRelatedDocuments,
-  relatedDocuments
+  relatedDocuments,
+  token
 ) => {
   const promises = selecteds.map((selected) => {
     if (selected.id !== "checkall") {
-      return api.delete(`/document-relateds/${selected.id}`);
+      return api.delete(`/document-relateds/${selected.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_RELATED,
+        },
+      });
     }
     return null;
   });

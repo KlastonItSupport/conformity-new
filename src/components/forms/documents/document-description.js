@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
 import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
 import { DetailsDocumentsContext } from "providers/details-documents";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const DocumentDescriptionForm = ({
   formRef,
@@ -33,7 +34,10 @@ const DocumentDescriptionForm = ({
         `documents/${queryParams.get("id")}`,
         { description },
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.DOCUMENT_UPDATED,
+          },
         }
       );
       if (response.status === 200) {

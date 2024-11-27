@@ -7,7 +7,7 @@ import {
   VStack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { BellRinging, Trash } from "@phosphor-icons/react";
+import { Trash } from "@phosphor-icons/react";
 import { ModalForm } from "components/components";
 import { ExtrasDocuments } from "components/components";
 import { DeleteModal } from "components/components";

@@ -1,3 +1,4 @@
+import { AUDIT_EVENTS } from "constants/audit-events";
 import { toast } from "react-toastify";
 
 const { api } = require("api/api");
@@ -16,13 +17,24 @@ export const addDepartamentsPermissions = async (
   documentId,
   departaments,
   departamentPermissions,
-  setDepartamentPermissions
+  setDepartamentPermissions,
+  token
 ) => {
-  const response = await api.post("departaments-permissions/", {
-    departaments: departaments.map((departament) => departament.value),
-    isAuthorized: true,
-    documentId,
-  });
+  const response = await api.post(
+    "departaments-permissions/",
+    {
+      departaments: departaments.map((departament) => departament.value),
+      isAuthorized: true,
+      documentId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-audit-event":
+          AUDIT_EVENTS.DOCUMENTS_DETAILS_ADD_DEPARTAMENT_PERMISSION,
+      },
+    }
+  );
 
   if (response.status === 201) {
     setDepartamentPermissions([...departamentPermissions, ...response.data]);
@@ -32,10 +44,18 @@ export const addDepartamentsPermissions = async (
 export const removeDepartamentsPermissions = async (
   departamentsId,
   departamentPermissions,
-  setDepartamentPermissions
+  setDepartamentPermissions,
+  token
 ) => {
   const response = await api.delete(
-    `departaments-permissions/${departamentsId}`
+    `departaments-permissions/${departamentsId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-audit-event":
+          AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_DEPARTAMENT_PERMISSION,
+      },
+    }
   );
 
   if (response.status === 200) {
@@ -52,11 +72,18 @@ export const removeDepartamentsPermissions = async (
 export const removeMultipleDepartamentsPermissions = async (
   departamentsIds,
   departamentPermissions,
-  setDepartamentPermissions
+  setDepartamentPermissions,
+  token
 ) => {
   const promises = departamentsIds.map((selected) => {
     if (selected.id !== "checkall") {
-      return api.delete(`/departaments-permissions/${selected.id}`);
+      return api.delete(`/departaments-permissions/${selected.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "x-audit-event":
+            AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_DEPARTAMENT_PERMISSION,
+        },
+      });
     }
     return null;
   });

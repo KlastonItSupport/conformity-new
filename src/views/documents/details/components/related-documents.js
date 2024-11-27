@@ -201,7 +201,8 @@ const RelatedDocuments = ({ documentId }) => {
             await deleteRelatedDocument(
               deleted,
               setRelatedDocuments,
-              relatedDocuments
+              relatedDocuments,
+              getToken()
             );
             setIsDeleteLoading(false);
             onDeleteModalClose();
@@ -220,7 +221,8 @@ const RelatedDocuments = ({ documentId }) => {
             await deleteMultiple(
               selecteds,
               setRelatedDocuments,
-              relatedDocuments
+              relatedDocuments,
+              getToken()
             );
             setIsDeleteLoading(false);
             onDeleteMultipleModalClose();
@@ -240,7 +242,8 @@ const RelatedDocuments = ({ documentId }) => {
                   documentId,
                   data.documentSideId,
                   setRelatedDocuments,
-                  relatedDocuments
+                  relatedDocuments,
+                  getToken()
                 )
               }
               setLoading={setIsCreateLoading}

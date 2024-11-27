@@ -37,8 +37,12 @@ const Evaluators = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [selectedItems, setSelectedItems] = useState([]);
 
-  const { checkPermissionForAction, userPermissions, userAccessRule } =
-    useContext(AuthContext);
+  const {
+    checkPermissionForAction,
+    userPermissions,
+    userAccessRule,
+    getToken,
+  } = useContext(AuthContext);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -185,7 +189,12 @@ const Evaluators = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteEvaluator(setEvaluators, evaluators, deleteId);
+          await deleteEvaluator(
+            setEvaluators,
+            evaluators,
+            deleteId,
+            getToken()
+          );
           setIsDeleteLoading(false);
           onDeleteModalClose();
         }}
@@ -199,7 +208,7 @@ const Evaluators = () => {
             formRef={formRef}
             onClose={onEditModalClose}
             onAddEvaluator={(data) =>
-              createEvaluator(setEvaluators, evaluators, documentId, data)
+              createEvaluator(setEvaluators, evaluators, data, getToken())
             }
             documentId={documentId}
           />
@@ -221,7 +230,8 @@ const Evaluators = () => {
             evaluators,
             setEvaluators,
             onDeleteMultipleModalClose,
-            setIsMultipleLoading
+            setIsMultipleLoading,
+            getToken()
           )
         }
         isLoading={isMultipleLoading}

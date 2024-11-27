@@ -1,4 +1,5 @@
 import { api } from "api/api";
+import { AUDIT_EVENTS } from "constants/audit-events";
 import moment from "moment";
 import { toast } from "react-toastify";
 
@@ -8,14 +9,26 @@ export const addRevision = async (
   userId,
   documentId,
   revisions,
-  setRevisions
+  setRevisions,
+  token
 ) => {
-  const response = await api.post("/document-revisions", {
-    description: data.description,
-    revisionDate: moment(data.revisionDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
-    userId,
-    documentId,
-  });
+  const response = await api.post(
+    "/document-revisions",
+    {
+      description: data.description,
+      revisionDate: moment(data.revisionDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      ),
+      userId,
+      documentId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_ADD_REVISION,
+      },
+    }
+  );
   if (response.status === 201) {
     const updatedRevisions = [response.data, ...revisions];
     toast.success("Revisão adicionada com sucesso");
@@ -23,7 +36,6 @@ export const addRevision = async (
   }
 };
 
-// Função para obter revisão
 export const getRevision = async (id, setRevisions) => {
   const response = await api.get(`/document-revisions/${id}`);
   if (response.status === 200) {
@@ -31,9 +43,13 @@ export const getRevision = async (id, setRevisions) => {
   }
 };
 
-// Função para excluir revisão
-export const deleteRevision = async (id, revisions, setRevisions) => {
-  const response = await api.delete(`/document-revisions/${id}`);
+export const deleteRevision = async (id, revisions, setRevisions, token) => {
+  const response = await api.delete(`/document-revisions/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_DELETE_REVISION,
+    },
+  });
   if (response.status === 200) {
     const updatedRevisions = revisions.filter((revision) => revision.id !== id);
     setRevisions(updatedRevisions);
@@ -42,14 +58,25 @@ export const deleteRevision = async (id, revisions, setRevisions) => {
 };
 
 // Função para editar revisão
-export const editRevision = async (data, edit, revisions, setRevisions) => {
+export const editRevision = async (
+  data,
+  edit,
+  revisions,
+  setRevisions,
+  token
+) => {
   if (data.revisionDate && data.revisionDate.length === 10) {
     data.revisionDate = moment(data.revisionDate, "DD/MM/YYYY").format(
       "YYYY-MM-DD"
     );
   }
 
-  const response = await api.patch(`/document-revisions/${edit.id}`, data);
+  const response = await api.patch(`/document-revisions/${edit.id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "x-audit-event": AUDIT_EVENTS.DOCUMENTS_DETAILS_EDIT_REVISION,
+    },
+  });
   if (response.status === 200) {
     const updatedRevisions = revisions.map((revision) =>
       revision.id === edit.id ? response.data : revision
@@ -64,11 +91,12 @@ export const deleteMultipleRevisions = async (
   selectedItems,
   revisions,
   setRevisions,
-  onMultipleDeleteModalClose
+  onMultipleDeleteModalClose,
+  token
 ) => {
   const deletePromises = selectedItems.map((selected) =>
     selected.id !== "checkall"
-      ? deleteRevision(selected.id, revisions, setRevisions)
+      ? deleteRevision(selected.id, revisions, setRevisions, token)
       : () => {}
   );
 

@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
 import TextEditor from "components/text-editor-mce";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const Feed = ({
   moduleId,
@@ -36,7 +37,12 @@ const Feed = ({
   };
 
   const deleteFeedItem = async (id) => {
-    const response = await api.delete(`feed/${id}`);
+    const response = await api.delete(`feed/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_DELETED,
+      },
+    });
 
     if (response.status === 200) {
       toast.success("Item excluído com sucesso");
@@ -46,7 +52,10 @@ const Feed = ({
 
   const updateFeedItem = async (id, data) => {
     const response = await api.patch(`feed/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_UPDATED,
+      },
     });
 
     if (response.status === 200) {
@@ -69,7 +78,10 @@ const Feed = ({
         user: user.id,
       },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENT_DETAILS_FEED_CREATED,
+        },
       }
     );
 

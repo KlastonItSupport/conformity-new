@@ -8,13 +8,14 @@ import {
 import { Trash } from "@phosphor-icons/react";
 import { DeleteModal } from "components/components";
 import { CustomTable } from "components/components";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   columns,
   removeDepartamentsPermissions,
   removeMultipleDepartamentsPermissions,
 } from "../helpers/departament-permissions-helper";
+import { AuthContext } from "providers/auth";
 
 const Permissions = ({
   departamentsPermissions,
@@ -26,6 +27,7 @@ const Permissions = ({
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [selecteds, setSelecteds] = useState([]);
   const [deleteItem, setDeleteItem] = useState(null);
+  const { getToken } = useContext(AuthContext);
 
   const {
     isOpen: isDeleteModalOpen,
@@ -129,7 +131,8 @@ const Permissions = ({
           await removeDepartamentsPermissions(
             deleteItem,
             departamentsPermissions,
-            setDepartamentsPermissions
+            setDepartamentsPermissions,
+            getToken()
           );
           setIsDeleteLoading(false);
           onDeleteModalClose();
@@ -146,7 +149,8 @@ const Permissions = ({
           await removeMultipleDepartamentsPermissions(
             selecteds,
             departamentsPermissions,
-            setDepartamentsPermissions
+            setDepartamentsPermissions,
+            getToken()
           );
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();

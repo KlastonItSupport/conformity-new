@@ -4,6 +4,7 @@ import { handlingMultipleFilesToBase64 } from "helpers/buffer-to-base-64";
 import { toast } from "react-toastify";
 
 import { createContext, useContext, useState } from "react";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const DocumentContext = createContext();
 
@@ -33,7 +34,10 @@ const DocumentProvider = ({ children }) => {
       const response = await api.get(
         `/documents?page=${page}&${searchParam}${filterParamsParsed}`,
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.DOCUMENTS_GET,
+          },
         }
       );
       if (response.status === 200) {
@@ -52,7 +56,10 @@ const DocumentProvider = ({ children }) => {
     delete data.project;
     try {
       const response = await api.post("documents", data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENT_CREATED,
+        },
       });
 
       if (response.status === 201) {
@@ -67,7 +74,10 @@ const DocumentProvider = ({ children }) => {
   const deleteDocument = async (id) => {
     try {
       const response = await api.delete(`documents/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENT_DELETED,
+        },
       });
       if (response.status === 200) {
         toast.success("Documento excluído com sucesso");
@@ -84,7 +94,10 @@ const DocumentProvider = ({ children }) => {
     data.document = files;
     try {
       const response = await api.patch(`documents/${editSelected.id}`, data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.DOCUMENT_UPDATED,
+        },
       });
       if (response.status === 200) {
         toast.success("Documento atualizado com sucesso");

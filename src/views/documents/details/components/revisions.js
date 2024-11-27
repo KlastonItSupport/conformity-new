@@ -37,8 +37,13 @@ const Revisions = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedIsLoading, setSelectedIsLoading] = useState(false);
 
-  const { user, checkPermissionForAction, userPermissions, userAccessRule } =
-    useContext(AuthContext);
+  const {
+    user,
+    checkPermissionForAction,
+    userPermissions,
+    userAccessRule,
+    getToken,
+  } = useContext(AuthContext);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -210,7 +215,7 @@ const Revisions = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteRevision(deleteId, revisions, setRevisions);
+          await deleteRevision(deleteId, revisions, setRevisions, getToken());
           setIsDeleteLoading(false);
           onDeleteModalClose();
         }}
@@ -228,7 +233,8 @@ const Revisions = () => {
             selectedItems,
             revisions,
             setRevisions,
-            onMultipleDeleteModalClose
+            onMultipleDeleteModalClose,
+            getToken()
           );
           setSelectedIsLoading(false);
         }}
@@ -243,7 +249,7 @@ const Revisions = () => {
             formRef={formRef}
             onClose={onEditModalClose}
             submitFunc={(data) =>
-              editRevision(data, edit, revisions, setRevisions)
+              editRevision(data, edit, revisions, setRevisions, getToken())
             }
             defaultValues={edit}
             setLoading={setIsEditLoading}
@@ -267,7 +273,14 @@ const Revisions = () => {
             onClose={onAddModalClose}
             event={"add"}
             submitFunc={(data) =>
-              addRevision(data, user.id, documentId, revisions, setRevisions)
+              addRevision(
+                data,
+                user.id,
+                documentId,
+                revisions,
+                setRevisions,
+                getToken()
+              )
             }
             setLoading={setIsAddLoading}
           />
