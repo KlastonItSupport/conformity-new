@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { AuthContext } from "providers/auth";
 import { api } from "api/api";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 export const originSchema = Yup.object().shape({
   name: Yup.string().required("Nome  obrigatório"),
@@ -31,14 +32,20 @@ const TaskType = ({
   const { getToken } = useContext(AuthContext);
   const createTaskType = async (data) => {
     const response = await api.post("types", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_TYPES_CREATED,
+      },
     });
     toast.success("Tipo de tarefa criada com sucesso!");
     return response.data;
   };
   const updateTaskType = async (data) => {
     const response = await api.patch(`types/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_TYPES_UPDATED,
+      },
     });
     toast.success("Tipo de tarefa atualizada com sucesso!");
     return response.data;

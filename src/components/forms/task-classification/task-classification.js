@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { api } from "api/api";
 import { AuthContext } from "providers/auth";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 export const originSchema = Yup.object().shape({
   name: Yup.string().required("Nome  obrigatório"),
@@ -31,7 +32,10 @@ const TaskClassification = ({
 
   const createClassification = async (data) => {
     const res = await api.post("/classifications", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_CLASSIFICATIONS_CREATED,
+      },
     });
     toast.success("Classificação criada com sucesso");
     return res.data;
@@ -39,7 +43,10 @@ const TaskClassification = ({
 
   const editClassification = async (data) => {
     const res = await api.patch(`/classifications/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_CLASSIFICATIONS_UPDATED,
+      },
     });
     toast.success("Classificação editada com sucesso");
     return res.data;

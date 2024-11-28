@@ -146,6 +146,7 @@ const TasksProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TASKS_TYPES_LIST,
           },
         }
       );
@@ -159,7 +160,10 @@ const TasksProvider = ({ children }) => {
   const deleteType = async (id) => {
     try {
       const response = await api.delete(`/types/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_TYPES_DELETED,
+        },
       });
 
       if (response.status === 200) {
@@ -190,7 +194,10 @@ const TasksProvider = ({ children }) => {
       const response = await api.get(
         `/classifications?page=${page}&search=${search}&pageSize=${limit}`,
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TASKS_CLASSIFICATIONS_LIST,
+          },
         }
       );
 
@@ -205,7 +212,10 @@ const TasksProvider = ({ children }) => {
   const deleteClassification = async (id) => {
     try {
       const response = await api.delete(`/classifications/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_CLASSIFICATIONS_DELETED,
+        },
       });
 
       if (response.status === 200) {
@@ -240,7 +250,10 @@ const TasksProvider = ({ children }) => {
       const response = await api.get(
         `/origins?page=${page}&search=${search}&pageSize=10`,
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TASKS_ORIGENS_LIST,
+          },
         }
       );
 
@@ -253,7 +266,10 @@ const TasksProvider = ({ children }) => {
   const deleteOrigin = async (id) => {
     try {
       const response = await api.delete(`/origins/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_ORIGENS_DELETED,
+        },
       });
 
       if (response.status === 200) {
@@ -283,7 +299,10 @@ const TasksProvider = ({ children }) => {
   const createOrigins = async (data) => {
     try {
       const response = await api.post("/origins", data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_ORIGENS_CREATED,
+        },
       });
 
       if (response.status === 201) {
@@ -298,7 +317,10 @@ const TasksProvider = ({ children }) => {
   const editOrigins = async (data) => {
     try {
       const response = await api.patch(`/origins/${data.id}`, data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TASKS_ORIGENS_UPDATED,
+        },
       });
 
       if (response.status === 200) {
