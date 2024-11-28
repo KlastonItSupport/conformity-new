@@ -21,6 +21,7 @@ import FileForm from "../forms/files-form";
 import { ModalForm } from "components/components";
 import { toast } from "react-toastify";
 import { DeleteModal } from "components/components";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ActionDocumentModal = ({ isOpen, onClose, id, canAdd, canDelete }) => {
   const { getToken } = useContext(AuthContext);
@@ -39,7 +40,10 @@ const ActionDocumentModal = ({ isOpen, onClose, id, canAdd, canDelete }) => {
 
   const deleteDocument = async (id) => {
     const response = await api.delete(`equipments/actions/documents/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_DOCUMENTS_DELETED,
+      },
     });
 
     if (response.status === 200) {
@@ -53,7 +57,10 @@ const ActionDocumentModal = ({ isOpen, onClose, id, canAdd, canDelete }) => {
       `equipments/actions/documents/${id}`,
       data,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_DOCUMENTS_ADD,
+        },
       }
     );
 

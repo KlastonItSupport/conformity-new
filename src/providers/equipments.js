@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
 
 import { createContext, useContext, useState } from "react";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const EquipmentContext = createContext();
 
@@ -17,7 +18,10 @@ const EquipmentProvider = ({ children }) => {
     const response = await api.get(
       `equipments?page=${page}&search=${search}&pageSize=${limit}`,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_LIST,
+        },
       }
     );
     setEquipments(response.data.items);
@@ -28,7 +32,10 @@ const EquipmentProvider = ({ children }) => {
 
   const createEquipment = async (data) => {
     const response = await api.post("equipments", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_CREATED,
+      },
     });
 
     setEquipments([...equipments, response.data]);
@@ -36,7 +43,10 @@ const EquipmentProvider = ({ children }) => {
 
   const updateEquipment = async (data, id) => {
     const response = await api.patch(`equipments/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_UPDATED,
+      },
     });
 
     if (response.status === 200) {
@@ -54,7 +64,10 @@ const EquipmentProvider = ({ children }) => {
 
   const deleteEquipment = async (id, showToast = true) => {
     const response = await api.delete(`equipments/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_DELETED,
+      },
     });
     if (response.status === 200) {
       if (showToast) {
@@ -86,7 +99,10 @@ const EquipmentProvider = ({ children }) => {
     const response = await api.get(
       `equipments/actions/${id}?page=${page}&search=${search}&pageSize=${limit}`,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_GET_ACTIONS,
+        },
       }
     );
 
@@ -98,7 +114,10 @@ const EquipmentProvider = ({ children }) => {
 
   const createActions = async (data) => {
     const response = await api.post("equipments/actions", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_CREATE_ACTIONS,
+      },
     });
 
     setActions([...actions, response.data]);
@@ -106,7 +125,10 @@ const EquipmentProvider = ({ children }) => {
 
   const updateActions = async (data, id) => {
     const response = await api.patch(`equipments/actions/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_UPDATE_ACTIONS,
+      },
     });
     if (response.status === 200) {
       toast.success("Ação atualizada com sucesso");
@@ -123,7 +145,10 @@ const EquipmentProvider = ({ children }) => {
 
   const deleteActions = async (id, showToast = true) => {
     const response = await api.delete(`equipments/actions/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.EQUIPMENTS_DELETE_ACTIONS,
+      },
     });
     if (response.status === 200) {
       if (showToast) {
