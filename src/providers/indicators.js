@@ -1,6 +1,7 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const { createContext, useContext, useState } = require("react");
 
@@ -20,7 +21,10 @@ const IndicatorsProvider = ({ children }) => {
     const response = await api.get(
       `/indicators?page=${page}&search=${search}&pageSize=${limit}&departmentId=${departament ?? ""}`,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.INDICATORS_LIST,
+        },
       }
     );
     setIndicators(response.data.items);
@@ -31,7 +35,10 @@ const IndicatorsProvider = ({ children }) => {
 
   const addIndicator = async (data) => {
     const response = await api.post("indicators", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.INDICATORS_CREATED,
+      },
     });
 
     if (response.status === 201) {
@@ -42,7 +49,10 @@ const IndicatorsProvider = ({ children }) => {
 
   const deleteIndicator = async (id, showToast = true) => {
     const response = await api.delete(`indicators/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.INDICATORS_DELETED,
+      },
     });
 
     if (response.data.status === 200) {
@@ -71,7 +81,10 @@ const IndicatorsProvider = ({ children }) => {
 
   const editIndicator = async (data, id) => {
     const response = await api.patch(`indicators/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.INDICATORS_UPDATED,
+      },
     });
 
     if (response.status === 200) {

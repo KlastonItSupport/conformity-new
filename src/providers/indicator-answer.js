@@ -1,6 +1,7 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const { createContext, useState, useContext } = require("react");
 
@@ -24,7 +25,10 @@ const IndicatorsAnswerProvider = ({ children }) => {
     const response = await api.get(
       `/indicators/indicator-answer/${id}?page=${page}&search=${search}&pageSize=${limit}&${queryParamsString}`,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.INDICATORS_GRAPHS,
+        },
       }
     );
     setIndicatorsAnswers(response.data.items);
@@ -35,7 +39,10 @@ const IndicatorsAnswerProvider = ({ children }) => {
 
   const deleteIndicatorAnswer = async (id, showToast = true) => {
     const response = await api.delete(`/indicators/indicator-answer/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.INDICATORS_GRAPHS_DELETE,
+      },
     });
 
     if (response.status === 200) {
@@ -68,7 +75,10 @@ const IndicatorsAnswerProvider = ({ children }) => {
 
   const addIndicatorAnswer = async (indicator) => {
     const response = await api.post("/indicators/indicator-answer", indicator, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.INDICATORS_GRAPHS_CREATE,
+      },
     });
 
     if (response.status === 201) {
@@ -82,7 +92,10 @@ const IndicatorsAnswerProvider = ({ children }) => {
       `/indicators/indicator-answer/${id}`,
       indicator,
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.INDICATORS_GRAPHS_UPDATE,
+        },
       }
     );
 
