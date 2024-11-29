@@ -29,6 +29,7 @@ import { ContractContext } from "providers/contract";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
 import withAuthenticated from "hoc/with-authenticated";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ContractsPage = () => {
   const { t } = useTranslation();
@@ -55,8 +56,12 @@ const ContractsPage = () => {
     editContract,
   } = useContext(ContractContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -95,6 +100,7 @@ const ContractsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.CRM_CONTRACTS_LIST);
     getContracts(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

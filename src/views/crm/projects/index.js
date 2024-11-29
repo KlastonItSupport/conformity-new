@@ -37,6 +37,7 @@ import { ProjectContext } from "providers/projects";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ProjectsPage = () => {
   const { t } = useTranslation();
@@ -63,8 +64,12 @@ const ProjectsPage = () => {
     editProject,
   } = useContext(ProjectContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -103,6 +108,7 @@ const ProjectsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.CRM_PROJECTS_LIST);
     getProjects(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""
@@ -207,7 +213,7 @@ const ProjectsPage = () => {
         tasks,
         documents,
         shareWithUsers,
-        description,
+        // description,
         editIcon,
         deleteIcon,
       ].filter((icon) => icon !== null);

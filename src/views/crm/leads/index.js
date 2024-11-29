@@ -33,6 +33,7 @@ import TaskModal from "./components/task-modal";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const LeadsPage = () => {
   const { t } = useTranslation();
@@ -65,8 +66,12 @@ const LeadsPage = () => {
     leadsStatus,
   } = useContext(LeadsContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -111,6 +116,7 @@ const LeadsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.CRM_LEADS_LIST);
     getLeads(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
@@ -165,17 +171,6 @@ const LeadsPage = () => {
       const tasks = checkPermissionForAction("tasks", "canEdit")
         ? {
             icon: <CheckFat size={20} />,
-            onClickRow: (item) => {},
-            onClickHeader: () => {},
-            isDisabled: false,
-            shouldShow: false,
-            title: "Ir para tarefas",
-          }
-        : null;
-
-      const services = checkPermissionForAction("tasks", "canEdit")
-        ? {
-            icon: <Gear size={20} />,
             onClickRow: (item) => {
               window.open(
                 `/crm/leads/tasks/${item.id}?name=${item.crmCompanyName}`
@@ -184,7 +179,7 @@ const LeadsPage = () => {
             onClickHeader: () => {},
             isDisabled: false,
             shouldShow: false,
-            title: "Ir para serviços",
+            title: "Ir para tarefas",
           }
         : null;
 
@@ -202,7 +197,7 @@ const LeadsPage = () => {
           }
         : null;
 
-      const icons = [tasks, services, tasksModal, editIcon, deleteIcon].filter(
+      const icons = [tasks, tasksModal, editIcon, deleteIcon].filter(
         (icon) => icon !== null
       );
 

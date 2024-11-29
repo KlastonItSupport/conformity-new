@@ -84,7 +84,7 @@ const Filters = ({ onSearch }) => {
   };
 
   useEffect(() => {
-    getCrm(10000, "").then((crm) => {
+    getCrm(1, "", 1000).then((crm) => {
       const options = crm.items.map((item) => {
         return { label: item.socialReason, value: item.id };
       });

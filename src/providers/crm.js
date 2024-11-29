@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CrmContext = createContext();
 
@@ -23,7 +24,10 @@ const CrmProvider = ({ children }) => {
   const deleteCrm = async (id, showToast = true) => {
     try {
       const response = await api.delete(`/crm/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_SUPPLIERS_DELETED,
+        },
       });
       if (response.status === 200) {
         if (showToast) {
@@ -55,7 +59,10 @@ const CrmProvider = ({ children }) => {
       "/crm",
       { ...data, companyId },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_SUPPLIERS_CREATED,
+        },
       }
     );
 
@@ -68,7 +75,10 @@ const CrmProvider = ({ children }) => {
 
   const updateCrm = async (data) => {
     const response = await api.patch(`/crm/${data.id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_SUPPLIERS_UPDATED,
+      },
     });
 
     if (response.status === 200) {

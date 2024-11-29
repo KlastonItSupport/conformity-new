@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CrmServicesContext = createContext();
 
@@ -20,10 +21,19 @@ const CrmServicesProvider = ({ children }) => {
   const createService = async (data) => {
     try {
       const userInfo = getUserInfo();
-      const response = await api.post("/services", {
-        ...data,
-        companyId: userInfo.companyId,
-      });
+      const response = await api.post(
+        "/services",
+        {
+          ...data,
+          companyId: userInfo.companyId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.CRM_SERVICES_CREATE,
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Serviço criado com sucesso");
@@ -36,7 +46,12 @@ const CrmServicesProvider = ({ children }) => {
 
   const deleteService = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/services/${id}`);
+      const response = await api.delete(`/services/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_SERVICES_DELETE,
+        },
+      });
 
       if (response.status === 200) {
         if (showToast) {
@@ -67,7 +82,12 @@ const CrmServicesProvider = ({ children }) => {
   };
 
   const editService = async (data) => {
-    const response = await api.patch(`services/${data.id}`, data);
+    const response = await api.patch(`services/${data.id}`, data, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_SERVICES_EDIT,
+      },
+    });
 
     if (response.status === 200) {
       toast.success("Serviço editado com sucesso");

@@ -28,6 +28,7 @@ import { AddressModal } from "../components/address-info";
 import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ClientsSuppliers = () => {
   const { t } = useTranslation();
@@ -56,8 +57,12 @@ const ClientsSuppliers = () => {
   const { getCrm, deleteCrm, deleteMultipleCrm, createCrm, updateCrm } =
     useContext(CrmContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -102,6 +107,7 @@ const ClientsSuppliers = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.CRM_SUPPLIERS_LIST);
     getCrm(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

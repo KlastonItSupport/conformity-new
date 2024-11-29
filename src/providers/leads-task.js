@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const LeadTaskContext = createContext();
 
@@ -32,7 +33,10 @@ const LeadTaskProvider = ({ children }) => {
 
   const createTaskLead = async (data) => {
     const response = await api.post(`/leads/tasks`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_LEADS_CREATE,
+      },
     });
 
     if (response.status === 201) {
@@ -45,7 +49,10 @@ const LeadTaskProvider = ({ children }) => {
   const deleteTaskLead = async (id, showToast = true) => {
     console.log("id", id);
     const response = await api.delete(`/leads/tasks/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_LEADS_DELETE,
+      },
     });
 
     if (response.status === 200 && showToast) {
@@ -70,7 +77,12 @@ const LeadTaskProvider = ({ children }) => {
   };
 
   const editTaskLead = async (taskLeadId, task) => {
-    const res = await api.patch(`/leads/tasks/${taskLeadId}`, task);
+    const res = await api.patch(`/leads/tasks/${taskLeadId}`, task, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TASKS_LEADS_EDIT,
+      },
+    });
 
     if (res.status === 200) {
       toast.success("Tarefa editada com sucesso!");

@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ContractContext = createContext();
 
@@ -23,7 +24,10 @@ const ContractProvider = ({ children }) => {
       "/contracts",
       { ...data, companyId: getUserInfo().companyId },
       {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_CONTRACTS_CREATE,
+        },
       }
     );
 
@@ -41,7 +45,12 @@ const ContractProvider = ({ children }) => {
   };
 
   const editContract = async (data) => {
-    const response = await api.patch(`/contracts/${data.id}`, data);
+    const response = await api.patch(`/contracts/${data.id}`, data, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_CONTRACTS_EDIT,
+      },
+    });
 
     if (response.status === 200) {
       toast.success("Contrato editado com sucesso");
@@ -54,7 +63,10 @@ const ContractProvider = ({ children }) => {
   const deleteContract = async (id, showToast = true) => {
     try {
       const response = await api.delete(`/contracts/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_CONTRACTS_DELETE,
+        },
       });
 
       if (response.status === 200) {

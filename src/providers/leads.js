@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const LeadsContext = createContext();
 
@@ -21,7 +22,10 @@ const LeadsProvider = ({ children }) => {
 
   const createLead = async (data) => {
     const response = await api.post("/leads", data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_LEADS_CREATE,
+      },
     });
 
     if (response.status === 201) {
@@ -35,7 +39,10 @@ const LeadsProvider = ({ children }) => {
 
   const deleteLead = async (id) => {
     const response = await api.delete(`/leads/${id}`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_LEADS_DELETE,
+      },
     });
 
     if (response.status === 200) {
@@ -61,7 +68,10 @@ const LeadsProvider = ({ children }) => {
 
   const editLead = async (id, data) => {
     const response = await api.patch(`/leads/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_LEADS_EDIT,
+      },
     });
 
     if (response.status === 200) {

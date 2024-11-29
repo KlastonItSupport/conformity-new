@@ -159,6 +159,15 @@ const AuthProvider = ({ children }) => {
     return false;
   };
 
+  const dispatchAuditEvent = (event) => {
+    api.get("audit", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": event,
+      },
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -180,6 +189,7 @@ const AuthProvider = ({ children }) => {
         checkPermissionForAction,
         isAuthenticated,
         hasPermissionToAccessThisPage,
+        dispatchAuditEvent,
       }}
     >
       {children}

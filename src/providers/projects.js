@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ProjectContext = createContext();
 
@@ -37,7 +38,10 @@ const ProjectProvider = ({ children }) => {
         "/projects",
         { ...data, companyId: getUserInfo().companyId },
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.CRM_PROJECTS_CREATE,
+          },
         }
       );
 
@@ -69,7 +73,10 @@ const ProjectProvider = ({ children }) => {
   const deleteProject = async (id, showToast = true) => {
     try {
       const response = await api.delete(`/projects/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.CRM_PROJECTS_DELETE,
+        },
       });
 
       if (response.status === 200) {
@@ -112,7 +119,10 @@ const ProjectProvider = ({ children }) => {
 
   const editProject = async (id, data) => {
     const res = await api.patch(`projects/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.CRM_PROJECTS_EDIT,
+      },
     });
     console.log(res.status);
     if (res.status === 200) {

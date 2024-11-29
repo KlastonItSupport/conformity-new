@@ -107,7 +107,7 @@ const ProjectsForm = ({
         }
       />
       {isShowingCalendarCreate && (
-        <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
+        <Box position={"absolute"} top="80%" left={0} zIndex={5} w="100%">
           <CalendarCustom
             onChangeDate={(date) => {
               const day = String(date.getDate()).padStart(2, "0");
@@ -158,7 +158,7 @@ const ProjectsForm = ({
         }
       />
       {isShowingCalendarEnd && (
-        <Box position={"absolute"} top="80%" left={0} zIndex={2} w="100%">
+        <Box position={"absolute"} top="80%" left={0} zIndex={5} w="100%">
           <CalendarCustom
             onChangeDate={(date) => {
               const day = String(date.getDate()).padStart(2, "0");
@@ -234,7 +234,7 @@ const ProjectsForm = ({
   useEffect(() => {
     setValue("status", "Iniciado");
     if (formValues) {
-      getCrm(10000, "").then((crm) => {
+      getCrm(1, "", 10000).then((crm) => {
         const options = crm.items.map((item) => {
           return { label: item.socialReason, value: item.id };
         });
@@ -248,7 +248,9 @@ const ProjectsForm = ({
       setValue("progress", formValues.progress);
       setDescription(formValues.text);
     } else {
-      getCrm(10000, "").then((crm) => {
+      getCrm(1, "", 10000).then((crm) => {
+        console.log("crm", crm);
+
         const options = crm.items.map((item) => {
           return { label: item.socialReason, value: item.id };
         });

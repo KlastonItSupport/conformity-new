@@ -27,6 +27,7 @@ import { CrmServicesContext } from "providers/crm-services";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ServicesPage = () => {
   const { t } = useTranslation();
@@ -52,8 +53,12 @@ const ServicesPage = () => {
     editService,
   } = useContext(CrmServicesContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -97,6 +102,7 @@ const ServicesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.CRM_SERVICES_LIST);
     getServices(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
