@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const RolesContext = createContext();
 
@@ -20,10 +21,19 @@ const RolesProvider = ({ children }) => {
   const createRole = async (data) => {
     try {
       const userInfo = getUserInfo();
-      const response = await api.post("/roles", {
-        ...data,
-        companyId: userInfo.companyId,
-      });
+      const response = await api.post(
+        "/roles",
+        {
+          ...data,
+          companyId: userInfo.companyId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_ROLES_CREATED,
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Cargo criado com sucesso");
@@ -36,7 +46,12 @@ const RolesProvider = ({ children }) => {
 
   const deleteRole = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/roles/${id}`);
+      const response = await api.delete(`/roles/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_ROLES_DELETED,
+        },
+      });
 
       if (response.status === 200) {
         if (showToast) {
@@ -67,7 +82,12 @@ const RolesProvider = ({ children }) => {
   };
 
   const editRole = async (data) => {
-    const response = await api.patch(`roles/${data.id}`, data);
+    const response = await api.patch(`roles/${data.id}`, data, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.COMPANY_ROLES_UPDATED,
+      },
+    });
 
     if (response.status === 200) {
       toast.success("Cargo editado com sucesso");

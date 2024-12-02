@@ -22,9 +22,11 @@ import { useTranslation } from "react-i18next";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CompaniesPage = () => {
-  const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
+  const { dealingWithAuth, getUserInfo, dispatchAuditEvent } =
+    useContext(AuthContext);
   const { isMobile, isDesktop } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
@@ -45,7 +47,7 @@ const CompaniesPage = () => {
   const formRef = useRef(null);
 
   useEffect(() => {
-    dealingWithAuth(true, "/companies", history);
+    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_LIST);
 
     const fetchData = async () => {
       if (!getUserInfo()) {

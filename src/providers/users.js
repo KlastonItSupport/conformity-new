@@ -4,6 +4,7 @@ import { createContext, useContext, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import i18n from "../i18n/index";
 import { AuthContext } from "./auth";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const UserContext = createContext();
 
@@ -53,7 +54,12 @@ const UserProvider = ({ children }) => {
           token: getToken(),
           newPassword,
         },
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_USERS_CHANGE_PASSWORD,
+          },
+        }
       );
 
       toast.success(i18n.t("Senha alterada com sucesso"));
@@ -77,7 +83,10 @@ const UserProvider = ({ children }) => {
           projectAccess: false,
         },
         {
-          headers: { Authorization: `Bearer ${getToken()}` },
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_USERS_CREATED,
+          },
         }
       );
 
@@ -103,7 +112,10 @@ const UserProvider = ({ children }) => {
     try {
       setDeleteIsLoading(true);
       const response = await api.delete(`/users/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_USERS_DELETED,
+        },
       });
       if (response.status === 200) {
         setDeleteIsLoading(false);
@@ -120,7 +132,10 @@ const UserProvider = ({ children }) => {
       setEditIsLoading(true);
 
       const response = await api.patch(`/users/${editId.id}`, data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_USERS_UPDATED,
+        },
       });
 
       if (response.data) {

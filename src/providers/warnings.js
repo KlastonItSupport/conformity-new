@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const WarningsContext = createContext();
 
@@ -12,10 +13,19 @@ const WarningsProvider = ({ children }) => {
   const createWarning = async (data) => {
     try {
       const userInfo = getUserInfo();
-      const response = await api.post("/warnings", {
-        ...data,
-        companyId: userInfo.companyId,
-      });
+      const response = await api.post(
+        "/warnings",
+        {
+          ...data,
+          companyId: userInfo.companyId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_WARNINGS_CREATED,
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Aviso criado com sucesso");

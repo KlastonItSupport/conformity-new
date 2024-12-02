@@ -22,9 +22,11 @@ import {
 } from "components/components";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { useTranslation, withTranslation } from "react-i18next";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const UsersPage = () => {
-  const { dealingWithAuth, getUserInfo } = useContext(AuthContext);
+  const { dealingWithAuth, getUserInfo, dispatchAuditEvent } =
+    useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
   const history = useNavigate();
@@ -73,7 +75,7 @@ const UsersPage = () => {
   }, 500);
 
   useEffect(() => {
-    dealingWithAuth(true, "/users", history);
+    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_USERS_LIST);
     const fetchData = async () => {
       if (!getUserInfo()) {
         return;

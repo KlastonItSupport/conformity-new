@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 
 import { AuthContext } from "./auth";
 import i18n from "../i18n/index";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CompanyContext = createContext();
 
@@ -34,7 +35,10 @@ const CompanyProvider = ({ children }) => {
     try {
       setCreateCompanyIsLoading(true);
       const response = await api.post("companies", data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_CREATED,
+        },
       });
 
       setCompanies([response.data, ...companies]);
@@ -74,7 +78,10 @@ const CompanyProvider = ({ children }) => {
     try {
       setEditCompanyIsLoading(true);
       const response = await api.patch(`companies/${id}`, data, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_UPDATED,
+        },
       });
 
       const editedCompanyIndex = companies.findIndex(

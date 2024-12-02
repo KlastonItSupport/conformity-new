@@ -28,6 +28,7 @@ import { RolesContext } from "providers/roles";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const RolesPage = () => {
   const { t } = useTranslation();
@@ -48,8 +49,12 @@ const RolesPage = () => {
   const { getRoles, deleteRole, deleteMultipleRoles, createRole, editRole } =
     useContext(RolesContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -89,6 +94,7 @@ const RolesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_ROLES_LIST);
     getRoles(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
@@ -144,9 +150,7 @@ const RolesPage = () => {
             shouldShow: false,
           }
         : null;
-      const icons = [editIcon, deleteIcon, trainingIcon].filter(
-        (icon) => icon !== null
-      );
+      const icons = [editIcon, deleteIcon].filter((icon) => icon !== null);
 
       setTableIcons(icons);
     };
