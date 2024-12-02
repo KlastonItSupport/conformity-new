@@ -28,6 +28,7 @@ import { SchoolContext } from "providers/schools";
 import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const SchoolsPage = () => {
   const { t } = useTranslation();
@@ -53,8 +54,12 @@ const SchoolsPage = () => {
     editSchool,
   } = useContext(SchoolContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -93,6 +98,7 @@ const SchoolsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TRAININGS_SCHOOL_LIST);
     getSchools(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

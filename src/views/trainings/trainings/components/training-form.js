@@ -23,6 +23,10 @@ const trainingSchema = (isAdmin) =>
       }),
 
     name: Yup.string().required("Campo obrigatório"),
+    expirationInMonths: Yup.number()
+      .typeError("Por favor insira um número válido")
+      .integer("Por favor insira um número inteiro")
+      .required("Campo obrigatório"),
   });
 
 const TrainingForm = ({

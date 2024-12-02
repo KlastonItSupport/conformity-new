@@ -27,6 +27,7 @@ import { TrainingsUserContext } from "providers/trainings-user";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const TrainingUsers = () => {
   const { t } = useTranslation();
@@ -57,6 +58,7 @@ const TrainingUsers = () => {
     userAccessRule,
     checkPermissionForAction,
     getUserInfo,
+    dispatchAuditEvent,
   } = useContext(AuthContext);
 
   const routeTreePaths = [
@@ -96,6 +98,7 @@ const TrainingUsers = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TRAININGS_USER_LIST);
     getUserTrainings(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

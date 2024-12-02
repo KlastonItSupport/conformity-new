@@ -15,6 +15,8 @@ import { MatrizContext } from "providers/matriz";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
+import { AuthContext } from "providers/auth";
 
 const MatrizPage = () => {
   const { t } = useTranslation();
@@ -27,6 +29,7 @@ const MatrizPage = () => {
   const [columns, setColumns] = useState([]);
 
   const { getMatriz, handleTableColumns } = useContext(MatrizContext);
+  const { dispatchAuditEvent } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -41,6 +44,7 @@ const MatrizPage = () => {
   ];
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TRAININGS_MATRIX_LIST);
     getMatriz(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""

@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CertificatesContext = createContext();
 
@@ -22,13 +23,16 @@ const CertificatesProvider = ({ children }) => {
 
   const createCertificate = async (data) => {
     try {
-      const payload = data.documents;
-      console.log(payload);
       const response = await api.post(
         `/user-trainings/certificates/${data.id}`,
 
         [...data.documents],
-        { headers: { Authorization: `Bearer ${getToken()}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TRAININGS_USER_CERTIFICATES_CREATED,
+          },
+        }
       );
 
       if (response.status === 201) {
@@ -54,7 +58,12 @@ const CertificatesProvider = ({ children }) => {
 
   const deleteCertificate = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/user-trainings/certificates/${id}`);
+      const response = await api.delete(`/user-trainings/certificates/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TRAININGS_USER_CERTIFICATES_DELETED,
+        },
+      });
 
       if (response.status === 200) {
         if (showToast) {

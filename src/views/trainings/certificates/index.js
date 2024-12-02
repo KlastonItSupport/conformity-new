@@ -28,6 +28,7 @@ import { CertificatesContext } from "providers/certificates";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const TrainingCertificatesPage = () => {
   const { t } = useTranslation();
@@ -53,8 +54,12 @@ const TrainingCertificatesPage = () => {
     getCertificatesDetails,
   } = useContext(CertificatesContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -93,6 +98,7 @@ const TrainingCertificatesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TRAININGS_USER_CERTIFICATES_LIST);
     getCertificates(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

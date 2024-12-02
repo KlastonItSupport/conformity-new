@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 const SchoolContext = createContext();
 
 const SchoolProvider = ({ children }) => {
@@ -22,10 +23,19 @@ const SchoolProvider = ({ children }) => {
   const createSchool = async (data) => {
     try {
       const userInfo = getUserInfo();
-      const response = await api.post("/schools", {
-        ...data,
-        companyId: userInfo.companyId,
-      });
+      const response = await api.post(
+        "/schools",
+        {
+          ...data,
+          companyId: userInfo.companyId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TRAININGS_SCHOOL_CREATED,
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Serviço criado com sucesso");
@@ -38,7 +48,10 @@ const SchoolProvider = ({ children }) => {
 
   const editSchool = async (data, id) => {
     const response = await api.patch(`schools/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TRAININGS_SCHOOL_UPDATED,
+      },
     });
 
     if (response.status === 200) {
@@ -50,7 +63,12 @@ const SchoolProvider = ({ children }) => {
 
   const deleteSchool = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/schools/${id}`);
+      const response = await api.delete(`/schools/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TRAININGS_SCHOOL_DELETED,
+        },
+      });
 
       if (response.status === 200) {
         if (showToast) {

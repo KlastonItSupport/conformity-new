@@ -3,6 +3,7 @@ import { AuthContext } from "./auth";
 
 import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const TrainingContext = createContext();
 
@@ -22,9 +23,18 @@ const TrainingProvider = ({ children }) => {
 
   const createTraining = async (data) => {
     try {
-      const response = await api.post("/trainings", {
-        ...data,
-      });
+      const response = await api.post(
+        "/trainings",
+        {
+          ...data,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.TRAININGS_CREATED,
+          },
+        }
+      );
 
       if (response.status === 201) {
         toast.success("Treinamento criado com sucesso");
@@ -37,7 +47,10 @@ const TrainingProvider = ({ children }) => {
 
   const editTraining = async (data, id) => {
     const response = await api.patch(`trainings/${id}`, data, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+        "x-audit-event": AUDIT_EVENTS.TRAININGS_UPDATED,
+      },
     });
 
     if (response.status === 200) {
@@ -49,7 +62,12 @@ const TrainingProvider = ({ children }) => {
 
   const deleteTraining = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/trainings/${id}`);
+      const response = await api.delete(`/trainings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "x-audit-event": AUDIT_EVENTS.TRAININGS_DELETED,
+        },
+      });
 
       if (response.status === 200) {
         if (showToast) {
