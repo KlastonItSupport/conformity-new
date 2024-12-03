@@ -39,7 +39,6 @@ const CategoryProvider = ({ children }) => {
     const response = await api.get("categories", {
       headers: {
         Authorization: `Bearer ${getToken()}`,
-        "x-audit-event": AUDIT_EVENTS.DOCUMENTS_LIST_CATEGORIES,
       },
     });
 

@@ -26,6 +26,7 @@ import { AuthContext } from "providers/auth";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
@@ -48,8 +49,12 @@ const ListDocumentsPage = () => {
     setEditSelected,
     pagination,
   } = useContext(DocumentContext);
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const formRef = useRef(null);
 
@@ -78,6 +83,7 @@ const ListDocumentsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.DOCUMENTS_GET);
     getDocuments(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

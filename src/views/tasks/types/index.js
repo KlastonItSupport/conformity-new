@@ -27,6 +27,7 @@ import TaskType from "components/forms/task-type/task-type";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const TypesPage = () => {
   const { t } = useTranslation();
@@ -47,8 +48,12 @@ const TypesPage = () => {
   const { getTypes, deleteType, deleteMultipleTypes } =
     useContext(TasksContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -87,6 +92,7 @@ const TypesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TASKS_TYPES_LIST);
     getTypes(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

@@ -36,7 +36,6 @@ const DocumentProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            "x-audit-event": AUDIT_EVENTS.DOCUMENTS_GET,
           },
         }
       );

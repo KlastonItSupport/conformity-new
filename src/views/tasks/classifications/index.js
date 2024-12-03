@@ -27,6 +27,7 @@ import TaskClassification from "components/forms/task-classification/task-classi
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { compose } from "recompose";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ClassificationPage = () => {
   const { t } = useTranslation();
@@ -50,8 +51,12 @@ const ClassificationPage = () => {
     getClassifications,
   } = useContext(TasksContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -90,6 +95,7 @@ const ClassificationPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TASKS_CLASSIFICATIONS_LIST);
     getClassifications(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""

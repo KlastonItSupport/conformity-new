@@ -67,10 +67,12 @@ import { MatrizProvider } from "providers/matriz";
 import RolesPage from "views/companies/roles";
 import { RolesProvider } from "providers/roles";
 import WarningsPage from "views/companies/warnings";
+import MonitoringPage from "views/companies/monitoring";
 import { WarningsProvider } from "providers/warnings";
 import CompaniesPage from "views/companies";
 import GroupsPage from "views/groups";
 import SupportPage from "views/support";
+import { AuditProvider } from "providers/audit";
 
 const routes = createBrowserRouter([
   {
@@ -93,6 +95,10 @@ const routes = createBrowserRouter([
   {
     path: "companies/warnings",
     element: <WarningsPage />,
+  },
+  {
+    path: "companies/monitoring",
+    element: <MonitoringPage />,
   },
   {
     path: "groups",
@@ -220,68 +226,72 @@ const routes = createBrowserRouter([
 
 ReactDOM.render(
   <AuthProvider>
-    <WarningsProvider>
-      <ChakraProvider theme={theme}>
-        <CompanyProvider>
-          <UserProvider>
-            <GroupProvider>
-              <ProjectProvider>
-                <DocumentProvider>
-                  <AnalysisProvider>
-                    <DetailsDocumentsProvider>
-                      <CategoryProvider>
-                        <DepartamentProvider>
-                          <TasksProvider>
-                            <DetailsTaskProvider>
-                              <EquipmentProvider>
-                                <IndicatorsProvider>
-                                  <IndicatorsAnswerProvider>
-                                    <RolesProvider>
-                                      <CrmProvider>
-                                        <TrainingProvider>
-                                          <MatrizProvider>
-                                            <TrainingsUserProvider>
-                                              <SchoolProvider>
-                                                <LeadsProvider>
-                                                  <CertificatesProvider>
-                                                    <LeadTaskProvider>
-                                                      <CrmServicesProvider>
-                                                        <ContractProvider>
-                                                          <ToastContainer />
-                                                          <React.StrictMode>
-                                                            <ThemeEditorProvider>
-                                                              <RouterProvider
-                                                                router={routes}
-                                                              />
-                                                            </ThemeEditorProvider>
-                                                          </React.StrictMode>
-                                                        </ContractProvider>
-                                                      </CrmServicesProvider>
-                                                    </LeadTaskProvider>
-                                                  </CertificatesProvider>
-                                                </LeadsProvider>
-                                              </SchoolProvider>
-                                            </TrainingsUserProvider>
-                                          </MatrizProvider>
-                                        </TrainingProvider>
-                                      </CrmProvider>
-                                    </RolesProvider>
-                                  </IndicatorsAnswerProvider>
-                                </IndicatorsProvider>
-                              </EquipmentProvider>
-                            </DetailsTaskProvider>
-                          </TasksProvider>
-                        </DepartamentProvider>
-                      </CategoryProvider>
-                    </DetailsDocumentsProvider>
-                  </AnalysisProvider>
-                </DocumentProvider>
-              </ProjectProvider>
-            </GroupProvider>
-          </UserProvider>
-        </CompanyProvider>
-      </ChakraProvider>
-    </WarningsProvider>
+    <AuditProvider>
+      <WarningsProvider>
+        <ChakraProvider theme={theme}>
+          <CompanyProvider>
+            <UserProvider>
+              <GroupProvider>
+                <ProjectProvider>
+                  <DocumentProvider>
+                    <AnalysisProvider>
+                      <DetailsDocumentsProvider>
+                        <CategoryProvider>
+                          <DepartamentProvider>
+                            <TasksProvider>
+                              <DetailsTaskProvider>
+                                <EquipmentProvider>
+                                  <IndicatorsProvider>
+                                    <IndicatorsAnswerProvider>
+                                      <RolesProvider>
+                                        <CrmProvider>
+                                          <TrainingProvider>
+                                            <MatrizProvider>
+                                              <TrainingsUserProvider>
+                                                <SchoolProvider>
+                                                  <LeadsProvider>
+                                                    <CertificatesProvider>
+                                                      <LeadTaskProvider>
+                                                        <CrmServicesProvider>
+                                                          <ContractProvider>
+                                                            <ToastContainer />
+                                                            <React.StrictMode>
+                                                              <ThemeEditorProvider>
+                                                                <RouterProvider
+                                                                  router={
+                                                                    routes
+                                                                  }
+                                                                />
+                                                              </ThemeEditorProvider>
+                                                            </React.StrictMode>
+                                                          </ContractProvider>
+                                                        </CrmServicesProvider>
+                                                      </LeadTaskProvider>
+                                                    </CertificatesProvider>
+                                                  </LeadsProvider>
+                                                </SchoolProvider>
+                                              </TrainingsUserProvider>
+                                            </MatrizProvider>
+                                          </TrainingProvider>
+                                        </CrmProvider>
+                                      </RolesProvider>
+                                    </IndicatorsAnswerProvider>
+                                  </IndicatorsProvider>
+                                </EquipmentProvider>
+                              </DetailsTaskProvider>
+                            </TasksProvider>
+                          </DepartamentProvider>
+                        </CategoryProvider>
+                      </DetailsDocumentsProvider>
+                    </AnalysisProvider>
+                  </DocumentProvider>
+                </ProjectProvider>
+              </GroupProvider>
+            </UserProvider>
+          </CompanyProvider>
+        </ChakraProvider>
+      </WarningsProvider>
+    </AuditProvider>
   </AuthProvider>,
   document.getElementById("root")
 );

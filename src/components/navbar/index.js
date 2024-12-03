@@ -254,6 +254,10 @@ export const NavBar = () => {
               src: "/companies/warnings",
               label: "Avisos",
             },
+            {
+              src: "/companies/monitoring",
+              label: "Monitoramento",
+            },
           ]}
           key={"admin-companies"}
         />

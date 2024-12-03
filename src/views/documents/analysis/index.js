@@ -24,6 +24,8 @@ import CancelDescription from "components/forms/analysis/cancel-description";
 import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
+import { AuthContext } from "providers/auth";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const AnalysisPage = () => {
   const { t } = useTranslation();
@@ -31,6 +33,7 @@ const AnalysisPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
 
+  const { dispatchAuditEvent } = useContext(AuthContext);
   const {
     getAnalysisDocuments,
     analysisDocuments,
@@ -93,6 +96,7 @@ const AnalysisPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.DOCUMENTS_ANALYSIS_LIST);
     getAnalysisDocuments(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? ""

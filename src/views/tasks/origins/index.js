@@ -27,6 +27,7 @@ import OriginForm from "./form/origin-form";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const OriginsPage = () => {
   const { t } = useTranslation();
@@ -47,8 +48,12 @@ const OriginsPage = () => {
   const { getOrigins, deleteOrigin, deleteMultipleOrigins } =
     useContext(TasksContext);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const routeTreePaths = [
     {
@@ -87,6 +92,8 @@ const OriginsPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TASKS_ORIGENS_LIST);
+
     getOrigins(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

@@ -33,6 +33,7 @@ import { TasksContext } from "providers/tasks";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const ListTasksPage = () => {
   const { t } = useTranslation();
@@ -46,8 +47,12 @@ const ListTasksPage = () => {
   const [editSelected, setEditSelected] = useState(null);
   const [selecteds, setSelecteds] = useState([]);
 
-  const { userPermissions, userAccessRule, checkPermissionForAction } =
-    useContext(AuthContext);
+  const {
+    userPermissions,
+    userAccessRule,
+    checkPermissionForAction,
+    dispatchAuditEvent,
+  } = useContext(AuthContext);
 
   const {
     getTasks,
@@ -105,6 +110,7 @@ const ListTasksPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
+    dispatchAuditEvent(AUDIT_EVENTS.TASKS_LIST);
     getTasks(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",

@@ -54,7 +54,6 @@ const TasksProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            "x-audit-event": AUDIT_EVENTS.TASKS_LIST,
           },
         }
       );
@@ -146,7 +145,6 @@ const TasksProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            "x-audit-event": AUDIT_EVENTS.TASKS_TYPES_LIST,
           },
         }
       );
@@ -196,7 +194,6 @@ const TasksProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            "x-audit-event": AUDIT_EVENTS.TASKS_CLASSIFICATIONS_LIST,
           },
         }
       );
@@ -252,7 +249,6 @@ const TasksProvider = ({ children }) => {
         {
           headers: {
             Authorization: `Bearer ${getToken()}`,
-            "x-audit-event": AUDIT_EVENTS.TASKS_ORIGENS_LIST,
           },
         }
       );
