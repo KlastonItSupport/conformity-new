@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "providers/auth";
 import { useTranslation } from "react-i18next";
 import undefinedPic from "assets/img/undefined-pic.png";
+import { AUDIT_EVENTS } from "constants/audit-events";
 
 const animation = keyframes`
 from {top: 0px;}
@@ -47,6 +48,7 @@ export const NavBar = () => {
     setPermissions,
     getUserAccessRule,
     userAccessRule,
+    dispatchAuditEvent,
   } = useContext(AuthContext);
   const history = useNavigate();
   const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
@@ -372,7 +374,10 @@ export const NavBar = () => {
                   {
                     src: "/",
                     label: t("Sair"),
-                    onClick: () => logout(history),
+                    onClick: () => {
+                      dispatchAuditEvent(AUDIT_EVENTS.USER_SIGNED_OUT);
+                      logout(history);
+                    },
                   },
                 ]}
               />

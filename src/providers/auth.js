@@ -1,9 +1,10 @@
 import { api } from "api/api";
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, useState } from "react";
 import moment from "moment";
 
 import { toast } from "react-toastify";
 import i18n from "../i18n/index";
+import { AUDIT_EVENTS } from "constants/audit-events";
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -19,7 +20,9 @@ const AuthProvider = ({ children }) => {
     try {
       const language = data.language;
       delete data.language;
-      const response = await api.post("/users/signIn", data);
+      const response = await api.post("/users/signIn", data, {
+        headers: { "x-audit-event": AUDIT_EVENTS.USER_SIGNED_IN },
+      });
 
       const { accessToken } = response.data;
       const user = {
