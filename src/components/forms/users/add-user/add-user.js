@@ -207,7 +207,7 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           errors={errors.accessRule}
           {...register("accessRule")}
           options={[
-            getUserInfo.accessRule()
+            getUserInfo().accessRule
               ? { label: "Super Admin", value: "super-admin" }
               : null,
             { label: "Super Usuário", value: "super-user" },

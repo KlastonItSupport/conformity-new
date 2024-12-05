@@ -5,7 +5,7 @@ import { useContext, useEffect } from "react";
 import { columns } from "./components/table-helper";
 import { Key, NotePencil, Trash } from "@phosphor-icons/react";
 import { UserContext } from "providers/users";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import {
@@ -25,11 +25,9 @@ import { useTranslation, withTranslation } from "react-i18next";
 import { AUDIT_EVENTS } from "constants/audit-events";
 
 const UsersPage = () => {
-  const { dealingWithAuth, getUserInfo, dispatchAuditEvent } =
-    useContext(AuthContext);
+  const { getUserInfo, dispatchAuditEvent } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
-  const history = useNavigate();
   const { isMobile } = useBreakpoint();
 
   const queryParams = useQuery();
