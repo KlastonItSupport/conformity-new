@@ -72,6 +72,7 @@ import { WarningsProvider } from "providers/warnings";
 import CompaniesPage from "views/companies";
 import GroupsPage from "views/groups";
 import SupportPage from "views/support";
+import BlogCategoriesPage from "views/companies/blog-category";
 import { AuditProvider } from "providers/audit";
 
 const routes = createBrowserRouter([
@@ -95,6 +96,10 @@ const routes = createBrowserRouter([
   {
     path: "companies/warnings",
     element: <WarningsPage />,
+  },
+  {
+    path: "companies/blog-categories",
+    element: <BlogCategoriesPage />,
   },
   {
     path: "companies/monitoring",

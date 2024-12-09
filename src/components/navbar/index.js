@@ -283,6 +283,10 @@ export const NavBar = () => {
               src: "/groups",
               label: t("Grupos e Permissões"),
             },
+            {
+              src: "/companies/blog-categories",
+              label: t("Categorias do Blog"),
+            },
           ]}
           key={"admin-admin"}
         />
