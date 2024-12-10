@@ -2,8 +2,8 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns } from "./table-helper";
-import { NotePencil, Trash, AddressBook } from "@phosphor-icons/react";
+import { columns, mockedData } from "./table-helper";
+import { NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -28,9 +28,9 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
-import BlogCategoryForm from "./components/form";
+import BlogForm from "./components/form";
 
-const BlogCategoriesPage = () => {
+const BlogPage = () => {
   const { t } = useTranslation();
   const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -194,7 +194,7 @@ const BlogCategoriesPage = () => {
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
             borderRadius="7px"
             _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
+            label={"Adicionar Conteúdo  "}
             onClick={onAddModalOpen}
             minW="150px"
             disabled={!checkPermissionForAction("companies", "canAdd")}
@@ -202,9 +202,9 @@ const BlogCategoriesPage = () => {
         </HStack>
 
         <CustomTable
-          data={roles}
+          data={mockedData}
           columns={columns}
-          title={t("Categorias")}
+          title={t("Conteúdos Cadastrados")}
           icons={tableIcons}
           searchInputValue={searchParams.get("search") ?? ""}
           onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
@@ -237,8 +237,8 @@ const BlogCategoriesPage = () => {
         </Flex>
       </VStack>
       <DeleteModal
-        title={t("Excluir Categoria")}
-        subtitle={t("Tem certeza de que deseja excluir este Categoria?")}
+        title={t("Excluir Publicação")}
+        subtitle={t("Tem certeza de que deseja excluir esta Publicação?")}
         isOpen={isDeleteModalOpen}
         onClose={onDeleteModalClose}
         onConfirm={async () => {
@@ -255,8 +255,8 @@ const BlogCategoriesPage = () => {
         isLoading={isLoading}
       />
       <DeleteModal
-        title={t("Excluir Categorias")}
-        subtitle={t("Tem certeza de que deseja excluir estas Categorias?")}
+        title={t("Excluir Publicações")}
+        subtitle={t("Tem certeza de que deseja excluir estas Publicações?")}
         isOpen={isDeleteMultipleModalOpen}
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
@@ -271,7 +271,7 @@ const BlogCategoriesPage = () => {
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
         form={
-          <BlogCategoryForm
+          <BlogForm
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
@@ -290,10 +290,10 @@ const BlogCategoriesPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Editar Categoria")}
+        title={t("Editar Publicação")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Editar")}
-        modalSize="md"
+        modalSize="2xl"
         isLoading={isLoading}
       />
 
@@ -301,7 +301,7 @@ const BlogCategoriesPage = () => {
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
         form={
-          <BlogCategoryForm
+          <BlogForm
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
@@ -313,10 +313,10 @@ const BlogCategoriesPage = () => {
           />
         }
         formRef={categoryRef}
-        title={t("Adicionar Categoria")}
+        title={t("Adicionar Publicação ao Blog")}
         leftButtonLabel={t("Cancelar")}
         rightButtonLabel={t("Adicionar")}
-        modalSize="md"
+        modalSize="2xl"
         isLoading={isLoading}
       />
     </>
@@ -326,4 +326,4 @@ const BlogCategoriesPage = () => {
 export default compose(
   withAuthenticated("companies"),
   withWarningCheck
-)(BlogCategoriesPage);
+)(BlogPage);

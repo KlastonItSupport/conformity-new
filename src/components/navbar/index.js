@@ -284,6 +284,10 @@ export const NavBar = () => {
               label: t("Grupos e Permissões"),
             },
             {
+              src: "/companies/blog",
+              label: t("Blog"),
+            },
+            {
               src: "/companies/blog-categories",
               label: t("Categorias do Blog"),
             },
