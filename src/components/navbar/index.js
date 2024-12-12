@@ -21,6 +21,7 @@ import {
   List,
   X,
   Buildings,
+  Bell,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -29,6 +30,7 @@ import { AuthContext } from "providers/auth";
 import { useTranslation } from "react-i18next";
 import undefinedPic from "assets/img/undefined-pic.png";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import Notification from "./components/notification";
 
 const animation = keyframes`
 from {top: 0px;}
@@ -351,6 +353,7 @@ export const NavBar = () => {
               Suporte
             </Text>
           </Box>
+          <Notification />
         </HStack>
         {isDesktop && (
           <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>

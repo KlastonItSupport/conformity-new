@@ -253,7 +253,7 @@ const Filters = ({
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
         borderRadius="7px"
         _active={{ bgColor: "primary.200" }}
-        label={<MagnifyingGlass size={32} color={"white"} />}
+        label={<MagnifyingGlass size={32} color={"white"} weight="bold" />}
         width="150px"
         mt={"35px !important"}
         type="submit"
