@@ -151,11 +151,7 @@ const BlogPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getBlog(
-      page,
-      queryParams.get("search") ?? "",
-      setPagination
-    );
+    const res = await getBlog(page, queryParams.get("search") ?? "");
     setPagination(res.pages);
     setBlogPosts(res.items);
   };
@@ -168,8 +164,7 @@ const BlogPage = () => {
       setSearchParams(searchParams);
       const res = await getBlog(
         searchParams.get("page") ?? 1,
-        searchParams.get("search") ?? "",
-        setPagination
+        searchParams.get("search") ?? ""
       );
 
       setPagination(res.pages);

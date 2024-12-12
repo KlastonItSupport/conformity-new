@@ -73,6 +73,8 @@ import CompaniesPage from "views/companies";
 import GroupsPage from "views/groups";
 import SupportPage from "views/support";
 import BlogCategoriesPage from "views/companies/blog-category";
+import BlogPostPage from "views/companies/blog/post";
+
 import BlogPage from "views/companies/blog";
 import { AuditProvider } from "providers/audit";
 import { BlogCategoriesProvider } from "providers/blog-categories";
@@ -105,6 +107,10 @@ const routes = createBrowserRouter([
     element: <BlogCategoriesPage />,
   },
   { path: "companies/blog", element: <BlogPage /> },
+  {
+    path: "companies/blog/post/:id",
+    element: <BlogPostPage />,
+  },
   {
     path: "companies/monitoring",
     element: <MonitoringPage />,

@@ -1,42 +1,60 @@
 import { api } from "api/api";
 import { AuthContext } from "./auth";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import moment from "moment";
 
 const BlogContext = createContext();
 
 const BlogProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
+  const [notificationsTotal, setNotificationsTotal] = useState(0);
+  const [notifications, setNotifications] = useState([]);
 
   const createBlogPost = async (data) => {
-    const response = await api.post(
-      "/blog",
-      { ...data, author: "", companyId: getUserInfo().companyId },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CREATED,
-        },
-      }
-    );
+    try {
+      const response = await api.post(
+        "/blog",
+        { ...data, author: "", companyId: getUserInfo().companyId },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CREATED,
+          },
+        }
+      );
 
-    return response.data;
+      if (response.status === 201) {
+        toast.success("Conteúdo criado com sucesso");
+        updateNotifications();
+      }
+      return response.data;
+    } catch (error) {
+      toast.error("Erro ao criar conteúdo");
+    }
   };
 
   const editBlog = async (data) => {
-    const response = await api.patch(
-      `/blog/${data.id}`,
-      { ...data, companyId: getUserInfo().companyId },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_UPDATED,
-        },
-      }
-    );
+    try {
+      const response = await api.patch(
+        `/blog/${data.id}`,
+        { ...data, companyId: getUserInfo().companyId },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_UPDATED,
+          },
+        }
+      );
 
-    return response.data;
+      if (response.status === 200) {
+        toast.success("Conteúdo atualizado com sucesso");
+      }
+      return response.data;
+    } catch (error) {
+      toast.error("Erro ao atualizar conteúdo");
+    }
   };
 
   const getBlog = async (page = 1, search = "", limit = 10) => {
@@ -48,6 +66,16 @@ const BlogProvider = ({ children }) => {
         },
       }
     );
+
+    return response.data;
+  };
+
+  const getBlogPost = async (id) => {
+    const response = await api.get(`/blog/details/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
 
     return response.data;
   };
@@ -64,6 +92,7 @@ const BlogProvider = ({ children }) => {
       if (response.status === 200) {
         if (showToast) {
           toast.success("Blog deletado com sucesso");
+          updateNotifications();
         }
       }
 
@@ -89,6 +118,22 @@ const BlogProvider = ({ children }) => {
     toast.success("Posts do Blog excluídos com sucesso!");
   };
 
+  const updateNotifications = async () => {
+    getBlog(1, "", 10000).then((data) => {
+      setNotifications(
+        data.items.map((item) => {
+          return {
+            id: item.id,
+            title: item.title,
+            description: item.resume,
+            date: moment(item.exbitionDate).format("DD/MM/YYYY"),
+          };
+        })
+      );
+      setNotificationsTotal(data.items.length);
+    });
+  };
+
   return (
     <BlogContext.Provider
       value={{
@@ -97,6 +142,11 @@ const BlogProvider = ({ children }) => {
         deleteMultipleBlog,
         createBlogPost,
         editBlog,
+        getBlogPost,
+        notifications,
+        notificationsTotal,
+        setNotificationsTotal,
+        updateNotifications,
       }}
     >
       {children}

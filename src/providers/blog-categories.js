@@ -10,18 +10,24 @@ const BlogCategoriesProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
 
   const createBlogCategory = async (data) => {
-    const response = await api.post(
-      "/blog/category",
-      { ...data, companyId: getUserInfo().companyId },
-      {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_CREATED,
-        },
+    try {
+      const response = await api.post(
+        "/blog/category",
+        { ...data, companyId: getUserInfo().companyId },
+        {
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_CREATED,
+          },
+        }
+      );
+      if (response.status === 201) {
+        toast.success("Categoria criada com sucesso");
       }
-    );
-
-    return response.data;
+      return response.data;
+    } catch (e) {
+      toast.error("Erro ao criar categoria");
+    }
   };
 
   const editBlogCategory = async (data) => {

@@ -77,9 +77,10 @@ const BlogForm = ({
       );
 
       if (formValues) {
-        setDescription(formValues.description);
+        setDescription(formValues.text);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const exbitionDate = (
@@ -223,6 +224,7 @@ const BlogForm = ({
         error={errors.goal?.message}
         defaultValue={formValues?.goal}
         height={"125px"}
+        placeholder="Descreva a meta do seu post. Exemplo: Criamos x para ..."
       />
       <FormTextArea
         label={"Resumo"}
@@ -230,6 +232,7 @@ const BlogForm = ({
         error={errors.resume?.message}
         defaultValue={formValues?.resume}
         height={"125px"}
+        placeholder="Descreva o resumo do seu post. Exemplo: Este post será sobre ..."
       />
       <TextEditor
         value={description}
