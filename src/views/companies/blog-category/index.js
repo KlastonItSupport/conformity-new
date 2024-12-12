@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
-import { NotePencil, Trash, AddressBook } from "@phosphor-icons/react";
+import { NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
   Flex,
@@ -23,12 +23,12 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 
-import { RolesContext } from "providers/roles";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import BlogCategoryForm from "./components/form";
+import { BlogCategoriesContext } from "providers/blog-categories";
 
 const BlogCategoriesPage = () => {
   const { t } = useTranslation();
@@ -46,8 +46,13 @@ const BlogCategoriesPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getRoles, deleteRole, deleteMultipleRoles, createRole, editRole } =
-    useContext(RolesContext);
+  const {
+    getBlogCategories,
+    deleteBlogCategory,
+    deleteMultipleBlogCategories,
+    createBlogCategory,
+    editBlogCategory,
+  } = useContext(BlogCategoriesContext);
 
   const {
     userPermissions,
@@ -94,8 +99,8 @@ const BlogCategoriesPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_ROLES_LIST);
-    getRoles(
+    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_LIST);
+    getBlogCategories(
       searchParams.get("page") ?? 1,
       searchParams.get("search") ?? "",
       setPagination
@@ -152,7 +157,7 @@ const BlogCategoriesPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getRoles(
+    const res = await getBlogCategories(
       page,
       queryParams.get("search") ?? "",
       setPagination
@@ -167,7 +172,7 @@ const BlogCategoriesPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getRoles(
+      const res = await getBlogCategories(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
@@ -244,7 +249,7 @@ const BlogCategoriesPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteRole(deleteId);
+          const response = await deleteBlogCategory(deleteId);
           if (response) {
             setRoles(roles.filter((category) => category.id !== deleteId));
           }
@@ -261,7 +266,7 @@ const BlogCategoriesPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleRoles(selected, setRoles, roles);
+          await deleteMultipleBlogCategories(selected, setRoles, roles);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -283,7 +288,7 @@ const BlogCategoriesPage = () => {
               setRoles(servicesCopy);
             }}
             event="edit"
-            onEdit={editRole}
+            onEdit={editBlogCategory}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -308,7 +313,7 @@ const BlogCategoriesPage = () => {
               setRoles([origin, ...roles]);
             }}
             event="add"
-            onAdd={createRole}
+            onAdd={createBlogCategory}
             setLoading={setIsLoading}
           />
         }
