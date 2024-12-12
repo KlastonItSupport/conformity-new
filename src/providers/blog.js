@@ -4,19 +4,19 @@ import { createContext, useContext } from "react";
 import { toast } from "react-toastify";
 import { AUDIT_EVENTS } from "constants/audit-events";
 
-const BlogCategoriesContext = createContext();
+const BlogContext = createContext();
 
-const BlogCategoriesProvider = ({ children }) => {
+const BlogProvider = ({ children }) => {
   const { getToken, getUserInfo } = useContext(AuthContext);
 
-  const createBlogCategory = async (data) => {
+  const createBlogPost = async (data) => {
     const response = await api.post(
-      "/blog/category",
-      { ...data, companyId: getUserInfo().companyId },
+      "/blog",
+      { ...data, author: "", companyId: getUserInfo().companyId },
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_CREATED,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CREATED,
         },
       }
     );
@@ -24,14 +24,14 @@ const BlogCategoriesProvider = ({ children }) => {
     return response.data;
   };
 
-  const editBlogCategory = async (data) => {
+  const editBlog = async (data) => {
     const response = await api.patch(
-      `/blog/category/${data.id}`,
+      `/blog/${data.id}`,
       { ...data, companyId: getUserInfo().companyId },
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_UPDATED,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_UPDATED,
         },
       }
     );
@@ -39,9 +39,9 @@ const BlogCategoriesProvider = ({ children }) => {
     return response.data;
   };
 
-  const getBlogCategories = async (page = 1, search = "", limit = 10) => {
+  const getBlog = async (page = 1, search = "", limit = 10) => {
     const response = await api.get(
-      `/blog/category?page=${page}&search=${search}&limit=${limit}`,
+      `/blog?page=${page}&search=${search}&pageSize=${limit}`,
       {
         headers: {
           Authorization: `Bearer ${getToken()}`,
@@ -52,36 +52,32 @@ const BlogCategoriesProvider = ({ children }) => {
     return response.data;
   };
 
-  const deleteBlogCategory = async (id, showToast = true) => {
+  const deleteBlog = async (id, showToast = true) => {
     try {
-      const response = await api.delete(`/blog/category/${id}`, {
+      const response = await api.delete(`/blog/${id}`, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
-          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_CATEGORIES_DELETED,
+          "x-audit-event": AUDIT_EVENTS.COMPANY_BLOG_DELETED,
         },
       });
 
       if (response.status === 200) {
         if (showToast) {
-          toast.success("Categoria do Blog deletado com sucesso");
+          toast.success("Blog deletado com sucesso");
         }
       }
 
       return true;
     } catch (error) {
       if (showToast) {
-        toast.error("Erro ao deletar Categoria do Blog");
+        toast.error("Erro ao deletar Blog");
       }
     }
   };
 
-  const deleteMultipleBlogCategories = async (
-    selecteds,
-    setServices,
-    services
-  ) => {
+  const deleteMultipleBlog = async (selecteds, setServices, services) => {
     const deletePromises = selecteds.map((selected) =>
-      deleteBlogCategory(selected.id, false)
+      deleteBlog(selected.id, false)
     );
     await Promise.all(deletePromises);
 
@@ -90,22 +86,22 @@ const BlogCategoriesProvider = ({ children }) => {
         (service) => !selecteds.some((selected) => selected.id === service.id)
       )
     );
-    toast.success("Categorias do Blog excluídos com sucesso!");
+    toast.success("Posts do Blog excluídos com sucesso!");
   };
 
   return (
-    <BlogCategoriesContext.Provider
+    <BlogContext.Provider
       value={{
-        getBlogCategories,
-        deleteBlogCategory,
-        deleteMultipleBlogCategories,
-        createBlogCategory,
-        editBlogCategory,
+        getBlog,
+        deleteBlog,
+        deleteMultipleBlog,
+        createBlogPost,
+        editBlog,
       }}
     >
       {children}
-    </BlogCategoriesContext.Provider>
+    </BlogContext.Provider>
   );
 };
 
-export { BlogCategoriesContext, BlogCategoriesProvider };
+export { BlogContext, BlogProvider };

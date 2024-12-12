@@ -2,7 +2,7 @@ import { CustomTable } from "components/components";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { columns, mockedData } from "./table-helper";
+import { columns } from "./table-helper";
 import { NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
@@ -23,12 +23,12 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 
-import { RolesContext } from "providers/roles";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import BlogForm from "./components/form";
+import { BlogContext } from "providers/blog";
 
 const BlogPage = () => {
   const { t } = useTranslation();
@@ -42,12 +42,12 @@ const BlogPage = () => {
   const [deleteId, setDeleteId] = useState(false);
   const [selected, setSelected] = useState([]);
   const [editSelected, setEditSelected] = useState(false);
-  const [roles, setRoles] = useState([]);
+  const [blogPosts, setBlogPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState(null);
 
-  const { getRoles, deleteRole, deleteMultipleRoles, createRole, editRole } =
-    useContext(RolesContext);
+  const { getBlog, deleteBlog, deleteMultipleBlog, createBlogPost, editBlog } =
+    useContext(BlogContext);
 
   const {
     userPermissions,
@@ -94,13 +94,12 @@ const BlogPage = () => {
   } = useDisclosure();
 
   useEffect(() => {
-    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_ROLES_LIST);
-    getRoles(
+    dispatchAuditEvent(AUDIT_EVENTS.COMPANY_BLOG_LIST);
+    getBlog(
       searchParams.get("page") ?? 1,
-      searchParams.get("search") ?? "",
-      setPagination
+      searchParams.get("search") ?? ""
     ).then((res) => {
-      setRoles(res.items);
+      setBlogPosts(res.items);
       setPagination(res.pages);
     });
 
@@ -152,13 +151,13 @@ const BlogPage = () => {
   const updateData = async (page) => {
     searchParams.set("page", page);
     setSearchParams(searchParams);
-    const res = await getRoles(
+    const res = await getBlog(
       page,
       queryParams.get("search") ?? "",
       setPagination
     );
     setPagination(res.pages);
-    setRoles(res.items);
+    setBlogPosts(res.items);
   };
 
   const debouncedSearch = debounce(async (inputValue) => {
@@ -167,14 +166,14 @@ const BlogPage = () => {
       searchParams.set("page", 1);
 
       setSearchParams(searchParams);
-      const res = await getRoles(
+      const res = await getBlog(
         searchParams.get("page") ?? 1,
         searchParams.get("search") ?? "",
         setPagination
       );
 
       setPagination(res.pages);
-      setRoles(res.items);
+      setBlogPosts(res.items);
     }
   }, 500);
 
@@ -202,7 +201,7 @@ const BlogPage = () => {
         </HStack>
 
         <CustomTable
-          data={mockedData}
+          data={blogPosts}
           columns={columns}
           title={t("Conteúdos Cadastrados")}
           icons={tableIcons}
@@ -225,7 +224,7 @@ const BlogPage = () => {
         >
           {pagination && (
             <Pagination
-              data={roles}
+              data={blogPosts}
               onClickPagination={updateData}
               itemsPerPage={5}
               totalPages={pagination.totalPages}
@@ -244,9 +243,11 @@ const BlogPage = () => {
         onConfirm={async () => {
           setIsLoading(true);
 
-          const response = await deleteRole(deleteId);
+          const response = await deleteBlog(deleteId);
           if (response) {
-            setRoles(roles.filter((category) => category.id !== deleteId));
+            setBlogPosts(
+              blogPosts.filter((category) => category.id !== deleteId)
+            );
           }
 
           setIsLoading(false);
@@ -261,7 +262,7 @@ const BlogPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsDeleteLoading(true);
-          await deleteMultipleRoles(selected, setRoles, roles);
+          await deleteMultipleBlog(selected, setBlogPosts, blogPosts);
           setIsDeleteLoading(false);
           onDeleteMultipleModalClose();
         }}
@@ -275,15 +276,15 @@ const BlogPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onEditModalClose();
-              const servicesCopy = [...roles];
+              const servicesCopy = [...blogPosts];
               const index = servicesCopy.findIndex(
                 (item) => item.id === origin.id
               );
               servicesCopy[index] = origin;
-              setRoles(servicesCopy);
+              setBlogPosts(servicesCopy);
             }}
             event="edit"
-            onEdit={editRole}
+            onEdit={editBlog}
             id={editSelected.id}
             formValues={editSelected}
             setLoading={setIsLoading}
@@ -305,10 +306,10 @@ const BlogPage = () => {
             formRef={categoryRef}
             onClose={(origin) => {
               onAddModalClose();
-              setRoles([origin, ...roles]);
+              setBlogPosts([origin, ...blogPosts]);
             }}
             event="add"
-            onAdd={createRole}
+            onAdd={createBlogPost}
             setLoading={setIsLoading}
           />
         }

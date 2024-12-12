@@ -76,6 +76,7 @@ import BlogCategoriesPage from "views/companies/blog-category";
 import BlogPage from "views/companies/blog";
 import { AuditProvider } from "providers/audit";
 import { BlogCategoriesProvider } from "providers/blog-categories";
+import { BlogProvider } from "providers/blog";
 
 const routes = createBrowserRouter([
   {
@@ -260,22 +261,24 @@ ReactDOM.render(
                                                   <LeadsProvider>
                                                     <CertificatesProvider>
                                                       <BlogCategoriesProvider>
-                                                        <LeadTaskProvider>
-                                                          <CrmServicesProvider>
-                                                            <ContractProvider>
-                                                              <ToastContainer />
-                                                              <React.StrictMode>
-                                                                <ThemeEditorProvider>
-                                                                  <RouterProvider
-                                                                    router={
-                                                                      routes
-                                                                    }
-                                                                  />
-                                                                </ThemeEditorProvider>
-                                                              </React.StrictMode>
-                                                            </ContractProvider>
-                                                          </CrmServicesProvider>
-                                                        </LeadTaskProvider>
+                                                        <BlogProvider>
+                                                          <LeadTaskProvider>
+                                                            <CrmServicesProvider>
+                                                              <ContractProvider>
+                                                                <ToastContainer />
+                                                                <React.StrictMode>
+                                                                  <ThemeEditorProvider>
+                                                                    <RouterProvider
+                                                                      router={
+                                                                        routes
+                                                                      }
+                                                                    />
+                                                                  </ThemeEditorProvider>
+                                                                </React.StrictMode>
+                                                              </ContractProvider>
+                                                            </CrmServicesProvider>
+                                                          </LeadTaskProvider>
+                                                        </BlogProvider>
                                                       </BlogCategoriesProvider>
                                                     </CertificatesProvider>
                                                   </LeadsProvider>

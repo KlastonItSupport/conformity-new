@@ -1,7 +1,7 @@
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormInput } from "components/components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { sleep } from "helpers/sleep";
@@ -10,14 +10,16 @@ import moment from "moment";
 import { CalendarCustom } from "components/calendar";
 import { FormTextArea } from "components/components";
 import TextEditor from "components/text-editor-mce";
+import { BlogCategoriesContext } from "providers/blog-categories";
 
 const blogSchema = Yup.object().shape({
   title: Yup.string().required("Campo obrigatório"),
-  categories: Yup.string().required("Campo obrigatório"),
+  blogCategoryId: Yup.string().required("Campo obrigatório"),
   status: Yup.string().required("Campo obrigatório"),
   tag: Yup.string().required("Campo obrigatório"),
   goal: Yup.string().required("Campo obrigatório"),
   resume: Yup.string().required("Campo obrigatório"),
+  exbitionDate: Yup.string().required("Campo obrigatório"),
 });
 
 const BlogForm = ({
@@ -37,13 +39,21 @@ const BlogForm = ({
     setValue,
   } = useForm({ resolver: yupResolver(blogSchema) });
 
+  const { getBlogCategories } = useContext(BlogCategoriesContext);
   const dateRef = useRef();
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const [description, setDescription] = useState("");
+  const [blogCategoriesOptions, setBlogCategoriesOptions] = useState([]);
   const richTextRef = useRef(null);
 
   const onSubmit = async (data) => {
     setLoading(true);
+    data.text = description;
+    if (data.exbitionDate) {
+      data.exbitionDate = moment(data.exbitionDate, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+    }
 
     if (event === "add") {
       sleep(1000);
@@ -59,9 +69,17 @@ const BlogForm = ({
   };
 
   useEffect(() => {
-    if (formValues) {
-      setDescription(formValues.description);
-    }
+    getBlogCategories(1, "", 10000).then((data) => {
+      setBlogCategoriesOptions(
+        data.items.map((item) => {
+          return { label: item.name, value: item.id };
+        })
+      );
+
+      if (formValues) {
+        setDescription(formValues.description);
+      }
+    });
   }, []);
 
   const exbitionDate = (
@@ -89,7 +107,7 @@ const BlogForm = ({
         onChange={(e) => {
           if (e.target.value.length === 10) setIsShowingCalendar(false);
         }}
-        error={errors.date?.message}
+        error={errors.exbitionDate?.message}
         defaultValue={
           formValues && formValues.exbitionDate
             ? moment(formValues.exbitionDate).format("DD/MM/YYYY")
@@ -142,28 +160,15 @@ const BlogForm = ({
       <VStack w={"100%"} alignItems={"start"}>
         <SelectInput
           label="Categorias"
-          {...register("categories")}
-          errors={errors.categories}
+          {...register("blogCategoryId")}
+          errors={errors.blogCategoryId}
           paddingLabel="0"
-          options={[
-            {
-              label: "Categoria 1",
-              value: "Categoria 1",
-            },
-            {
-              label: "Categoria 2",
-              value: "Categoria 2",
-            },
-            {
-              label: "Categoria 3",
-              value: "Categoria 3",
-            },
-          ]}
+          options={blogCategoriesOptions}
           defaultValue={
-            formValues && formValues.categories
+            formValues && formValues.blogCategoryId
               ? {
-                  label: formValues.categories,
-                  value: formValues.categories,
+                  label: formValues.blogCategoryName,
+                  value: formValues.blogCategoryId,
                 }
               : null
           }
