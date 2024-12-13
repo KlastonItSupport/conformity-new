@@ -259,6 +259,7 @@ const Filters = () => {
   const categoryInput = formDefaultValues.categoryId && (
     <VStack w={"100%"} align={"start"}>
       <SelectInput
+        mt={"10px"}
         label="Categoria"
         {...register("categoryId")}
         errors={errors.categoryId}
@@ -330,7 +331,7 @@ const Filters = () => {
     setDocuments(res.items);
   };
   return isMobile ? (
-    <VStack w={"100%"} paddingX={"20px"} as="form">
+    <VStack w={"100%"} as="form">
       <HStack mb={"30px "}>
         {initialDateInput}
         {finalDateInput}
@@ -343,7 +344,7 @@ const Filters = () => {
         fontSize="sm"
         fontWeight="bold"
         h="50"
-        bgColor={"primary.100"}
+        bgColor={"header.100"}
         _hover={{ bgColor: "primary.200" }}
         textColor={"white"}
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -357,7 +358,7 @@ const Filters = () => {
   ) : (
     <HStack
       justifyContent={"space-between"}
-      w={"95%"}
+      w={"100%"}
       position="relative"
       pb={"20px"}
       alignItems={"center"}
@@ -372,8 +373,8 @@ const Filters = () => {
       <ButtonPrimary
         fontSize="sm"
         fontWeight="bold"
-        h="50"
-        bgColor={"primary.100"}
+        h="40px"
+        bgColor={"header.100"}
         _hover={{ bgColor: "primary.200" }}
         textColor={"white"}
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"

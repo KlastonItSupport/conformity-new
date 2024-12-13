@@ -24,8 +24,8 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="50"
-      bgColor={"primary.100"}
+      h="40px"
+      bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
       boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -41,8 +41,8 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="50"
-      bgColor={"primary.100"}
+      h="40px"
+      bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
       boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -56,8 +56,8 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="50"
-      bgColor={"primary.100"}
+      h="40px"
+      bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
       boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -73,8 +73,8 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="50"
-      bgColor={"primary.100"}
+      h="40px"
+      bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
       boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -88,7 +88,7 @@ const ActionsButtons = ({ canAdd }) => {
   return (
     <>
       {isMobile ? (
-        <VStack w={"100%"} px={"20px"} mb={"30px !important"}>
+        <VStack w={"100%"} mb={"30px !important"}>
           <HStack w={"100%"} justifyContent={"space-between"}>
             {addButton}
             {listButton}
@@ -99,7 +99,7 @@ const ActionsButtons = ({ canAdd }) => {
           </HStack>
         </VStack>
       ) : (
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
+        <HStack justify={"start"} w={"100%"}>
           {addButton}
           {listButton}
           {revisivionButton}

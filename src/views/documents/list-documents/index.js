@@ -27,6 +27,7 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import Wrapper from "components/wrapper";
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
@@ -204,10 +205,9 @@ const ListDocumentsPage = () => {
   };
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
         <ActionsButtons
           canAdd={checkPermissionForAction("documents", "canAdd")}
         />
@@ -285,7 +285,7 @@ const ListDocumentsPage = () => {
         modalSize="2xl"
         isLoading={isEditLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

@@ -236,7 +236,7 @@ const ListTasksPage = () => {
       <NavBar />
       <Wrapper routeTreePaths={routeTreePaths}>
         <HStack
-          justify={{ sm: "center", md: "start" }}
+          justify={{ sm: "space-between", md: "start" }}
           width={"100%"}
           pb={"15px"}
         >

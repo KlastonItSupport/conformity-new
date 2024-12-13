@@ -27,6 +27,7 @@ import { ButtonPrimary } from "components/button-primary";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import Wrapper from "components/wrapper";
 
 const CategoriesPage = () => {
   const { t } = useTranslation();
@@ -171,16 +172,15 @@ const CategoriesPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
+        <HStack justify={"start"} w={"100%"} pb={"10px"}>
           <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
+            h="40px"
+            bgColor={"header.100"}
             _hover={{ bgColor: "primary.200" }}
             textColor={"white"}
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -300,7 +300,7 @@ const CategoriesPage = () => {
         modalSize="md"
         isLoading={createCategoryIsLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

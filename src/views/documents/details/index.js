@@ -103,7 +103,12 @@ const DocumentsDetailsPage = () => {
     <>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
+        <VStack w={isMobile ? "100%" : "95vw"}>
+          <NavigationLinks
+            routeTree={routeTreePaths}
+            padding={isMobile ? "0px 15px" : null}
+          />
+        </VStack>
         {isMobile ? (
           <VStack w={"100%"} h={"100%"} paddingX={"10px"}>
             {leftContainer}

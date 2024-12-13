@@ -26,6 +26,7 @@ import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
 import { AuthContext } from "providers/auth";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import Wrapper from "components/wrapper";
 
 const AnalysisPage = () => {
   const { t } = useTranslation();
@@ -188,11 +189,9 @@ const AnalysisPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
-
         <CustomTable
           data={analysisDocuments}
           columns={columns}
@@ -212,7 +211,7 @@ const AnalysisPage = () => {
         />
         <Flex
           justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
+          w={isMobile ? "99vw" : "100%"}
           bgColor={"white"}
         >
           {pagination && (
@@ -307,7 +306,7 @@ const AnalysisPage = () => {
         rightButtonLabel={t("Confirmar")}
         isLoading={modalLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

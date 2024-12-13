@@ -1,10 +1,7 @@
 import { HStack, Link } from "@chakra-ui/react";
-import { useBreakpoint } from "hooks/usebreakpoint";
 import React from "react";
 
 const NavigationLinks = ({ routeTree, padding }) => {
-  const { isMobile } = useBreakpoint();
-
   return (
     <HStack
       w={"100%"}
