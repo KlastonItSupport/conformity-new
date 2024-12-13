@@ -12,8 +12,8 @@ const SelectInput = forwardRef(
           <Text
             fontSize="sm"
             fontWeight="500"
-            pb={paddingLabel ? paddingLabel : "10px"}
-            pl={paddingLabel ?? "5px"}
+            pb={paddingLabel ? paddingLabel : "0px"}
+            pl={paddingLabel ?? "0px"}
           >
             {label}
           </Text>
@@ -31,6 +31,7 @@ const SelectInput = forwardRef(
           bgColor={"primary.50"}
           cursor={"pointer"}
           {...rest}
+          mt={"0px !important"}
         >
           {defaultValue && (
             <option key={defaultValue.value} value={defaultValue.value}>

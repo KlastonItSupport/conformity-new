@@ -10,14 +10,7 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
-import {
-  Flex,
-  HStack,
-  VStack,
-  useBreakpoint,
-  useDisclosure,
-} from "@chakra-ui/react";
-import NavigationLinks from "components/navigationLinks";
+import { Flex, HStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
 
@@ -34,6 +27,7 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import Wrapper from "components/wrapper";
 
 const ListTasksPage = () => {
   const { t } = useTranslation();
@@ -240,14 +234,17 @@ const ListTasksPage = () => {
   return (
     <>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <HStack justify={{ sm: "center", md: "start" }} w={"95vw"} py={"20px"}>
+      <Wrapper routeTreePaths={routeTreePaths}>
+        <HStack
+          justify={{ sm: "center", md: "start" }}
+          width={"100%"}
+          pb={"15px"}
+        >
           <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
+            h="40px"
+            bgColor={"header.100"}
             _hover={{ bgColor: "primary.200" }}
             textColor={"white"}
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -261,8 +258,8 @@ const ListTasksPage = () => {
           <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
+            h="40px"
+            bgColor={"header.100"}
             _hover={{ bgColor: "primary.200" }}
             textColor={"white"}
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -316,7 +313,8 @@ const ListTasksPage = () => {
             />
           )}
         </Flex>
-      </VStack>
+      </Wrapper>
+
       <DeleteModal
         title={t("Excluir Tarefa")}
         subtitle={t("Tem certeza de que deseja excluir esta Tarefa?")}

@@ -203,7 +203,7 @@ const Filters = ({
     setIsLoading(false);
   };
   return isMobile ? (
-    <VStack w={"100%"} paddingX={"20px"} as="form">
+    <VStack w={"100%"} as="form">
       {statusInput}
       {originInput}
 
@@ -215,7 +215,7 @@ const Filters = ({
         fontSize="sm"
         fontWeight="bold"
         h="50"
-        bgColor={"primary.100"}
+        bgColor={"header.100"}
         _hover={{ bgColor: "primary.200" }}
         textColor={"white"}
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -229,7 +229,7 @@ const Filters = ({
   ) : (
     <HStack
       justifyContent={"space-between"}
-      w={"95%"}
+      w={"100%"}
       position="relative"
       pb={"20px"}
       alignItems={"center"}
@@ -246,8 +246,8 @@ const Filters = ({
       <ButtonPrimary
         fontSize="sm"
         fontWeight="bold"
-        h="50"
-        bgColor={"primary.100"}
+        h="40px"
+        bgColor={"header.100"}
         _hover={{ bgColor: "primary.200" }}
         textColor={"white"}
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
@@ -255,7 +255,7 @@ const Filters = ({
         _active={{ bgColor: "primary.200" }}
         label={<MagnifyingGlass size={32} color={"white"} weight="bold" />}
         width="150px"
-        mt={"35px !important"}
+        mt={"20px !important"}
         type="submit"
         isLoading={isLoading}
       />

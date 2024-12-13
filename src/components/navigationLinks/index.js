@@ -7,9 +7,9 @@ const NavigationLinks = ({ routeTree, padding }) => {
 
   return (
     <HStack
-      w={isMobile ? "100vw" : "95vw"}
-      pb={"20px"}
-      paddingX={isMobile ? "20px" : 0}
+      w={"100%"}
+      pb={"10px"}
+      // paddingX={isMobile ? "px" : 0}
       padding={padding}
     >
       {routeTree.map((route, index) => {

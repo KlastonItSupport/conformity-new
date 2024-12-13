@@ -21,7 +21,6 @@ import {
   List,
   X,
   Buildings,
-  Bell,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -327,7 +326,7 @@ export const NavBar = () => {
         w={"100%"}
         bgColor={"#2B3D4C"}
         height={"65px"}
-        marginBottom={"40px"}
+        marginBottom={"5px"}
         px={"20px"}
         position={"fixed"}
         top={0}

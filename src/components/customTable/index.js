@@ -323,7 +323,7 @@ const TableCustom = ({
   };
   return (
     <Box
-      w={isMobile ? "99%" : deskWidth ?? "95%"}
+      w={isMobile ? "99%" : deskWidth ?? "100%"}
       margin={"0 auto"}
       bgColor={"white"}
       minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
