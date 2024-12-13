@@ -13,6 +13,15 @@ const DetailsDocumentsProvider = ({ children }) => {
   const [description, setDescription] = useState("");
   //   const location = useLocation();
 
+  const checkPermissionToDetailsDocuments = async (id) => {
+    const response = await api.get(`/documents/permission/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  };
+
   const getDocumentDetails = async (id) => {
     try {
       const response = await api.get(`documents/document-details/${id}`, {
@@ -76,6 +85,7 @@ const DetailsDocumentsProvider = ({ children }) => {
         createAdditionalDocument,
         description,
         setDescription,
+        checkPermissionToDetailsDocuments,
       }}
     >
       {children}

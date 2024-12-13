@@ -26,6 +26,7 @@ import { DetailsTaskContext } from "providers/details-task";
 import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
+import withDetailsPermission from "hoc/use-task-details-permission";
 
 const TaskDetailsPage = () => {
   const { t } = useTranslation();
@@ -208,5 +209,6 @@ const TaskDetailsPage = () => {
 
 export default compose(
   withAuthenticated("tasks"),
-  withWarningCheck
+  withWarningCheck,
+  withDetailsPermission("tasks")
 )(TaskDetailsPage);

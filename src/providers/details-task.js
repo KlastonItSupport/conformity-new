@@ -9,6 +9,15 @@ const DetailsTaskContext = createContext();
 const DetailsTaskProvider = ({ children }) => {
   const { getToken } = useContext(AuthContext);
 
+  const checkPermissionToDetailsTask = async (id) => {
+    const response = await api.get(`/tasks-details/permissions/${id}`, {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    return response.data;
+  };
+
   const getSpecificTask = async (id) => {
     try {
       const response = await api.get(`/tasks/${id}`, {
@@ -188,6 +197,7 @@ const DetailsTaskProvider = ({ children }) => {
         deleteAttachment,
         changeTaskPrevision,
         getPrevisionsHistory,
+        checkPermissionToDetailsTask,
       }}
     >
       {children}
