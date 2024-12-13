@@ -21,6 +21,7 @@ import {
   List,
   X,
   Buildings,
+  Bell,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -90,7 +91,7 @@ export const NavBar = () => {
       type: "dashboard",
       icon: (
         <ItemMenu
-          icon={<House size={28} />}
+          icon={<House size={24} />}
           itemsList={[
             {
               src: "/",
@@ -105,7 +106,7 @@ export const NavBar = () => {
       type: "documents",
       icon: (
         <ItemMenu
-          icon={<FolderSimple size={28} />}
+          icon={<FolderSimple size={24} />}
           itemsList={[
             {
               src: "/documents",
@@ -128,7 +129,7 @@ export const NavBar = () => {
       type: "tasks",
       icon: (
         <ItemMenu
-          icon={<CheckFat size={28} />}
+          icon={<CheckFat size={24} />}
           itemsList={[
             {
               src: "/tasks",
@@ -155,7 +156,7 @@ export const NavBar = () => {
       type: "equipments",
       icon: (
         <ItemMenu
-          icon={<Gear size={28} />}
+          icon={<Gear size={24} />}
           itemsList={[
             {
               src: "/equipments",
@@ -170,7 +171,7 @@ export const NavBar = () => {
       type: "indicators",
       icon: (
         <ItemMenu
-          icon={<ChartLineUp size={28} />}
+          icon={<ChartLineUp size={24} />}
           itemsList={[
             {
               src: "/indicators/graphs",
@@ -189,7 +190,7 @@ export const NavBar = () => {
       type: "crm",
       icon: (
         <ItemMenu
-          icon={<HardDrives size={28} />}
+          icon={<HardDrives size={24} />}
           itemsList={[
             {
               src: "/crm/clients-suppliers",
@@ -220,7 +221,7 @@ export const NavBar = () => {
       type: "users",
       icon: (
         <ItemMenu
-          icon={<Users size={28} />}
+          icon={<Users size={24} />}
           itemsList={[
             {
               src: "/trainings",
@@ -247,7 +248,7 @@ export const NavBar = () => {
       type: "companies",
       icon: (
         <ItemMenu
-          icon={<Buildings size={28} />}
+          icon={<Buildings size={24} />}
           itemsList={[
             {
               src: "/companies/roles",
@@ -326,7 +327,7 @@ export const NavBar = () => {
         w={"100%"}
         bgColor={"#2B3D4C"}
         height={"65px"}
-        marginBottom={"5px"}
+        marginBottom={"40px"}
         px={"20px"}
         position={"fixed"}
         top={0}
@@ -335,7 +336,7 @@ export const NavBar = () => {
         <HStack w={"40%"}>
           <Img
             src={whiteLogo}
-            w={"128px"}
+            w={"124px"}
             onClick={() => navigate("/users")}
             cursor={"pointer"}
           />
@@ -398,9 +399,9 @@ export const NavBar = () => {
           <HStack justifyContent={"end"} w={"100%"} zIndex={10}>
             <Box cursor={"pointer"} isOpen={isOpen} onClick={toggleMenu}>
               {!isOpen ? (
-                <List size={28} color="white" />
+                <List size={24} color="white" />
               ) : (
-                <X size={28} color="white" />
+                <X size={24} color="white" />
               )}
             </Box>
           </HStack>

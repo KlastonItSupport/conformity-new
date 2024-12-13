@@ -44,7 +44,7 @@ const Notification = () => {
           zIndex={11}
           touchAction="manipulation"
         >
-          <Bell size={28} color="#FFF" />
+          <Bell size={24} color="#FFF" />
 
           {notificationsTotal > 0 && (
             <>
