@@ -114,7 +114,7 @@ const TaskForm = ({
 
       setResponsables(
         data[4].map((item) => {
-          return { label: item.name, value: item.name };
+          return { label: item.name, value: item.id };
         })
       );
 
@@ -136,6 +136,10 @@ const TaskForm = ({
 
   const onSubmit = async (data) => {
     setLoading(true);
+    data.userId = data.responsable;
+    data.responsable = responsables.find(
+      (item) => item.value === data.responsable
+    ).label;
     if (event === "add") {
       const datePrevision = moment(data.datePrevision, "DD/MM/YYYY").format(
         "YYYY-MM-DD"
