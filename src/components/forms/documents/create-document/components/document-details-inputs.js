@@ -2,8 +2,18 @@ import { FormInput } from "components/components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-const DocumentDetailsInputs = ({ register, errors, formValues }) => {
+const DocumentDetailsInputs = ({ register, errors, formValues, setValue }) => {
   const { t } = useTranslation();
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      // Obtener el nombre del archivo sin la extensión
+      const fileName = e.target.files[0].name.replace(/\.[^/.]+$/, "");
+      // Establecer el nombre en el campo de nombre
+      setValue("name", fileName);
+    }
+  };
+
   return (
     <>
       <FormInput
@@ -18,7 +28,9 @@ const DocumentDetailsInputs = ({ register, errors, formValues }) => {
         bgColor={"primary.50"}
         label={t("Insira seu documento")}
         className="center-file-input"
-        {...register("document")}
+        {...register("document", {
+          onChange: handleFileChange
+        })}
         multiple
         error={errors.document?.message}
       />

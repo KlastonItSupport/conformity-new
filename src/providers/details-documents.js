@@ -13,13 +13,27 @@ const DetailsDocumentsProvider = ({ children }) => {
   const [description, setDescription] = useState("");
   //   const location = useLocation();
 
-  const checkPermissionToDetailsDocuments = async (id) => {
-    const response = await api.get(`/documents/permission/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+const checkPermissionToDetailsDocuments = async (id) => {
+    try {
+      console.log('Checking permissions for document:', id);
+      console.log('Token:', getToken());
+  
+      const response = await api.get(`/documents/permission/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      
+      console.log('Permission response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking permissions:', {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        config: error.config,
+      });
+      return { isAllowed: false, message: error.response?.data?.message || 'Error checking permissions' };
+    }
   };
 
   const getDocumentDetails = async (id) => {

@@ -3,13 +3,18 @@ import FormInput from "components/form-input/form-input";
 import { useForm } from "react-hook-form";
 import editUsersFormSchema from "./schema";
 import SelectInput from "components/select";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "providers/users";
+import { CompanyContext } from "providers/company";
 import { useTranslation } from "react-i18next";
+import { Center, Spinner } from "@chakra-ui/react";
 
 export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
   const { t } = useTranslation();
   const { editUser } = useContext(UserContext);
+  const { getCompanies } = useContext(CompanyContext);
+  const [companyOptions, setCompanyOptions] = useState([]);
+  const [companiesIsLoading, setCompaniesIsLoading] = useState(false);
   const {
     handleSubmit,
     register,
@@ -19,19 +24,60 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
   });
 
   const onSubmit = async (data) => {
-    await editUser(data);
-    onCloseModal();
+    try {
+      const userData = {
+        name: data.name,
+        email: data.email,
+        celphone: data.celphone,
+        companyId: data.companyId,
+        role: data.role,
+        departament: data.departament,
+        accessRule: data.accessRule,
+        status: data.status
+      };
+
+      console.log('Updating user with data:', userData); // Para debugging
+
+      await editUser(userData);
+      onCloseModal();
+    } catch (error) {
+      console.error('Error updating user:', error);
+      // Aquí podrías mostrar un mensaje de error al usuario
+    }
   };
 
   const getAccessDefaultValue = () => {
     if (formValues.accessRule === "super-admin") {
-      return { label: "Super Admin", value: "super-admin" };
+      return { label: "Root", value: "super-admin" };
     }
     if (formValues.accessRule === "super-user") {
       return { label: "Super Usuário", value: "super-user" };
     }
     return { label: "Usuário", value: "user" };
   };
+
+  const fetchCompaniesData = async () => {
+    try {
+      setCompaniesIsLoading(true);
+      const companies = await getCompanies();
+      console.log('Companies fetched:', companies); // Para debugging
+      setCompanyOptions(
+        companies.map((company) => ({
+          label: company.name,
+          value: company.id // Asegúrate de que este sea el ID correcto
+        }))
+      );
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    } finally {
+      setCompaniesIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCompaniesData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <form
@@ -89,6 +135,26 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         {...register("celphone")}
         error={errors.celphone?.message}
       />
+
+{companiesIsLoading ? (
+        <Center>
+          <Spinner />
+        </Center>
+      ) : (
+        <SelectInput
+          label={t("Empresa *")}
+          {...register("companyId")}
+          errors={errors.companyId}
+          options={companyOptions}
+          placeholder={t("Selecione uma empresa")}
+          defaultValue={{
+            label: formValues.company?.name,
+            value: formValues.companyId
+          }}
+        />
+      )}
+
+
       <SelectInput
         error={errors.role}
         options={[
@@ -115,7 +181,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         {...register("accessRule")}
         defaultValue={getAccessDefaultValue()}
         options={[
-          { label: "Super Admin", value: "super-admin" },
+          { label: "Root", value: "super-admin" },
           { label: "Super Usuário", value: "super-user" },
           { label: "Usuário", value: "user" },
         ]}
@@ -140,6 +206,8 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
           },
         ]}
       />
+
+      
     </form>
   );
 };

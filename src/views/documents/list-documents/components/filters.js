@@ -134,29 +134,21 @@ const Filters = () => {
         ref={initialDateRef}
         variant="auth"
         fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
         type="text"
-        margin="0 0 -16px 0 "
+        margin="0"
         placeholder="dd/mm/yyyy"
         fontWeight="500"
         size="lg"
         borderRadius="6px"
-        bgColor={"primary.50"}
-        label={"Data Inicial"}
+        bgColor="primary.50"
+        label="Data Inicial"
+        width="100%"
         {...register("initialDate")}
         onClick={() => setIsShowingCalendarInitial(!isShowingCalendarInitial)}
         autocomplete="off"
         onChange={(e) => {
           if (e.target.value.length === 10) {
             setIsShowingCalendarInitial(false);
-            // try {
-            //   const value = e.target.value;
-            //   const initialDate = moment(value, "DD/MM/YYYY").format(
-            //     "YYYY-MM-DD"
-            //   );
-            //   searchParams.set("initialDate", initialDate);
-            //   setSearchParams(searchParams);
-            // } catch (_) {}
           }
           if (e.target.value.length === 0) {
             searchParams.delete("initialDate");
@@ -166,15 +158,13 @@ const Filters = () => {
         defaultValue={formDefaultValues.initialDate}
       />
       {isShowingCalendarInitial && (
-        <Box position={"absolute"} top="20" left={0} zIndex={2} w="100%">
+        <Box position="absolute" top="12" left={0} zIndex={2} w="100%">
           <CalendarCustom
             onChangeDate={(date) => {
               const day = String(date.getDate()).padStart(2, "0");
               const month = String(date.getMonth() + 1).padStart(2, "0");
               const year = date.getFullYear();
-
               const formattedDate = `${day}/${month}/${year}`;
-
               setValue("initialDate", formattedDate);
               setIsShowingCalendarInitial(!isShowingCalendarInitial);
             }}
@@ -183,32 +173,34 @@ const Filters = () => {
       )}
     </Box>
   );
-
+  
   const finalDateInput = (
     <Box position="relative" w="100%">
       <FormInput
         ref={endDateRef}
         variant="auth"
         fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
         type="text"
+        margin="0"
         placeholder="dd/mm/yyyy"
-        margin="0 0 -16px 0 "
         fontWeight="500"
         size="lg"
         borderRadius="6px"
-        bgColor={"primary.50"}
-        label={"Data Final"}
+        bgColor="primary.50"
+        label="Data Final"
+        width="100%"
         {...register("endDate")}
         onClick={() => setIsShowingCalendarEnd(!isShowingCalendarEnd)}
         autocomplete="off"
         onChange={(e) => {
           if (e.target.value.length === 10) {
             setIsShowingCalendarEnd(false);
-            // try {
+                        // try {
             //   const value = e.target.value;
-            //   const endDate = moment(value, "DD/MM/YYYY").format("YYYY-MM-DD");
-            //   searchParams.set("finalDate", endDate);
+            //   const initialDate = moment(value, "DD/MM/YYYY").format(
+            //     "YYYY-MM-DD"
+            //   );
+            //   searchParams.set("initialDate", initialDate);
             //   setSearchParams(searchParams);
             // } catch (_) {}
           }
@@ -220,15 +212,13 @@ const Filters = () => {
         defaultValue={formDefaultValues.endDate}
       />
       {isShowingCalendarEnd && (
-        <Box position={"absolute"} top="20" left={0} zIndex={2} w="100%">
+        <Box position="absolute" top="12" left={0} zIndex={2} w="100%">
           <CalendarCustom
             onChangeDate={(date) => {
               const day = String(date.getDate()).padStart(2, "0");
               const month = String(date.getMonth() + 1).padStart(2, "0");
               const year = date.getFullYear();
-
               const formattedDate = `${day}/${month}/${year}`;
-
               setValue("endDate", formattedDate);
               setIsShowingCalendarEnd(!isShowingCalendarEnd);
             }}
@@ -239,7 +229,7 @@ const Filters = () => {
   );
 
   const departamentInput = formDefaultValues.departamentId && (
-    <VStack w={"100%"} align={"start"}>
+    <Box w="100%">
       <SelectInput
         label="Departamento"
         {...register("departamentId")}
@@ -252,14 +242,17 @@ const Filters = () => {
           ...departaments,
         ]}
         defaultValue={formDefaultValues.departamentId}
+        size="lg"
+        bgColor="primary.50"
+        margin="0"
+        width="100%"
       />
-    </VStack>
+    </Box>
   );
-
+  
   const categoryInput = formDefaultValues.categoryId && (
-    <VStack w={"100%"} align={"start"}>
+    <Box w="100%">
       <SelectInput
-        mt={"10px"}
         label="Categoria"
         {...register("categoryId")}
         errors={errors.categoryId}
@@ -271,23 +264,25 @@ const Filters = () => {
           ...categories,
         ]}
         defaultValue={formDefaultValues.categoryId}
+        size="lg"
+        bgColor="primary.50"
+        margin="0"
+        width="100%"
       />
-    </VStack>
+    </Box>
   );
-
+  
   const authorInput = (
     <FormInput
       variant="auth"
       fontSize="sm"
-      ms={{ base: "0px", md: "0px" }}
       type="text"
       placeholder="Ex: Bruno Santos"
-      margin="0 0 10px 0 "
+      margin="0"
       fontWeight="500"
       size="lg"
       borderRadius="6px"
-      bgColor={"primary.50"}
-      innerPadding="10px 0"
+      bgColor="primary.50"
       label="Autor"
       width="100%"
       {...register("author")}
@@ -360,7 +355,8 @@ const Filters = () => {
       justifyContent={"space-between"}
       w={"100%"}
       position="relative"
-      pb={"20px"}
+      pt={"30px"}
+      pb={"10px"}
       alignItems={"center"}
       as={"form"}
       onSubmit={handleSubmit(onSubmit)}
@@ -372,7 +368,7 @@ const Filters = () => {
       {authorInput}
       <ButtonPrimary
         fontSize="sm"
-        fontWeight="bold"
+        fontWeight=" "
         h="40px"
         bgColor={"header.100"}
         _hover={{ bgColor: "primary.200" }}

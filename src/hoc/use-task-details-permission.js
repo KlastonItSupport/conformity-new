@@ -20,23 +20,36 @@ const withDetailsPermission = (type) => (WrappedComponent) => {
     };
 
     const handlePermission = async () => {
-      setIsLoading(true);
-      const id = getIdFromQuery();
-      if (!id) {
-        setIsAllowed(false);
-        setIsLoading(false);
-        return;
-      }
-      const permission =
-        type === "documents"
+      try {
+        setIsLoading(true);
+        const id = getIdFromQuery();
+        console.log('Checking permission for ID:', id);
+        
+        if (!id) {
+          console.log('No ID found in query');
+          setIsAllowed(false);
+          setIsLoading(false);
+          return;
+        }
+    
+        const permission = type === "documents"
           ? await checkPermissionToDetailsDocuments(id)
           : await checkPermissionToDetailsTask(id);
-      setIsAllowed(permission.isAllowed);
-      setIsLoading(false);
+        
+        console.log('Permission response:', permission);
+        setIsAllowed(permission.isAllowed);
+      } catch (error) {
+        console.error('Error in handlePermission:', error);
+        setIsAllowed(false);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
+    
     useEffect(() => {
       handlePermission();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
 
     if (isLoading) {

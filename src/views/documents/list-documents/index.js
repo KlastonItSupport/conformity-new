@@ -208,9 +208,12 @@ const ListDocumentsPage = () => {
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
+        {/* 
         <ActionsButtons
           canAdd={checkPermissionForAction("documents", "canAdd")}
-        />
+        /> 
+        */}
+
         <Filters />
         <CustomTable
           data={documents}
@@ -227,6 +230,8 @@ const ListDocumentsPage = () => {
               })
             );
           }}
+           actionsButtons={<ActionsButtons canAdd={checkPermissionForAction("documents", "canAdd")} />}
+          actionsButtonsPosition="center"
         />
         <Flex
           justifyContent={"end"}

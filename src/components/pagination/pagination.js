@@ -91,28 +91,36 @@ export const Pagination = ({
   };
 
   return (
-    <HStack padding={hasPadding ? "20px" : "0px"}>
+    <HStack 
+      padding={hasPadding ? "20px" : "0"}
+      spacing="2"
+      justify="center"
+      width="100%"
+    >
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
-        fontWeight={"normal"}
+        fontWeight="normal"
         onClick={() => onPageClick(Number(currentPage) - 1)}
         disabled={Number(currentPage) === 1}
-        bgColor={"secondaryGray.100"}
-        maxHeight={"30px"}
+        bgColor="secondaryGray.100"
+        height="30px"
+        minW="auto"
+        px="3"
       >
         {t("Anterior")}
       </Button>
       {handleMiddlePages()}
-
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
-        fontWeight={"normal"}
+        fontWeight="normal"
         onClick={() => onPageClick(Number(currentPage) + 1)}
         disabled={Number(currentPage) === lastPage || lastPage === 0}
-        bgColor={"secondaryGray.100"}
-        maxHeight={"30px"}
+        bgColor="secondaryGray.100"
+        height="30px"
+        minW="auto"
+        px="3"
       >
         {t("Próximo")}
       </Button>

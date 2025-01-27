@@ -9,6 +9,7 @@ const addUserSchema = Yup.object().shape({
     .required("Senha Obrigatória")
     .min(10, "Minimo de 10 digitos"),
   celphone: Yup.string().required("O telefone é obrigatório"),
+  companyId: Yup.string().required("A empresa é obrigatória"),
   role: Yup.string().required("O cargo é obrigatório"),
   departament: Yup.string().required("O departamexnto é obrigatório"),
   status: Yup.string().required("Status é obrigatório"),

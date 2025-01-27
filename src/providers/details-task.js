@@ -10,12 +10,26 @@ const DetailsTaskProvider = ({ children }) => {
   const { getToken } = useContext(AuthContext);
 
   const checkPermissionToDetailsTask = async (id) => {
-    const response = await api.get(`/tasks-details/permissions/${id}`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
-    });
-    return response.data;
+    try {
+      console.log('Checking permissions for document:', id);
+      console.log('Token:', getToken());
+  
+      const response = await api.get(`/tasks-details/permissions/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+        },
+      });
+      
+      console.log('Permission response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking permissions:', {
+        status: error.response?.status,
+        message: error.response?.data?.message || error.message,
+        config: error.config,
+      });
+      return { isAllowed: false, message: error.response?.data?.message || 'Error checking permissions' };
+    }
   };
 
   const getSpecificTask = async (id) => {

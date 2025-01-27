@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  Button,
   Flex,
   FormLabel,
   Heading,
@@ -145,7 +144,7 @@ export const SignInForm = () => {
             <option value="es">{t("Espanhol")}</option>
           </Select>
           <Flex mb="24px">
-            <NavLink to="/auth/forgot-password">
+            <NavLink to="/forgot-password">
               <Text
                 color={"primary.100"}
                 fontSize="sm"

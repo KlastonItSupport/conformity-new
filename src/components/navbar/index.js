@@ -21,7 +21,6 @@ import {
   List,
   X,
   Buildings,
-  Bell,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -90,16 +89,15 @@ export const NavBar = () => {
     {
       type: "dashboard",
       icon: (
-        <ItemMenu
-          icon={<House size={24} />}
-          itemsList={[
-            {
-              src: "/",
-              label: "N/A",
-            },
-          ]}
-          key={"admin-dashboard"}
-        />
+        <Box 
+          onClick={() => navigate("/")} 
+          cursor="pointer" 
+          color="#86A2BB" 
+          _hover={{ color: "white" }}
+          mr="15px"
+        >
+          <House size={24} />
+        </Box>
       ),
     },
     {
@@ -332,6 +330,7 @@ export const NavBar = () => {
         position={"fixed"}
         top={0}
         zIndex={3}
+        boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
       >
         <HStack w={"40%"}>
           <Img

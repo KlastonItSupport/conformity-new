@@ -28,7 +28,7 @@ const ActionsButtons = ({ canAdd }) => {
       bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
-      boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
       borderRadius="7px"
       _active={{ bgColor: "primary.200" }}
       label={"Adicionar"}
@@ -45,7 +45,7 @@ const ActionsButtons = ({ canAdd }) => {
       bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
-      boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
       borderRadius="7px"
       _active={{ bgColor: "primary.200" }}
       label={"Lista mestre"}
@@ -60,7 +60,7 @@ const ActionsButtons = ({ canAdd }) => {
       bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
-      boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
       borderRadius="7px"
       _active={{ bgColor: "primary.200" }}
       label={"Revisões"}
@@ -77,7 +77,7 @@ const ActionsButtons = ({ canAdd }) => {
       bgColor={"header.100"}
       _hover={{ bgColor: "primary.200" }}
       textColor={"white"}
-      boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
       borderRadius="7px"
       _active={{ bgColor: "primary.200" }}
       label={"Lembretes"}
@@ -89,7 +89,7 @@ const ActionsButtons = ({ canAdd }) => {
     <>
       {isMobile ? (
         <VStack w={"100%"} mb={"30px !important"}>
-          <HStack w={"100%"} justifyContent={"space-between"}>
+          <HStack w={"100%"}  justifyContent={"space-between"}>
             {addButton}
             {listButton}
           </HStack>

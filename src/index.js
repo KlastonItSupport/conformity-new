@@ -9,6 +9,7 @@ import theme from "./theme/theme";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SignInPage from "views/sign-in";
+import ForgotPasswordPage from "views/forgot-password";
 import { UserProvider } from "providers/users";
 import { CompanyProvider } from "providers/company";
 import { GroupProvider } from "providers/group";
@@ -88,6 +89,10 @@ const routes = createBrowserRouter([
   {
     path: "signin",
     element: <SignInPage />,
+  },
+  {
+    path: "forgot-password",
+    element: <ForgotPasswordPage />,
   },
   {
     path: "users",

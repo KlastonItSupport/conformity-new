@@ -88,7 +88,7 @@ export const InteractiveButtons = ({
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
         onClick={handleExcel}
-        sx={{ borderRadius: "none" }}
+        borderRadius="md"
         padding={isMobile ? 0 : null}
       >
         Excel
@@ -96,13 +96,13 @@ export const InteractiveButtons = ({
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
         onClick={handleCSV}
-        sx={{ borderRadius: "none" }}
+        borderRadius="md"
       >
         CSV
       </Button>
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}
-        sx={{ borderRadius: "none" }}
+        borderRadius="md"
       >
         Print
       </Button>

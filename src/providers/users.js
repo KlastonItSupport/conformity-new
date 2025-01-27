@@ -130,11 +130,20 @@ const UserProvider = ({ children }) => {
   const editUser = async (data) => {
     try {
       setEditIsLoading(true);
+      
+      // Asegurarse de que el companyId sea una string
+      const userData = {
+        ...data,
+        companyId: String(data.companyId),
+      };
 
-      const response = await api.patch(`/users/${editId.id}`, data, {
+      console.log('Sending user data:', userData); // Debug log
+
+      const response = await api.patch(`/users/${editId.id}`, userData, {
         headers: {
           Authorization: `Bearer ${getToken()}`,
           "x-audit-event": AUDIT_EVENTS.COMPANY_USERS_UPDATED,
+          'Content-Type': 'application/json', // Añadir explícitamente el Content-Type
         },
       });
 
@@ -144,17 +153,22 @@ const UserProvider = ({ children }) => {
         );
 
         const updatedUsers = [...users];
-
-        updatedUsers[editedUserIndex] = response.data;
-
+        updatedUsers[editedUserIndex] = {
+          ...response.data,
+          companyId: userData.companyId, // Asegurarse de mantener el companyId correcto
+        };
         setUsers(updatedUsers);
 
         toast.success(i18n.t("Usuário editado com sucesso"));
+        return true;
       } else {
         toast.error(i18n.t("Resposta inválida da API ao editar usuário"));
+        return false;
       }
     } catch (error) {
+      console.error("Error editing user:", error);
       toast.error(i18n.t("Ocorreu um erro ao editar usuário"));
+      return false;
     } finally {
       setEditIsLoading(false);
     }

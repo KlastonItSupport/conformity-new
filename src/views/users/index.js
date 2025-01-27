@@ -208,7 +208,7 @@ const UsersPage = () => {
       <NavBar />
       <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
         <NavigationLinks routeTree={routeTreePaths} />
-        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
+        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "50px" : 0}>
           <ButtonPrimary
             fontSize="sm"
             fontWeight="bold"

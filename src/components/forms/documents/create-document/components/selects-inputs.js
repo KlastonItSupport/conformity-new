@@ -171,12 +171,11 @@ const SelectsInputs = ({
             { label: "Externo", value: "extern" },
           ]}
           defaultValue={
-            formValues
-              ? {
-                  label: formValues.type === "intern" ? "Interno" : "Externo",
-                  value: formValues.type,
-                }
-              : null
+            formValues?.type ? {
+              label: formValues.type === "intern" ? "Interno" : "Externo",
+              value: formValues.type,
+            }
+            : { label: "Selecione um tipo", value: "" }
           }
         />
       </VStack>

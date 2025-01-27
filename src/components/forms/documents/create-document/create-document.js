@@ -126,6 +126,7 @@ const DocumentForm = ({ formRef, onClose, setIsLoading, event = "add" }) => {
           register={register}
           errors={errors}
           formValues={formValues}
+          setValue={setValue}
         />
         <SelectsInputs
           register={register}

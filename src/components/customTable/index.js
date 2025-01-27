@@ -18,6 +18,8 @@ import { InteractiveButtons } from "./components/interactive-buttons";
 import FormInput from "components/form-input/form-input";
 import { useBreakpoint } from "hooks/usebreakpoint";
 import { useTranslation } from "react-i18next";
+import { MagnifyingGlass } from "@phosphor-icons/react";
+
 
 const TableCustom = ({
   columns,
@@ -37,6 +39,8 @@ const TableCustom = ({
   border,
   borderRadius,
   paginationComponent,
+  actionsButtons,
+  actionsButtonsPosition = 'left',
 }) => {
   const { isMobile } = useBreakpoint();
   const { t } = useTranslation();
@@ -291,24 +295,40 @@ const TableCustom = ({
 
   const searchInput = () => {
     return (
-      <HStack>
-        <Text>Search:</Text>
-        <FormInput
-          variant="auth"
-          fontSize="sm"
-          ms={{ base: "0px", md: "0px" }}
-          type="text"
-          placeholder={t("Pesquisar")}
-          margin="0 0 10px 0 "
-          fontWeight="500"
-          size="lg"
-          borderRadius="6px"
-          bgColor={"primary.50"}
-          width="200px"
-          onChange={onChangeSearchInput}
-          defaultValue={searchInputValue}
-        />
-      </HStack>
+<HStack
+  spacing={4}
+  align="center"
+  p={2}
+>
+  <MagnifyingGlass 
+    size={24} 
+    weight="bold"
+    color="var(--chakra-colors-gray-600)"
+  />
+  <FormInput
+    variant="auth"
+    fontSize="sm"
+    ms={0}
+    type="text"
+    placeholder={t("Pesquisar")}
+    fontWeight="500"
+    size="lg"
+    borderRadius="8px"
+    bgColor="primary.50"
+    width="240px"
+    _hover={{ 
+      bgColor: "gray.100",
+      borderColor: "primary.200"
+    }}
+    _focus={{
+      bgColor: "white",
+      borderColor: "primary.300",
+      boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+    }}
+    onChange={onChangeSearchInput}
+    defaultValue={searchInputValue}
+  />
+</HStack>
     );
   };
 
@@ -331,33 +351,48 @@ const TableCustom = ({
       borderRadius={borderRadius}
       padding={border ? "0 15px" : null}
     >
-      <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
-        <Flex
-          flexDirection={isMobile ? "column" : "row"}
-          w={"100%"}
-          justifyContent={"space-between"}
-        >
-          <Text
-            fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
-            color={"navy.700"}
-            fontWeight={"bold"}
-            paddingBottom={isMobile ? "10px" : "0"}
-          >
-            {title}
-          </Text>
-          {showSearchInput && searchInput()}
-        </Flex>
-        {data.length > 0 && (
-          <InteractiveButtons
-            columns={columns}
-            data={data}
-            setVisibleColumns={setVisibleColumns}
-            visibleColumns={visibleColumns}
-            downloadTitle={title}
-            formatOnDownLoad={formatOnDownLoad}
-          />
-        )}
-      </VStack>
+   <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
+  <Flex
+    flexDirection={isMobile ? "column" : "row"}
+    w={"100%"}
+    justifyContent={"space-between"}
+    alignItems={"center"}
+    gap={"10px"}
+  >
+    <Text
+      fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
+      color={"navy.700"}
+      fontWeight={"bold"}
+      paddingBottom={isMobile ? "10px" : "0"}
+      flex="1"  // Allow title to take available space
+    >
+      {title}
+    </Text>
+    
+    {actionsButtons && (
+      <Flex
+        justifyContent={"center"}  // Always center
+        alignItems={"center"}
+        flex="1"  // Take equal space
+      >
+        {actionsButtons}
+      </Flex>
+    )}
+    
+    {showSearchInput && searchInput()}
+  </Flex>
+  
+  {data.length > 0 && (
+    <InteractiveButtons
+      columns={columns}
+      data={data}
+      setVisibleColumns={setVisibleColumns}
+      visibleColumns={visibleColumns}
+      downloadTitle={title}
+      formatOnDownLoad={formatOnDownLoad}
+    />
+  )}
+</VStack>
       <Box width={"100%"} overflow={"auto"}>
         <Table overflow={"auto"}>
           <Thead>
