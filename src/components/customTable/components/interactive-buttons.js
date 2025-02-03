@@ -84,42 +84,53 @@ export const InteractiveButtons = ({
     setVisibleColumns([...visibleColumns, column]);
   };
   return (
-    <HStack spacing={"0"}>
+    <HStack spacing={"4"} bg="white" p={3} borderRadius="md" boxShadow="sm">
       <Button
-        _hover={{ bgColor: "secondaryGray.400" }}
+        bg="blue.500"
+        color="white"
+        _hover={{ bg: "blue.600" }}
         onClick={handleExcel}
         borderRadius="md"
-        padding={isMobile ? 0 : null}
+        height="32px"
+        px={3}
       >
         Excel
       </Button>
       <Button
-        _hover={{ bgColor: "secondaryGray.400" }}
+        bg="green.500"
+        color="white"
+        _hover={{ bg: "green.600" }}
         onClick={handleCSV}
         borderRadius="md"
+        height="32px"
+        px={3}
       >
         CSV
       </Button>
       <Button
-        _hover={{ bgColor: "secondaryGray.400" }}
+        bg="purple.500"
+        color="white"
+        _hover={{ bg: "purple.600" }}
         borderRadius="md"
+        height="32px"
+        px={3}
       >
         Print
       </Button>
       <Menu>
         <MenuButton
-          px={4}
-          py={2}
-          transition="all 0.2s"
+          as={Button}
+          bg="teal.500"
+          color="white"
+          _hover={{ bg: "teal.600" }}
           borderRadius="md"
-          borderWidth="1px"
-          _hover={{ bgColor: "secondaryGray.400" }}
-          border={"none"}
-          fontWeight={"semibold"}
+          height="32px"
+          px={3}
+          rightIcon={<ChevronDownIcon />}
         >
-          {isMobile ? "Column" : "Column Visibility"} <ChevronDownIcon />
+          {isMobile ? "Column" : "Column Visibility"}
         </MenuButton>
-        <MenuList>
+        <MenuList bg="white" boxShadow="xl" borderRadius="md">
           {columns.map((column) => {
             const isShowingThisColumn = visibleColumns.find(
               (visibleColumn) => column.header === visibleColumn
@@ -128,6 +139,8 @@ export const InteractiveButtons = ({
               visibleColumns.length === 1 ? true : false;
             return (
               <MenuItem
+                bg="white"
+                _hover={{ bg: "gray.100" }}
                 display={"flex"}
                 justifyContent={"space-between"}
                 onClick={() =>

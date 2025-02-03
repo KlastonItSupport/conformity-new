@@ -343,60 +343,72 @@ const TableCustom = ({
   };
   return (
     <Box
-    w={isMobile ? "99%" : deskWidth ?? "100%"}
-    margin={"0 auto"}
-    bgColor={"#fafafa"} 
-    minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
-    border={border}
-    borderRadius="10px"  
-    padding="24px"
-    boxShadow="sm" 
-    p="16px"
-  >
-   <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
-      <Flex
-        flexDirection={isMobile ? "column" : "row"}
-        w={"100%"}
-        justifyContent={"space-between"}
-        alignItems={"center"}
-        gap={"10px"}
-      >
-    <Text
-      fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
-      color={"navy.700"}
-      fontWeight={"bold"}
-      paddingBottom={isMobile ? "10px" : "0"}
-      flex="1"  // Allow title to take available space
+      w={isMobile ? "99%" : deskWidth ?? "100%"}
+      margin={"0 auto"}
+      bgColor={"#fafafa"} 
+      minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
+      border={border}
+      borderRadius="10px"  
+      padding="5px"
+      boxShadow="sm"
     >
-      {title}
-    </Text>
-    
-    {actionsButtons && (
-      <Flex
-        justifyContent={"center"}  // Always center
-        alignItems={"center"}
-        flex="1"  // Take equal space
-      >
-        {actionsButtons}
-      </Flex>
-    )}
-    
-    {showSearchInput && searchInput()}
-  </Flex>
-  
-  {data.length > 0 && (
-    <InteractiveButtons
-      columns={columns}
-      data={data}
-      setVisibleColumns={setVisibleColumns}
-      visibleColumns={visibleColumns}
-      downloadTitle={title}
-      formatOnDownLoad={formatOnDownLoad}
-    />
-  )}
-</VStack>
+      <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
+        <Flex
+          flexDirection={isMobile ? "column" : "row"}
+          w={"100%"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+          padding={"20px"}
+          gap={"10px"}
+        >
+          <Text
+            fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
+            color={"navy.700"}
+            fontWeight={"bold"}
+            paddingBottom={isMobile ? "10px" : "0"}
+            flex="1"  // Allow title to take available space
+          >
+            {title}
+          </Text>
+          
+          {actionsButtons && (
+            <Flex
+              justifyContent={"center"}  // Always center
+              alignItems={"center"}
+              flex="1"  // Take equal space
+            >
+              {actionsButtons}
+            </Flex>
+          )}
+          
+          {showSearchInput && searchInput()}
+        </Flex>
+        
+        {data.length > 0 && (
+          <InteractiveButtons
+            columns={columns}
+            data={data}
+            setVisibleColumns={setVisibleColumns}
+            visibleColumns={visibleColumns}
+            downloadTitle={title}
+            formatOnDownLoad={formatOnDownLoad}
+          />
+        )}
+      </VStack>
       <Box width={"100%"} overflow={"auto"}>
-        <Table overflow={"auto"}>
+        <Table 
+          overflow={"auto"}
+          backgroundColor="white"
+          padding="16px"
+          borderCollapse="separate"
+          borderSpacing="0"
+          sx={{
+            'td, th': {
+              backgroundColor: 'white',
+              padding: '7px 16px',
+            },
+          }}
+        >
           <Thead>
             <Tr>
             <Th borderWidth="0.5px" borderColor="#000000">

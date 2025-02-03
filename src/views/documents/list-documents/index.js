@@ -230,7 +230,7 @@ const ListDocumentsPage = () => {
               })
             );
           }}
-           actionsButtons={<ActionsButtons canAdd={checkPermissionForAction("documents", "canAdd")} />}
+          actionsButtons={<ActionsButtons canAdd={checkPermissionForAction("documents", "canAdd")} />}
           actionsButtonsPosition="center"
         />
         <Flex

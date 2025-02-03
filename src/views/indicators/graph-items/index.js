@@ -210,7 +210,7 @@ const GraphItemsPage = () => {
   return (
     <>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
+      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
         <NavigationLinks routeTree={routeTreePaths} />
         <HStack
           display={"flex"}

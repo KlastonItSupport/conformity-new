@@ -79,12 +79,12 @@ const GraphsPage = () => {
   return (
     <>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} paddingX={{ sm: "20px" }} />
+      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
+        <NavigationLinks routeTree={routeTreePaths} paddingX={{ sm: "10px" }} />
         <HStack
           justify={"start"}
           w={isMobile ? "100vw" : "95vw"}
-          paddingX={isMobile ? "20px" : 0}
+          paddingX={isMobile ? "10px" : 0}
           py={"20px"}
         ></HStack>
         <Filters
