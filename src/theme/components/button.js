@@ -98,6 +98,21 @@ export const buttonStyles = {
             bg: mode("secondaryGray.100", "brand.400")(props),
           },
         }),
+        pagination: (props) => ({
+          bg: mode("#1f2d39", "navy.900")(props),
+          color: "white",
+          _active: {
+            bg: mode("brand.500", "brand.400")(props),
+          },
+          _disabled: {
+            bg: mode("#1f2d39", "navy.900")(props),
+            opacity: 0.6,
+            cursor: "not-allowed",
+          },
+          _hover: {
+            bg: mode("brand.500", "brand.400")(props),
+          },
+        }),
       },
     },
   },

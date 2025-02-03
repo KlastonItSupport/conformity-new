@@ -1,4 +1,4 @@
-import { Button, HStack } from "@chakra-ui/react";
+import { Button, HStack, useColorMode } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 
 export const Pagination = ({
@@ -11,6 +11,7 @@ export const Pagination = ({
   lastPage,
   hasPadding = true,
 }) => {
+  const { colorMode } = useColorMode();
   const pages = [];
   const { t } = useTranslation();
 
@@ -96,6 +97,7 @@ export const Pagination = ({
       spacing="2"
       justify="center"
       width="100%"
+      bg={colorMode === "light" ? "#1f2d39" : "navy.900"}
     >
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}

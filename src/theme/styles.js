@@ -65,11 +65,18 @@ export const globalStyles = {
   },
   styles: {
     global: (props) => ({
-      body: {
+      'html, body': {
         overflowX: "hidden",
-        bg: mode("#FFFFFF", "navy.900")(props),
+        bg: mode("#1f2d39", "navy.900")(props),
         fontFamily: "DM Sans",
         letterSpacing: "-0.5px",
+      },
+      '#root': {
+        bg: mode("#1f2d39", "navy.900")(props),
+        minHeight: '100vh',
+      },
+      '.chakra-stack': {
+        bg: 'transparent',
       },
       input: {
         color: "gray.700",

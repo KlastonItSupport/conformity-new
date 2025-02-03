@@ -171,6 +171,58 @@ const AuthProvider = ({ children }) => {
     });
   };
 
+  const forgotPassword = async (email) => {
+    try {
+      await api.post('/auth/forgot-password', { email }, {
+        headers: {
+          'x-audit-event': AUDIT_EVENTS.USER_FORGOT_PASSWORD
+        }
+      });
+      
+      toast.success(i18n.t('Email de recuperação enviado com sucesso'));
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.status === 404
+        ? i18n.t('Email não encontrado')
+        : error.response?.status === 429
+        ? i18n.t('Muitas tentativas. Tente novamente mais tarde')
+        : i18n.t('Erro ao enviar email de recuperação');
+      
+      toast.error(errorMessage);
+      return false;
+    }
+  };
+
+  const resetPassword = async (token, newPassword) => {
+    try {
+      await api.post('/users/reset-password', { token, newPassword }, {
+        headers: {
+          'x-audit-event': AUDIT_EVENTS.USER_RESET_PASSWORD
+        }
+      });
+      toast.success(i18n.t('Senha alterada com sucesso'));
+      return true;
+    } catch (error) {
+      toast.error(i18n.t('Token inválido ou expirado'));
+      return false;
+    }
+  };
+
+  const changePassword = async (data) => {
+    try {
+      const response = await api.post('users/change-password', {
+        token: data.token,
+        id: data.id,
+        newPassword: data.newPassword
+      });
+      toast.success('Senha alterada com sucesso!');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erro ao alterar senha');
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -193,6 +245,9 @@ const AuthProvider = ({ children }) => {
         isAuthenticated,
         hasPermissionToAccessThisPage,
         dispatchAuditEvent,
+        forgotPassword,
+        resetPassword,
+        changePassword,
       }}
     >
       {children}
@@ -201,3 +256,4 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
+

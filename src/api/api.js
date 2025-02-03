@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://api.klaston.com/",
+  baseURL: "https://api.klaston.com",
   // baseURL: "http://localhost:3000/",
   // baseURL: "https://conformity-new-api-production.up.railway.app/",
 });
@@ -13,7 +13,12 @@ api.interceptors.request.use(request => {
   console.log('Data:', request.data);
   console.groupEnd();
   return request;
-});
+},
+error => {
+  console.error('Request Error:', error);
+  return Promise.reject(error);
+}
+);
 
 // Interceptor para respuestas
 api.interceptors.response.use(
@@ -32,7 +37,15 @@ api.interceptors.response.use(
     console.log('Full Error:', error);
     console.groupEnd();
     return Promise.reject(error);
-  }
+  },
+error => {
+  console.group('❌ API Error');
+  console.log('Status:', error.response?.status);
+  console.log('Data:', error.response?.data);
+  console.log('Full Error:', error);
+  console.groupEnd();
+  return Promise.reject(error);
+}
 );
 
 export default api;

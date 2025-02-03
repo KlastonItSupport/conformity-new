@@ -101,7 +101,26 @@
         "Insira sua foto":"Insert your profile picture",
         "Data de aniversário":"Birthdate",
         "Salvar":"Save",
-        "Formato inválido. Use o formato dd/mm/yyyy":"Invalid format. Use the format dd/mm/yyyy"
+        "Formato inválido. Use o formato dd/mm/yyyy":"Invalid format. Use the format dd/mm/yyyy",
+        "forgotPassword": {
+            "title": "Password Recovery",
+            "subtitle": "Enter your email to receive recovery instructions",
+            "emailSent": "Email sent! Please check your inbox",
+            "emailPlaceholder": "example@email.com",
+            "emailLabel": "Email *",
+            "submitButton": "Send",
+            "errors": {
+                "emailRequired": "Email is required",
+                "emailInvalid": "Invalid email",
+                "sendError": "Error sending recovery email",
+                "sendSuccess": "Recovery email sent successfully"
+            }
+        },
+        "Email de recuperação enviado com sucesso": "Recovery email sent successfully",
+        "Email não encontrado": "Email not found",
+        "Erro ao enviar email de recuperação": "Error sending recovery email",
+        "Email de recuperação enviado! Verifique sua caixa de entrada.": "Recovery email sent! Check your inbox.",
+        "Insira seu email para receber instruções de recuperação": "Enter your email to receive recovery instructions"
     }
 }
 

@@ -5,7 +5,7 @@ import { columns } from "./companieArray";
 import { NotePencil } from "@phosphor-icons/react";
 import { CompanyContext } from "providers/company";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
 import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
@@ -25,12 +25,10 @@ import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 
 const CompaniesPage = () => {
-  const { dealingWithAuth, getUserInfo, dispatchAuditEvent } =
-    useContext(AuthContext);
+  const { getUserInfo, dispatchAuditEvent } = useContext(AuthContext);
   const { isMobile, isDesktop } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParams = useQuery();
-  const history = useNavigate();
   const { t } = useTranslation();
 
   const {

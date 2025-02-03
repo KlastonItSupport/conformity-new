@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Flex,
@@ -7,7 +7,6 @@ import {
   VStack,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { HSeparator } from "components/separator/Separator";
 import { AuthContext } from "providers/auth";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,9 +20,11 @@ const forgotPasswordSchema = yup.object().shape({
 });
 
 export const ForgotPasswordForm = () => {
-  const { resetPassword } = useContext(AuthContext);
+  const { forgotPassword } = useContext(AuthContext);
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
   const {
     handleSubmit,
@@ -33,15 +34,23 @@ export const ForgotPasswordForm = () => {
     resolver: yupResolver(forgotPasswordSchema),
   });
 
-  const textColor = useColorModeValue("navy.700", "white");
-  const textColorSecondary = "gray.600";
-  const [isLoading, setIsLoading] = React.useState(false);
-
-  const handleResetPassword = async (data) => {
-    setIsLoading(true);
-    await resetPassword(data.email);
-    navigate("/auth/signin");
-    setIsLoading(false);
+  const handleForgotPassword = async (data) => {
+    try {
+      setIsLoading(true);
+      const success = await forgotPassword(data.email);
+      
+      if (success) {
+        setEmailSent(true);
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          navigate("/signin");
+        }, 3000);
+      }
+    } catch (error) {
+      // Error handled by AuthContext
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -53,20 +62,23 @@ export const ForgotPasswordForm = () => {
       <VStack alignItems={{ lg: "normal", sm: "start", md: "start" }}>
         <Heading
           fontSize={{ lg: "36px", md: "32px", sm: "24px" }}
-          color={textColor}
+          color={useColorModeValue("navy.700", "white")}
         >
           {t("Recuperar Senha")}
         </Heading>
         <Text
           mb="36px"
           ms="4px"
-          color={textColorSecondary}
+          color={emailSent ? "green.500" : "gray.600"}
           fontWeight="400"
           fontSize="md"
         >
-          {t("Insira seu email para receber instruções de recuperação")}
+          {emailSent
+            ? t("Email de recuperação enviado! Verifique sua caixa de entrada.")
+            : t("Insira seu email para receber instruções de recuperação")}
         </Text>
       </VStack>
+
       <Flex
         direction="column"
         w={{ base: "100%", md: "420px" }}
@@ -76,10 +88,7 @@ export const ForgotPasswordForm = () => {
         mx={{ base: "auto", lg: "unset" }}
         me="auto"
       >
-        <Flex align="center" mb="25px">
-          <HSeparator />
-        </Flex>
-        <form onSubmit={handleSubmit(handleResetPassword)}>
+        <form onSubmit={handleSubmit(handleForgotPassword)}>
           <FormInput
             variant="auth"
             fontSize="sm"
@@ -94,6 +103,7 @@ export const ForgotPasswordForm = () => {
             {...register("email")}
             error={errors.email?.message}
             label="Email *"
+            isDisabled={emailSent}
           />
 
           <ButtonPrimary
@@ -107,10 +117,20 @@ export const ForgotPasswordForm = () => {
             textColor={"white"}
             boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
             borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
             type="submit"
-            label={t("Enviar")}
             isLoading={isLoading}
+            isDisabled={emailSent}
+            label={t("Enviar")}
+          />
+          
+          <ButtonPrimary
+            fontSize="sm"
+            fontWeight="bold"
+            w="100%"
+            h="50"
+            variant="outline"
+            onClick={() => navigate("/signin")}
+            label={t("Voltar ao Login")}
           />
         </form>
       </Flex>

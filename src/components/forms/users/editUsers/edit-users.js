@@ -21,34 +21,48 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(editUsersFormSchema),
+    defaultValues: {
+      name: formValues.name,
+      email: formValues.email,
+      celphone: formValues.celphone,
+      companyId: formValues.companyId, // Ensure companyId is included
+      role: formValues.role,
+      departament: formValues.departament,
+      accessRule: formValues.accessRule,
+      status: formValues.status,
+    },
   });
 
   const onSubmit = async (data) => {
+    const userData = {
+      ...data,
+      id: formValues.id,
+      companyId: data.companyId,
+    };
+  
+    console.log('Original Company ID:', formValues.companyId);
+    console.log('New Company ID:', data.companyId);
+    console.log('Full User Data:', userData);
+  
     try {
-      const userData = {
-        name: data.name,
-        email: data.email,
-        celphone: data.celphone,
-        companyId: data.companyId,
-        role: data.role,
-        departament: data.departament,
-        accessRule: data.accessRule,
-        status: data.status
-      };
-
-      console.log('Updating user with data:', userData); // Para debugging
-
-      await editUser(userData);
-      onCloseModal();
+      const response = await editUser(userData);
+      console.log('Full API Response:', response);
+      
+      if (response) {
+        onCloseModal();
+      }
     } catch (error) {
-      console.error('Error updating user:', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+      console.error('Error Details:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data
+      });
     }
   };
 
   const getAccessDefaultValue = () => {
-    if (formValues.accessRule === "super-admin") {
-      return { label: "Root", value: "super-admin" };
+    if (formValues.accessRule === "root") {
+      return { label: "root", value: "root" };
     }
     if (formValues.accessRule === "super-user") {
       return { label: "Super Usuário", value: "super-user" };
@@ -60,12 +74,8 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
     try {
       setCompaniesIsLoading(true);
       const companies = await getCompanies();
-      console.log('Companies fetched:', companies); // Para debugging
       setCompanyOptions(
-        companies.map((company) => ({
-          label: company.name,
-          value: company.id // Asegúrate de que este sea el ID correcto
-        }))
+        companies.map((company) => ({ label: company.name, value: company.id }))
       );
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -142,16 +152,16 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         </Center>
       ) : (
         <SelectInput
-          label={t("Empresa *")}
-          {...register("companyId")}
-          errors={errors.companyId}
-          options={companyOptions}
-          placeholder={t("Selecione uma empresa")}
-          defaultValue={{
-            label: formValues.company?.name,
-            value: formValues.companyId
-          }}
-        />
+        label={t("Empresa *")}
+        {...register("companyId")}
+        errors={errors.companyId}
+        options={companyOptions}
+        placeholder={t("Selecione uma empresa")}
+        defaultValue={{
+          label: formValues.company?.name,
+          value: formValues.companyId
+        }}
+      />
       )}
 
 
@@ -181,7 +191,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         {...register("accessRule")}
         defaultValue={getAccessDefaultValue()}
         options={[
-          { label: "Root", value: "super-admin" },
+          { label: "root", value: "root" },
           { label: "Super Usuário", value: "super-user" },
           { label: "Usuário", value: "user" },
         ]}

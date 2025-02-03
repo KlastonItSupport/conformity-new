@@ -267,7 +267,7 @@ const TableCustom = ({
               );
             })}
             {icons && (
-              <Td border={"1px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
+              <Td border={"0px solid #ddd"} w={iconsHasMaxW ? "20px" : null}>
                 <Box display={"flex"}>
                   {icons &&
                     icons.map(
@@ -343,22 +343,24 @@ const TableCustom = ({
   };
   return (
     <Box
-      w={isMobile ? "99%" : deskWidth ?? "100%"}
-      margin={"0 auto"}
-      bgColor={"white"}
-      minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
-      border={border}
-      borderRadius={borderRadius}
-      padding={border ? "0 15px" : null}
-    >
-   <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
-  <Flex
-    flexDirection={isMobile ? "column" : "row"}
-    w={"100%"}
-    justifyContent={"space-between"}
-    alignItems={"center"}
-    gap={"10px"}
+    w={isMobile ? "99%" : deskWidth ?? "100%"}
+    margin={"0 auto"}
+    bgColor={"#fafafa"} 
+    minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
+    border={border}
+    borderRadius="10px"  
+    padding="24px"
+    boxShadow="sm" 
+    p="16px"
   >
+   <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
+      <Flex
+        flexDirection={isMobile ? "column" : "row"}
+        w={"100%"}
+        justifyContent={"space-between"}
+        alignItems={"center"}
+        gap={"10px"}
+      >
     <Text
       fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
       color={"navy.700"}
@@ -397,7 +399,7 @@ const TableCustom = ({
         <Table overflow={"auto"}>
           <Thead>
             <Tr>
-              <Th border={"1px solid #ddd"}>
+            <Th borderWidth="0.5px" borderColor="#000000">
                 <Checkbox
                   marginRight={"10px"}
                   size="lg"

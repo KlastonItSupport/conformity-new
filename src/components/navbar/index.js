@@ -2,6 +2,9 @@ import {
   Box,
   HStack,
   Img,
+  Input,
+  InputGroup,
+  InputLeftElement,
   Spinner,
   Text,
   VStack,
@@ -21,6 +24,7 @@ import {
   List,
   X,
   Buildings,
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { ItemMenu } from "./components/item-menu.js";
 import { UserInfo } from "./components/user-info";
@@ -32,13 +36,13 @@ import { AUDIT_EVENTS } from "constants/audit-events";
 import Notification from "./components/notification";
 
 const animation = keyframes`
-from {top: 0px;}
-to {top: 200px;}
+  from {top: 0px;}
+  to {top: 200px;}
 `;
 
 export const NavBar = () => {
   const { t } = useTranslation();
-  const finalAnimation = `${animation}  2s`;
+  const finalAnimation = `${animation} 2s`;
   const {
     logout,
     getUserInfo,
@@ -56,6 +60,7 @@ export const NavBar = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -86,15 +91,14 @@ export const NavBar = () => {
   };
 
   const iconsMenu = [
-    {
+       {
       type: "dashboard",
       icon: (
         <Box 
           onClick={() => navigate("/")} 
           cursor="pointer" 
-          color="#86A2BB" 
-          _hover={{ color: "white" }}
-          mr="15px"
+          color="white" 
+          _hover={{ color: "#87A3BC" }}
         >
           <House size={24} />
         </Box>
@@ -321,43 +325,80 @@ export const NavBar = () => {
 
   return (
     <>
-      <HStack
-        w={"100%"}
-        bgColor={"#2B3D4C"}
-        height={"65px"}
-        marginBottom={"40px"}
-        px={"20px"}
-        position={"fixed"}
-        top={0}
-        zIndex={3}
-        boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
-      >
-        <HStack w={"40%"}>
+<HStack
+  w={"calc(100% - 32px)"} // Ajusta el ancho para dejar espacio para el margen
+  bgColor={"#3b5366"}
+  height={"65px"}
+  marginRight={"16px"}
+  marginTop={"16px"}
+  marginBottom={"40px"}
+  padding={"16px"}
+  position={"fixed"}
+  top={0}
+  right={0} // Asegura que el NavBar esté alineado a la derecha
+  zIndex={1000} // Asegura que esté por encima de otros elementos
+  borderRadius={"50px"}
+  boxShadow="0px 4px 12px rgba(0, 0, 0, 0.1)"
+  boxSizing="border-box" // Incluye el padding en el cálculo del ancho
+>
+        {/* Left section */}
+        <HStack w={"50%"} spacing={6}>
+          {/* Logo */}
           <Img
             src={whiteLogo}
             w={"124px"}
             onClick={() => navigate("/users")}
             cursor={"pointer"}
           />
-          <Box>
-            <Text
-              fontSize={"md"}
-              color={"#87A3BC"}
-              px={"15px"}
-              cursor={"pointer"}
-              // bgColor={"red"}
-              _hover={{ color: "white" }}
-              onClick={() => navigate("/support")}
-            >
-              Suporte
-            </Text>
-          </Box>
+          
+          {/* Support button */}
+          <Text
+            fontSize={"md"}
+            color={"white"}
+            cursor={"pointer"}
+            transition="all 0.2s"
+            _hover={{ color: "#87A3BC" }}
+            onClick={() => navigate("/support")}
+            fontWeight="medium"
+          >
+            Suporte
+          </Text>
+
+          {/* Search bar */}
+          <InputGroup maxW="300px">
+            <InputLeftElement pointerEvents="none">
+              <MagnifyingGlass size={20} color="#87A3BC" />
+            </InputLeftElement>
+            <Input
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              size="md"
+              variant="filled"
+              bg="rgba(255, 255, 255, 0.1)"
+              border="1px solid rgba(134, 162, 187, 0.1)"
+              _placeholder={{ color: "#87A3BC" }}
+              _hover={{
+                bg: "rgba(255, 255, 255, 0.15)",
+              }}
+              _focus={{
+                bg: "rgba(255, 255, 255, 0.15)",
+                borderColor: "rgba(134, 162, 187, 0.3)",
+              }}
+              color="white"
+              borderRadius="full"
+            />
+          </InputGroup>
+
+          {/* Notification */}
           <Notification />
         </HStack>
+
+        {/* Right section */}
         {isDesktop && (
-          <HStack w={"80%"} justifyContent={"flex-end"} spacing={4}>
+          <HStack w={"50%"} justifyContent={"flex-end"} spacing={6}>
             {isLoading ? (
-              <HStack w={"80%"}>
+              <HStack>
                 <Text mr={"20px"} color={"white"}>
                   Carregando permissões
                 </Text>
@@ -394,8 +435,10 @@ export const NavBar = () => {
             )}
           </HStack>
         )}
+
+        {/* Mobile menu button */}
         {!isDesktop && !isLoading && (
-          <HStack justifyContent={"end"} w={"100%"} zIndex={10}>
+          <HStack justifyContent={"end"} w={"50%"} zIndex={10}>
             <Box cursor={"pointer"} isOpen={isOpen} onClick={toggleMenu}>
               {!isOpen ? (
                 <List size={24} color="white" />
@@ -406,6 +449,8 @@ export const NavBar = () => {
           </HStack>
         )}
       </HStack>
+
+      {/* Mobile menu content */}
       {!isDesktop && isOpen && !isLoading && (
         <VStack
           animation={finalAnimation}
@@ -414,6 +459,8 @@ export const NavBar = () => {
           spacing={4}
           w="100vw"
           mt={"65px"}
+          marginX={"16px"}
+          borderRadius={"12px"}
         >
           {iconsMenu.map((iconMenu, index) => {
             if (checkingPermission(iconMenu.type)) {

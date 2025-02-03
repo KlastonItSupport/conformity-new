@@ -18,17 +18,13 @@ import { Plus } from "@phosphor-icons/react";
 import { ModalForm } from "components/modals/modalForm";
 import { GroupForm } from "components/forms/groups/group";
 import { AuthContext } from "providers/auth";
-import { CompanyContext } from "providers/company";
 
 export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
   const { createUser } = useContext(UserContext);
   const { getUserInfo } = useContext(AuthContext);
   const { getGroups, createGroupIsLoading } = useContext(GroupContext);
-  const { getCompanies } = useContext(CompanyContext);
   const [groupOptions, setGroupOptions] = useState([]);
-  const [companyOptions, setCompanyOptions] = useState([]);
   const [groupIsLoading, setGroupIsLoading] = useState(false);
-  const [companiesIsLoading, setCompaniesIsLoading] = useState(false);
   const groupFormRef = useRef(null);
   const {
     handleSubmit,
@@ -46,35 +42,12 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
 
   const onSubmit = async (data) => {
     if (setLoading) setLoading(true);
-    
-    try {
-      const userData = {
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        celphone: data.celphone,
-        companyId: data.companyId,
-        groupId: data.groupId || '',
-        role: data.role,
-        departament: data.departament,
-        accessRule: data.accessRule,
-        status: data.status || 'active'
-      };
+    const cretedSuccessfully = await createUser(data);
 
-      console.log('Creating user with data:', userData); // Para debugging
-
-      const createdSuccessfully = await createUser(userData);
-
-      if (createdSuccessfully) {
-        onCloseModal(createdSuccessfully);
-      }
-    } catch (error) {
-      // Manejar el error apropiadamente
-      console.error('Error creating user:', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
-    } finally {
-      if (setLoading) setLoading(false);
+    if (cretedSuccessfully) {
+      onCloseModal(cretedSuccessfully);
     }
+    if (setLoading) setLoading(false);
   };
 
   const fetchGroupData = async () => {
@@ -89,24 +62,9 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
     }
   };
 
-  const fetchCompaniesData = async () => {
-    try {
-      setCompaniesIsLoading(true);
-      const companies = await getCompanies();
-      setCompanyOptions(
-        companies.map((company) => ({ label: company.name, value: company.id }))
-      );
-    } catch (error) {
-      console.error('Error fetching companies:', error);
-    } finally {
-      setCompaniesIsLoading(false);
-    }
-  };
-
   useEffect(() => {
     setGroupIsLoading(true);
     fetchGroupData();
-    fetchCompaniesData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -193,20 +151,6 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           </HStack>
         )}
 
-        {companiesIsLoading ? (
-          <Center>
-            <Spinner />
-          </Center>
-        ) : (
-          <SelectInput
-            label="Empresa *"
-            {...register("companyId")}
-            errors={errors.companyId}
-            options={companyOptions}
-            placeholder="Selecione uma empresa"
-          />
-        )}
-
         <FormInput
           variant="auth"
           fontSize="sm"
@@ -264,7 +208,7 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           {...register("accessRule")}
           options={[
             getUserInfo().accessRule
-              ? { label: "Root", value: "super-admin" }
+              ? { label: "Super Admin", value: "super-admin" }
               : null,
             { label: "Super Usuário", value: "super-user" },
             { label: "Usuário", value: "user" },
