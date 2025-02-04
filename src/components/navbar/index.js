@@ -95,7 +95,7 @@ export const NavBar = () => {
       type: "dashboard",
       icon: (
         <Box 
-          onClick={() => navigate("/")} 
+          onClick={() => navigate("/dashboard")}
           cursor="pointer" 
           color="white" 
           _hover={{ color: "#87A3BC" }}
@@ -347,7 +347,7 @@ export const NavBar = () => {
           <Img
             src={whiteLogo}
             w={"124px"}
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/dashboard")}
             cursor={"pointer"}
           />
           
@@ -421,14 +421,24 @@ export const NavBar = () => {
                   {
                     src: "/profile",
                     label: t("Meu Perfil"),
+                    _hover: {
+                      bg: '#2B3D4C',
+                      color: '87A3BC',
+                    },
+                    color: "white"
                   },
                   {
-                    src: "/",
+                    src: "/signin",
                     label: t("Sair"),
                     onClick: () => {
                       dispatchAuditEvent(AUDIT_EVENTS.USER_SIGNED_OUT);
                       logout(history);
                     },
+                    _hover: {
+                      bg: '#2B3D4C',
+                      color: '87A3BC',
+                    },
+                    color: "white"
                   },
                 ]}
               />

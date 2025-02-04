@@ -1,7 +1,19 @@
-
 {
     "translation":{
         "Seja bem-vindo ao Conformity!": "Seja bem-vindo ao Conformity!",
-        "A solução mais completa e segura em gestão administrativa.":"A solução mais completa e segura em gestão administrativa."
+        "A solução mais completa e segura em gestão administrativa.":"A solução mais completa e segura em gestão administrativa.",
+        "General Information": "Informações Gerais",
+        "Company": "Empresa",
+        "Group": "Grupo",
+        "Department": "Departamento",
+        "Role": "Cargo",
+        "User": "Usuário",
+        "Licenses": "Licenças",
+        "Contracted Licenses": "Licenças Contratadas",
+        "Used Licenses": "Licenças Utilizadas",
+        "licenses": "licenças",
+        "Disk Space": "Espaço em Disco",
+        "Used Space": "Espaço Utilizado",
+        "Available Space": "Espaço Disponível"
     }
 }

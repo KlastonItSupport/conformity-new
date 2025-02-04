@@ -84,53 +84,57 @@ export const InteractiveButtons = ({
     setVisibleColumns([...visibleColumns, column]);
   };
   return (
-    <HStack spacing={"4"} bg="white" p={3} borderRadius="md" boxShadow="sm">
+    <HStack spacing={"3"} p={2}>
       <Button
-        bg="blue.500"
-        color="white"
-        _hover={{ bg: "blue.600" }}
+        variant="outline"
+        colorScheme="blue"
+        _hover={{ bg: "blue.50" }}
         onClick={handleExcel}
-        borderRadius="md"
-        height="32px"
-        px={3}
+        borderRadius="sm"
+        height="28px"
+        px={2}
+        fontSize="sm"
       >
         Excel
       </Button>
       <Button
-        bg="green.500"
-        color="white"
-        _hover={{ bg: "green.600" }}
+        variant="outline"
+        colorScheme="green"
+        _hover={{ bg: "green.50" }}
         onClick={handleCSV}
-        borderRadius="md"
-        height="32px"
-        px={3}
+        borderRadius="sm"
+        height="28px"
+        px={2}
+        fontSize="sm"
       >
         CSV
       </Button>
       <Button
-        bg="purple.500"
-        color="white"
-        _hover={{ bg: "purple.600" }}
-        borderRadius="md"
-        height="32px"
-        px={3}
+        variant="outline"
+        colorScheme="purple"
+        _hover={{ bg: "purple.50" }}
+        borderRadius="sm"
+        height="28px"
+        px={2}
+        fontSize="sm"
       >
         Print
       </Button>
       <Menu>
         <MenuButton
           as={Button}
-          bg="teal.500"
-          color="white"
-          _hover={{ bg: "teal.600" }}
-          borderRadius="md"
-          height="32px"
-          px={3}
-          rightIcon={<ChevronDownIcon />}
+          variant="outline"
+          colorScheme="teal"
+          _hover={{ bg: "teal.50" }}
+          borderRadius="sm"
+          height="28px"
+          px={2}
+          fontSize="sm"
+          rightIcon={<ChevronDownIcon boxSize={4} />}
         >
           {isMobile ? "Column" : "Column Visibility"}
         </MenuButton>
-        <MenuList bg="white" boxShadow="xl" borderRadius="md">
+        <MenuList boxShadow="xl" borderRadius="sm">
           {columns.map((column) => {
             const isShowingThisColumn = visibleColumns.find(
               (visibleColumn) => column.header === visibleColumn
@@ -139,7 +143,6 @@ export const InteractiveButtons = ({
               visibleColumns.length === 1 ? true : false;
             return (
               <MenuItem
-                bg="white"
                 _hover={{ bg: "gray.100" }}
                 display={"flex"}
                 justifyContent={"space-between"}
@@ -159,8 +162,8 @@ export const InteractiveButtons = ({
                       : "pointer"
                 }
               >
-                <Text>{column.header} </Text>
-                {isShowingThisColumn && <Check color="green" size={20} />}
+                <Text fontSize="sm">{column.header} </Text>
+                {isShowingThisColumn && <Check color="green" size={18} />}
               </MenuItem>
             );
           })}

@@ -34,7 +34,7 @@ export const ItemMenu = ({ icon, itemsList, label }) => {
       <MenuList
         onMouseEnter={onOpen}
         onMouseLeave={onClose}
-        bg="#1E2A35"
+        bg="#3B5366"
         borderColor="rgba(134, 162, 187, 0.1)"
         borderRadius="xl"
         p={1}
@@ -44,9 +44,9 @@ export const ItemMenu = ({ icon, itemsList, label }) => {
             key={index}
             _hover={{
               bg: '#2B3D4C',
-              color: 'white',
+              color: '87A3BC',
             }}
-            color="#87A3BC"
+            color="white"
           >
             <Link href={item.src}>{item.label}</Link>
           </MenuItem>

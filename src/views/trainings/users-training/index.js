@@ -201,7 +201,7 @@ const TrainingUsers = () => {
   return (
     <>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
+      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" padding="24px">
         <NavigationLinks routeTree={routeTreePaths} />
         <HStack justify={"start"} w={"95vw"} py={"20px"}>
           <ButtonPrimary

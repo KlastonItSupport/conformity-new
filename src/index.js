@@ -81,11 +81,13 @@ import BlogPage from "views/companies/blog";
 import { AuditProvider } from "providers/audit";
 import { BlogCategoriesProvider } from "providers/blog-categories";
 import { BlogProvider } from "providers/blog";
+import DashboardPage from "views/dashboard/index";
+import { Navigate } from "react-router-dom";
 
 const routes = createBrowserRouter([
   {
     path: "/",
-    element: <SignInPage />,
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: "signin",
@@ -246,6 +248,10 @@ const routes = createBrowserRouter([
   {
     path: "/support",
     element: <SupportPage />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardPage />,
   },
 ]);
 

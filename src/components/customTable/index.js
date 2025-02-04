@@ -383,17 +383,6 @@ const TableCustom = ({
           
           {showSearchInput && searchInput()}
         </Flex>
-        
-        {data.length > 0 && (
-          <InteractiveButtons
-            columns={columns}
-            data={data}
-            setVisibleColumns={setVisibleColumns}
-            visibleColumns={visibleColumns}
-            downloadTitle={title}
-            formatOnDownLoad={formatOnDownLoad}
-          />
-        )}
       </VStack>
       <Box width={"100%"} overflow={"auto"}>
         <Table 
@@ -466,6 +455,18 @@ const TableCustom = ({
           </Thead>
           <Tbody>{renderTableRows()}</Tbody>
         </Table>
+        {data.length > 0 && (
+          <Flex justifyContent="flex-start" mt={4} ml={4}>
+            <InteractiveButtons
+              columns={columns}
+              data={data}
+              setVisibleColumns={setVisibleColumns}
+              visibleColumns={visibleColumns}
+              downloadTitle={title}
+              formatOnDownLoad={formatOnDownLoad}
+            />
+          </Flex>
+        )}
       </Box>
       {paginationComponent && paginationComponent}
     </Box>
