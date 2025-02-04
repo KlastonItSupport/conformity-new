@@ -384,6 +384,18 @@ const TableCustom = ({
           {showSearchInput && searchInput()}
         </Flex>
       </VStack>
+      {data.length > 0 && (
+        <Flex justifyContent="flex-start" my={4}>
+          <InteractiveButtons
+            columns={columns}
+            data={data}
+            setVisibleColumns={setVisibleColumns}
+            visibleColumns={visibleColumns}
+            downloadTitle={title}
+            formatOnDownLoad={formatOnDownLoad}
+          />
+        </Flex>
+      )}
       <Box width={"100%"} overflow={"auto"}>
         <Table 
           overflow={"auto"}
@@ -394,7 +406,7 @@ const TableCustom = ({
           sx={{
             'td, th': {
               backgroundColor: 'white',
-              padding: '7px 16px',
+              padding: '5px 8px',
             },
           }}
         >
@@ -455,18 +467,6 @@ const TableCustom = ({
           </Thead>
           <Tbody>{renderTableRows()}</Tbody>
         </Table>
-        {data.length > 0 && (
-          <Flex justifyContent="flex-start" mt={4} ml={4}>
-            <InteractiveButtons
-              columns={columns}
-              data={data}
-              setVisibleColumns={setVisibleColumns}
-              visibleColumns={visibleColumns}
-              downloadTitle={title}
-              formatOnDownLoad={formatOnDownLoad}
-            />
-          </Flex>
-        )}
       </Box>
       {paginationComponent && paginationComponent}
     </Box>

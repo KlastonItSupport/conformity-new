@@ -92,7 +92,7 @@ export const InteractiveButtons = ({
         onClick={handleExcel}
         borderRadius="sm"
         height="28px"
-        px={2}
+        px={2}Z
         fontSize="sm"
       >
         Excel

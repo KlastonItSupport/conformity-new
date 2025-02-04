@@ -97,7 +97,7 @@ export const Pagination = ({
       spacing="2"
       justify="center"
       width="100%"
-      bg={colorMode === "light" ? "#1f2d39" : "navy.900"}
+      bg={colorMode === "light" ? "#fafafa" : "navy.900"}
     >
       <Button
         _hover={{ bgColor: "secondaryGray.400" }}

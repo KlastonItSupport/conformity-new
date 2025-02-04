@@ -67,12 +67,12 @@ export const globalStyles = {
     global: (props) => ({
       'html, body': {
         overflowX: "hidden",
-        bg: mode("#1f2d39", "navy.900")(props),
+        bg: mode("#2B3C49", "navy.900")(props),
         fontFamily: "DM Sans",
         letterSpacing: "-0.5px",
       },
       '#root': {
-        bg: mode("#1f2d39", "navy.900")(props),
+        bg: mode("#2b3c49", "navy.900")(props),
         minHeight: '100vh',
       },
       '.chakra-stack': {
@@ -84,52 +84,7 @@ export const globalStyles = {
       html: {
         fontFamily: "DM Sans",
       },
-      '.navbar': {
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        base: {
-          position: 'relative',
-          zIndex: 1000,
-        },
-        md: {
-          position: 'static',
-          zIndex: 'auto',
-        }
-      },
-      '.mobile-menu': {
-        display: 'none',
-        base: {
-          position: 'absolute',
-          top: '100%',
-          right: 0,
-          width: '100%',
-          bg: 'white',
-          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        },
-        '&.active': {
-          display: 'block',
-        }
-      },
-      '.menu-toggle': {
-        display: 'none',
-        base: {
-          display: 'block',
-          cursor: 'pointer',
-          padding: '1rem',
-        },
-        md: {
-          display: 'none',
-        }
-      },
-      '.desktop-menu': {
-        base: {
-          display: 'none',
-        },
-        md: {
-          display: 'block',
-        }
-      }
+      
     }),
   },
 };

@@ -207,7 +207,15 @@ const ListDocumentsPage = () => {
   return (
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
+      <VStack 
+        marginTop={"100px"} 
+        spacing={0} 
+        w="100%" 
+        h="100%"
+        bg="#FAFAFA"
+        p={6}
+        borderRadius={{ base: "0 0.375rem 0.375rem 0.375rem", md: "0 0.375rem 0.375rem 0.375rem" }}
+      >
         {/* 
         <ActionsButtons
           canAdd={checkPermissionForAction("documents", "canAdd")}
