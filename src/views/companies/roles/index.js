@@ -6,8 +6,7 @@ import { columns } from "./table-helper";
 import { NotePencil, Trash, AddressBook } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
 import {
-  Flex,
-  HStack,
+  Box,
   VStack,
   useBreakpoint,
   useDisclosure,
@@ -15,7 +14,6 @@ import {
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
-
 import { ModalForm } from "components/components";
 import { useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
@@ -23,12 +21,13 @@ import { debounce } from "lodash";
 import { AuthContext } from "providers/auth";
 import { ButtonPrimary } from "components/button-primary";
 import RolesForm from "./components/form";
-
 import { RolesContext } from "providers/roles";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const RolesPage = () => {
   const { t } = useTranslation();
@@ -191,63 +190,89 @@ const RolesPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            minW="150px"
-            disabled={!checkPermissionForAction("companies", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={roles}
-          columns={columns}
-          title={t("Cargos")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Cargos")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={roles}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("companies", "canAdd")}
             />
-          )}
-        </Flex>
-      </VStack>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={roles}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={roles}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
+      {/* Modals */}
       <DeleteModal
         title={t("Excluir Cargo")}
         subtitle={t("Tem certeza de que deseja excluir este Cargo?")}
@@ -331,7 +356,7 @@ const RolesPage = () => {
         modalSize="md"
         isLoading={isLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

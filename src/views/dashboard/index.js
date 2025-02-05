@@ -56,9 +56,10 @@ const DashboardPage = () => {
       <Box
         marginTop="64px"
         w="100%"
+        px={6}
       >
         <VStack 
-          spacing={6}
+          spacing={3}
           w="100%"
           align="stretch"
         >

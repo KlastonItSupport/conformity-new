@@ -10,10 +10,9 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
-import { Flex, HStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, HStack, VStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
-
 import { ModalForm } from "components/components";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "hooks/query";
@@ -28,6 +27,8 @@ import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
+import NavigationLinks from "components/navigationLinks";
 
 const ListTasksPage = () => {
   const { t } = useTranslation();
@@ -232,88 +233,117 @@ const ListTasksPage = () => {
   };
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <Wrapper routeTreePaths={routeTreePaths}>
-        <HStack
-          justify={{ sm: "space-between", md: "start" }}
-          width={"100%"}
-          pb={"15px"}
+      <TopNavigation 
+        pageTitle={t("Tasks")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="40px"
-            bgColor={"header.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            width="150px"
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
-          />
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="40px"
-            bgColor={"header.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Detalhamento"}
-            width="150px"
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
-          />
-        </HStack>
-        <Filters
-          origins={origins}
-          classifications={classifications}
-          types={types}
-          departaments={departaments}
-          setOrigins={setOrigins}
-          setClassifications={setClassifications}
-          setTypes={setTypes}
-          setDepartaments={setDepartaments}
-        />
-        <CustomTable
-          data={tasks}
-          columns={columns}
-          title={t("Tasks")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
-        >
-          {pagination && (
-            <Pagination
-              data={tasks}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <HStack
+            justify={{ sm: "space-between", md: "start" }}
+            width="100%"
+            spacing={4}
+          >
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("tasks", "canAdd")}
             />
-          )}
-        </Flex>
-      </Wrapper>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Detalhamento"
+              width="150px"
+              disabled={!checkPermissionForAction("tasks", "canAdd")}
+            />
+          </HStack>
+
+          <Box>
+            <Filters
+              origins={origins}
+              classifications={classifications}
+              types={types}
+              departaments={departaments}
+              setOrigins={setOrigins}
+              setClassifications={setClassifications}
+              setTypes={setTypes}
+              setDepartaments={setDepartaments}
+            />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={tasks}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={tasks}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
 
       <DeleteModal
         title={t("Excluir Tarefa")}
@@ -322,17 +352,16 @@ const ListTasksPage = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsLoading(true);
-
           const response = await deleteTask(deleteId);
           if (response) {
             setTasks(tasks.filter((document) => document.id !== deleteId));
           }
-
           setIsLoading(false);
           onDeleteModalClose();
         }}
         isLoading={isLoading}
       />
+
       <DeleteModal
         title={t("Excluir Tarefas")}
         subtitle={t("Tem certeza de que deseja excluir estas Tarefas?")}
@@ -340,14 +369,13 @@ const ListTasksPage = () => {
         onClose={onDeleteMultipleModalClose}
         onConfirm={async () => {
           setIsLoading(true);
-
           await deleteMultipleTasks(selecteds);
-
           setIsLoading(false);
           onDeleteMultipleModalClose();
         }}
         isLoading={isLoading}
       />
+
       <ModalForm
         isOpen={isAddModalOpen}
         onClose={onAddModalClose}
@@ -373,6 +401,7 @@ const ListTasksPage = () => {
         modalSize="2xl"
         isLoading={isLoading}
       />
+
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}
@@ -392,7 +421,7 @@ const ListTasksPage = () => {
         modalSize="2xl"
         isLoading={isLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

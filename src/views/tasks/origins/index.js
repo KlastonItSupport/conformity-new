@@ -11,6 +11,7 @@ import {
   VStack,
   useBreakpoint,
   useDisclosure,
+  Box,
 } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
@@ -29,6 +30,7 @@ import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
 
 const OriginsPage = () => {
   const { t } = useTranslation();
@@ -181,60 +183,86 @@ const OriginsPage = () => {
   return (
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <HStack justify={"start"} w={"100%"} pb={"10px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="40px"
-            bgColor={"header.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            width="150px"
-            disabled={!checkPermissionForAction("documents", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={origins}
-          columns={columns}
-          title={t("Origens")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Origens")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={origins}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor={"header.100"}
+              _hover={{ bgColor: "primary.200" }}
+              textColor={"white"}
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label={"Adicionar"}
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("documents", "canAdd")}
             />
-          )}
-        </Flex>
-      </VStack>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={origins}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={origins}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
       <DeleteModal
         title={t("Excluir Origem")}
         subtitle={t("Tem certeza de que deseja excluir esta Origem?")}

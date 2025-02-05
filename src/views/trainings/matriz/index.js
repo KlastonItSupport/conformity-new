@@ -3,7 +3,7 @@ import { CustomTable } from "components/components";
 import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavBar } from "components/navbar";
-import { Flex, VStack, useBreakpoint } from "@chakra-ui/react";
+import { Flex, VStack, useBreakpoint, Box } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 
@@ -17,6 +17,8 @@ import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import { AuthContext } from "providers/auth";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const MatrizPage = () => {
   const { t } = useTranslation();
@@ -82,45 +84,72 @@ const MatrizPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Filters
-          setTrainings={setTrainings}
-          setPagination={setPagination}
-          setColumns={setColumns}
-        />
-        {columns.length > 0 && (
-          <CustomTable
-            data={trainings}
-            columns={columns}
-            title={t("Matriz de treinamentos")}
-            searchInputValue={searchParams.get("search") ?? ""}
-            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-            iconsHasMaxW={true}
-            onCheckItems={(show) => {}}
-          />
-        )}
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Matriz")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={trainings}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <Filters
+              setTrainings={setTrainings}
+              setPagination={setPagination}
+              setColumns={setColumns}
             />
-          )}
-        </Flex>
-      </VStack>
-    </>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            {columns.length > 0 && (
+              <CustomTable
+                data={trainings}
+                columns={columns}
+                title={t("")}
+                searchInputValue={searchParams.get("search") ?? ""}
+                onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+                iconsHasMaxW={true}
+                onCheckItems={(show) => {}}
+              />
+            )}
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={trainings}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+    </Wrapper>
   );
 };
 

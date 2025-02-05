@@ -38,6 +38,8 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const ProjectsPage = () => {
   const { t } = useTranslation();
@@ -257,83 +259,113 @@ const ProjectsPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Box
-          display={"flex"}
-          flexDir={{ base: "column", md: "row" }} // "base" é para mobile, "md" para telas maiores
-          justifyContent={"space-between"}
-          w={"95vw"}
+      <TopNavigation 
+        pageTitle={t("Projetos")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          <SquareInfos label={"Projetos iniciados"} value={status.started} />
-          <SquareInfos label={"Projetos em pausa"} value={status.stopped} />
-          <SquareInfos label={"Projetos finalizados"} value={status.ended} />
-          <SquareInfos
-            label={"Projetos em andamento"}
-            value={status.inProgress}
-          />
-        </Box>
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
 
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            width="150px"
-            onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("crm", "canAdd")}
-          />
-        </HStack>
-        <Filters
-          onSearch={(projects, paginations) => {
-            setPagination(paginations);
-            setProjects(projects);
-          }}
-        />
-        <CustomTable
-          data={projects}
-          columns={columns}
-          title={t("Projetos")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
-        >
-          {pagination && (
-            <Pagination
-              data={projects}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box
+            display={"flex"}
+            flexDir={{ base: "column", md: "row" }}
+            justifyContent={"space-between"}
+            w="100%"
+          >
+            <SquareInfos label={"Projetos iniciados"} value={status.started} />
+            <SquareInfos label={"Projetos em pausa"} value={status.stopped} />
+            <SquareInfos label={"Projetos finalizados"} value={status.ended} />
+            <SquareInfos
+              label={"Projetos em andamento"}
+              value={status.inProgress}
             />
-          )}
-        </Flex>
-      </VStack>
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("crm", "canAdd")}
+            />
+          </Box>
+
+          <Box>
+            <Filters
+              onSearch={(projects, paginations) => {
+                setPagination(paginations);
+                setProjects(projects);
+              }}
+            />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={projects}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={projects}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
+      {/* Modals */}
       <DeleteModal
         title={t("Excluir Projeto")}
         subtitle={t("Tem certeza de que deseja excluir este Projeto?")}
@@ -418,7 +450,7 @@ const ProjectsPage = () => {
         modalSize="2xl"
         isLoading={isLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 

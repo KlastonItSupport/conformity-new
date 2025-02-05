@@ -25,7 +25,7 @@ export const TopNavigation = ({ pageTitle }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const NavigationContent = () => (
-    <HStack spacing={4}>
+    <HStack spacing={4} weight="bold">
       <Notification />
     </HStack>
   );

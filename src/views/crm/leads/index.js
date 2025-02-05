@@ -34,6 +34,8 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const LeadsPage = () => {
   const { t } = useTranslation();
@@ -261,104 +263,89 @@ const LeadsPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" padding="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <LeadsStatus
-          cancelled={leadsStatus.cancelled}
-          requested={leadsStatus.requested}
-          refused={leadsStatus.refused}
-          inProgress={leadsStatus.inProgress}
-          completed={leadsStatus.completed}
-          total={leadsStatus.total}
-        />
-        <SelectTableType
-          selectedTable={selectedTable}
-          setSelectedTable={setSelectedTable}
-        />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          {selectedTable === "leads" && (
+      <TopNavigation 
+        pageTitle={t("Leads")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
+        >
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
             <ButtonPrimary
               fontSize="sm"
               fontWeight="bold"
-              h="50"
-              bgColor={"primary.100"}
+              h="40px"
+              bgColor="header.100"
               _hover={{ bgColor: "primary.200" }}
-              textColor={"white"}
+              textColor="white"
               boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
               borderRadius="7px"
               _active={{ bgColor: "primary.200" }}
-              label={"Adicionar"}
-              width="150px"
+              label="Adicionar"
               onClick={onAddModalOpen}
-              disabled={!checkPermissionForAction("tasks", "canAdd")}
+              width="150px"
+              disabled={!checkPermissionForAction("crm", "canAdd")}
             />
-          )}
-          {selectedTable !== "leads" && <Box height={50}></Box>}
-        </HStack>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={leads}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={leads}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
 
-        {selectedTable === "leads" && (
-          <CustomTable
-            data={leads}
-            columns={columns}
-            title={t("Leads cadastradas")}
-            icons={tableIcons}
-            searchInputValue={searchParams.get("search") ?? ""}
-            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-            iconsHasMaxW={true}
-            onCheckItems={(show) => {
-              setTableIcons(
-                tableIcons.map((icon) => {
-                  icon.isDisabled = show;
-                  return icon;
-                })
-              );
-            }}
-          />
-        )}
-        {selectedTable === "tasks" && (
-          <CustomTable
-            data={tasksLeads}
-            columns={tasksColumns}
-            title={t("Tarefas cadastradas")}
-            searchInputValue={searchParams.get("searchTasks") ?? ""}
-            onChangeSearchInput={(e) => debouncedSearchTasks(e.target.value)}
-            iconsHasMaxW={true}
-          />
-        )}
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
-        >
-          {pagination && (
-            <Pagination
-              data={isLeadsSelected ? leads : tasksLeads}
-              onClickPagination={
-                isLeadsSelected ? updateData : updateDataLeadsTasks
-              }
-              itemsPerPage={5}
-              totalPages={
-                isLeadsSelected
-                  ? pagination.totalPages
-                  : paginationTasks.totalPages
-              }
-              currentPage={
-                isLeadsSelected
-                  ? pagination.currentPage
-                  : paginationTasks.currentPage
-              }
-              nextPage={
-                isLeadsSelected ? pagination.next : paginationTasks.next
-              }
-              lastPage={
-                isLeadsSelected ? pagination.last : paginationTasks.last
-              }
-            />
-          )}
-        </Flex>
-      </VStack>
+      {/* Modals */}
       <DeleteModal
         title={t("Excluir Lead")}
         subtitle={t("Tem certeza de que deseja excluir este Lead?")}
@@ -449,7 +436,7 @@ const LeadsPage = () => {
           id={selected.id}
         />
       )}
-    </>
+    </Wrapper>
   );
 };
 

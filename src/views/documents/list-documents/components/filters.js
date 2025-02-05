@@ -1,4 +1,4 @@
-import { Box, HStack, VStack } from "@chakra-ui/react";
+import { Box, HStack, VStack, Text } from "@chakra-ui/react";
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { ButtonPrimary } from "components/button-primary";
 import { CalendarCustom } from "components/calendar";
@@ -195,14 +195,6 @@ const Filters = () => {
         onChange={(e) => {
           if (e.target.value.length === 10) {
             setIsShowingCalendarEnd(false);
-                        // try {
-            //   const value = e.target.value;
-            //   const initialDate = moment(value, "DD/MM/YYYY").format(
-            //     "YYYY-MM-DD"
-            //   );
-            //   searchParams.set("initialDate", initialDate);
-            //   setSearchParams(searchParams);
-            // } catch (_) {}
           }
           if (e.target.value.length === 0) {
             searchParams.delete("finalDate");
@@ -229,7 +221,7 @@ const Filters = () => {
   );
 
   const departamentInput = formDefaultValues.departamentId && (
-    <Box w="100%">
+    <Box w="100%" h="100%">
       <SelectInput
         label="Departamento"
         {...register("departamentId")}
@@ -246,19 +238,21 @@ const Filters = () => {
         bgColor="primary.50"
         margin="0"
         width="100%"
+        height="45px"
+        containerStyles={{ height: "100%" }}
       />
     </Box>
   );
   
   const categoryInput = formDefaultValues.categoryId && (
-    <Box w="100%">
+    <Box w="100%" h="100%">
       <SelectInput
         label="Categoria"
         {...register("categoryId")}
         errors={errors.categoryId}
         options={[
           {
-            label: "Selecione um departamento",
+            label: "Selecione uma categoria",
             value: "not-selected",
           },
           ...categories,
@@ -268,6 +262,8 @@ const Filters = () => {
         bgColor="primary.50"
         margin="0"
         width="100%"
+        height="45px"
+        containerStyles={{ height: "100%" }}
       />
     </Box>
   );
@@ -326,8 +322,8 @@ const Filters = () => {
     setDocuments(res.items);
   };
   return isMobile ? (
-    <VStack w={"100%"} as="form">
-      <HStack mb={"30px "}>
+    <VStack w="100%" as="form" onSubmit={handleSubmit(onSubmit)} spacing={4}>
+      <HStack w="100%" spacing={4}>
         {initialDateInput}
         {finalDateInput}
       </HStack>
@@ -338,49 +334,60 @@ const Filters = () => {
       <ButtonPrimary
         fontSize="sm"
         fontWeight="bold"
-        h="50"
-        bgColor={"header.100"}
+        h="45px"
+        bgColor="header.100"
         _hover={{ bgColor: "primary.200" }}
-        textColor={"white"}
+        textColor="white"
         boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
         borderRadius="7px"
         _active={{ bgColor: "primary.200" }}
-        label={"Filtrar"}
+        label="Filtrar"
         width="100%"
-        m={"10px  20px !important"}
+        type="submit"
       />
     </VStack>
   ) : (
     <HStack
-      justifyContent={"space-between"}
-      w={"100%"}
-      position="relative"
-      pt={"30px"}
-      pb={"10px"}
-      alignItems={"center"}
-      as={"form"}
+      as="form"
       onSubmit={handleSubmit(onSubmit)}
+      w="100%"
+      spacing={4}
+      alignItems="flex-start"
     >
-      {initialDateInput}
-      {finalDateInput}
-      {departamentInput}
-      {categoryInput}
-      {authorInput}
-      <ButtonPrimary
-        fontSize="sm"
-        fontWeight=" "
-        h="40px"
-        bgColor={"header.100"}
-        _hover={{ bgColor: "primary.200" }}
-        textColor={"white"}
-        boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-        borderRadius="7px"
-        _active={{ bgColor: "primary.200" }}
-        label={<MagnifyingGlass size={32} color={"white"} />}
-        width="150px"
-        mt={"35px !important"}
-        type="submit"
-      />
+      <Box flex={1} h="85px">
+        {initialDateInput}
+      </Box>
+      <Box flex={1} h="85px">
+        {finalDateInput}
+      </Box>
+      <Box flex={1} h="85px">
+        {departamentInput}
+      </Box>
+      <Box flex={1} h="85px">
+        {categoryInput}
+      </Box>
+      <Box flex={1} h="85px">
+        {authorInput}
+      </Box>
+      <Box alignSelf="flex-end" pb="10px">
+        <ButtonPrimary
+          fontSize="sm"
+          h="45px"
+          bgColor="header.100"
+          _hover={{ bgColor: "primary.200" }}
+          textColor="white"
+          boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+          borderRadius="7px"
+          _active={{ bgColor: "primary.200" }}
+          label={
+            <HStack spacing={2} justify="center">
+              <MagnifyingGlass size={20} weight="bold" />
+            </HStack>
+          }
+          minW="120px"
+          type="submit"
+        />
+      </Box>
     </HStack>
   );
 };

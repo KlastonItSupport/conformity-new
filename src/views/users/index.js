@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, VStack, useDisclosure } from "@chakra-ui/react";
 import { AuthContext } from "providers/auth";
 import { useContext, useEffect } from "react";
 import { columns } from "./components/table-helper";
@@ -21,8 +21,10 @@ import {
   AddUserForm,
 } from "components/components";
 import { useBreakpoint } from "hooks/usebreakpoint";
-import { useTranslation, withTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const UsersPage = () => {
   const { getUserInfo, dispatchAuditEvent } = useContext(AuthContext);
@@ -204,142 +206,168 @@ const UsersPage = () => {
   ];
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "50px" : 0}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            mb="24px"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            type="submit"
-            label={` + ${t("Adicionar")}`}
-            width="150px"
-            onClick={onAddUserModalOpen}
-          />
-        </Box>
-        <CustomTable
-          data={users}
-          columns={columns}
-          title={t("Usuários")}
-          actionButtons={[
-            <NotePencil size={20} cursor={"pointer"} color="black" />,
-            <Trash size={20} cursor={"pointer"} color="black" />,
-            <Key size={20} cursor={"pointer"} color="black" />,
-          ]}
-          icons={tableIcons}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          searchInputValue={queryParams.get("search")}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Usuários")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddUserModalOpen}
+              width="150px"
+            />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
               data={users}
-              onClickPagination={updateData}
-              itemsPerPage={itemsPerPage}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+              columns={columns}
+              title={t("")}
+              actionButtons={[
+                <NotePencil size={20} cursor={"pointer"} color="black" />,
+                <Trash size={20} cursor={"pointer"} color="black" />,
+                <Key size={20} cursor={"pointer"} color="black" />,
+              ]}
+              icons={tableIcons}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              searchInputValue={queryParams.get("search")}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
             />
-          )}
-        </Flex>
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={users}
+                  onClickPagination={updateData}
+                  itemsPerPage={itemsPerPage}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
 
-        <ModalForm
-          isOpen={isEditModalOpen}
-          onClose={onEditModalClose}
-          form={
-            <EditUsersForm
-              formRef={formRef}
-              onCloseModal={onEditModalClose}
-              formValues={editId}
-            />
-          }
-          formRef={formRef}
-          title={t("Editar Usuário")}
-          description={t("Tem certeza de que deseja Editar este usuário?")}
-          leftButtonLabel={t("Cancelar")}
-          rightButtonLabel={t("Editar")}
-          modalSize="xl"
-          isLoading={editIsLoading}
-        />
+      {/* Modals */}
+      <ModalForm
+        isOpen={isEditModalOpen}
+        onClose={onEditModalClose}
+        form={
+          <EditUsersForm
+            formRef={formRef}
+            onCloseModal={onEditModalClose}
+            formValues={editId}
+          />
+        }
+        formRef={formRef}
+        title={t("Editar Usuário")}
+        description={t("Tem certeza de que deseja Editar este usuário?")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Editar")}
+        modalSize="xl"
+        isLoading={editIsLoading}
+      />
 
-        <ModalForm
-          isOpen={isEditPasswordModalOpen}
-          onClose={onEditPasswordModalClose}
-          form={
-            <EditUsersPasswordForm
-              formRef={formRef}
-              onEdit={changePassword}
-              onCloseModal={onEditPasswordModalClose}
-            />
-          }
-          formRef={formRef}
-          title={t("Editar Senha")}
-          description={t("Tem certeza que deseja alterar a senha?")}
-          leftButtonLabel={t("Cancelar")}
-          rightButtonLabel={t("Editar")}
-          modalSize="xl"
-          isLoading={changePasswordIsLoading}
-        />
+      <ModalForm
+        isOpen={isEditPasswordModalOpen}
+        onClose={onEditPasswordModalClose}
+        form={
+          <EditUsersPasswordForm
+            formRef={formRef}
+            onEdit={changePassword}
+            onCloseModal={onEditPasswordModalClose}
+          />
+        }
+        formRef={formRef}
+        title={t("Editar Senha")}
+        description={t("Tem certeza que deseja alterar a senha?")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Editar")}
+        modalSize="xl"
+        isLoading={changePasswordIsLoading}
+      />
 
-        <ModalForm
-          isOpen={isAddUserModalOpen}
-          onClose={onAddUserModalClose}
-          form={
-            <AddUserForm formRef={formRef} onCloseModal={onAddUserModalClose} />
-          }
-          formRef={formRef}
-          title={t("Adicionar usuário")}
-          description={""}
-          leftButtonLabel={t("Cancelar")}
-          rightButtonLabel={t("Criar")}
-          isLoading={createUserIsLoading}
-        />
-        <DeleteModal
-          title={t("Excluir Usuário")}
-          subtitle={t("Tem certeza de que deseja excluir este usuário?")}
-          isOpen={isDeleteModalOpen}
-          onClose={onDeleteModalClose}
-          onConfirm={async () => {
-            await deleteUser(deleteId.id);
-            onDeleteModalClose();
-          }}
-          id={deleteId}
-          isLoading={deleteIsLoading}
-        />
-        <DeleteModal
-          title={t("Excluir Usuários")}
-          subtitle={t("Tem certeza de que deseja excluir estes usuários?")}
-          isOpen={isDeleteSelectedUsers}
-          onClose={onDeleteSelectedUsersClose}
-          id={selectedItems}
-          onConfirm={onConfirmDeleteSelecteds}
-          isLoading={selectedIsLoading}
-        />
-      </VStack>
-    </>
+      <ModalForm
+        isOpen={isAddUserModalOpen}
+        onClose={onAddUserModalClose}
+        form={
+          <AddUserForm formRef={formRef} onCloseModal={onAddUserModalClose} />
+        }
+        formRef={formRef}
+        title={t("Adicionar usuário")}
+        description={""}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Criar")}
+        isLoading={createUserIsLoading}
+      />
+
+      <DeleteModal
+        title={t("Excluir Usuário")}
+        subtitle={t("Tem certeza de que deseja excluir este usuário?")}
+        isOpen={isDeleteModalOpen}
+        onClose={onDeleteModalClose}
+        onConfirm={async () => {
+          await deleteUser(deleteId.id);
+          onDeleteModalClose();
+        }}
+        id={deleteId}
+        isLoading={deleteIsLoading}
+      />
+
+      <DeleteModal
+        title={t("Excluir Usuários")}
+        subtitle={t("Tem certeza de que deseja excluir estes usuários?")}
+        isOpen={isDeleteSelectedUsers}
+        onClose={onDeleteSelectedUsersClose}
+        id={selectedItems}
+        onConfirm={onConfirmDeleteSelecteds}
+        isLoading={selectedIsLoading}
+      />
+    </Wrapper>
   );
 };
 
-export default withTranslation()(UsersPage);
+export default UsersPage;

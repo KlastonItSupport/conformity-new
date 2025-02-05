@@ -9,7 +9,7 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
-import { Flex, VStack, useBreakpoint, useDisclosure, Box } from "@chakra-ui/react";
+import { Flex, VStack, useBreakpoint, useDisclosure, Box, Spinner, Text } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import Filters from "./components/filters";
@@ -40,6 +40,7 @@ const ListDocumentsPage = () => {
 
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [isEditLoading, setIsEditLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
     documents,
@@ -57,6 +58,9 @@ const ListDocumentsPage = () => {
     userAccessRule,
     checkPermissionForAction,
     dispatchAuditEvent,
+    user,
+    getUserInfo,
+    setUser,
   } = useContext(AuthContext);
 
   const formRef = useRef(null);
@@ -86,6 +90,18 @@ const ListDocumentsPage = () => {
   } = useDisclosure();
 
   const { isCollapsed } = useSidebar();
+
+  useEffect(() => {
+    const initializeUser = async () => {
+      if (!user || !user.id) {
+        const userInfo = getUserInfo();
+        setUser(userInfo);
+      }
+      setIsLoading(false);
+    };
+
+    initializeUser();
+  }, [user, getUserInfo, setUser]);
 
   useEffect(() => {
     dispatchAuditEvent(AUDIT_EVENTS.DOCUMENTS_GET);
@@ -217,9 +233,10 @@ const ListDocumentsPage = () => {
       <Box
         marginTop="64px"
         w="100%"
+        px={6}
       >
         <VStack 
-          spacing={6}
+          spacing={3}
           w="100%"
           align="stretch"
         >
@@ -227,66 +244,74 @@ const ListDocumentsPage = () => {
             <NavigationLinks routeTree={routeTreePaths} />
           </Box>
 
-          <Box
-            bg="white"
-            borderRadius="lg"
-            p={4}
-            boxShadow="sm"
-            w="100%"
-          >
+          <Box>
             <Filters />
           </Box>
           
-          <Box 
-            w="100%" 
-            bg="white"
-            borderRadius="lg"
-            boxShadow="sm"
-            overflow="hidden"
-          >
-            <CustomTable
-              data={documents}
-              columns={columns}
-              title={t("Documentos Cadastrados")}
-              icons={tableIcons}
-              actionsButtons={
-                <ActionsButtons 
-                  canAdd={checkPermissionForAction("documents", "canAdd")} 
-                />
-              }
-              actionsButtonsPosition="right"
-              onCheckItems={(show) => {
-                setTableIcons(
-                  tableIcons.map((icon) => {
-                    icon.isDisabled = show;
-                    return icon;
-                  })
-                );
-              }}
-              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-              searchInputValue={searchParams.get("search") ?? ""}
-              hasMinHg={false}
-              border="none"
+          {isLoading ? (
+            <Box 
+              w="100%" 
+              bg="white"
               borderRadius="lg"
-            />
-            {pagination && (
-              <Box 
-                p={4} 
-                borderTop="1px solid" 
-                borderColor="gray.100"
-              >
-                <Pagination
-                  data={mockedData}
-                  onClickPagination={updateData}
-                  itemsPerPage={5}
-                  totalPages={pagination.totalPages}
-                  currentPage={pagination.currentPage}
-                  nextPage={pagination.next}
-                  lastPage={pagination.last}
-                />
-              </Box>
-            )}
-          </Box>
+              boxShadow="sm"
+              p={4}
+              textAlign="center"
+            >
+              <Spinner />
+              <Text mt={2}>{t("Carregando...")}</Text>
+            </Box>
+          ) : (
+            <Box 
+              w="100%" 
+              bg="white"
+              borderRadius="lg"
+              boxShadow="sm"
+              overflow="hidden"
+            >
+              <CustomTable
+                data={documents}
+                columns={columns}
+                title={t("")}
+                icons={tableIcons}
+                actionsButtons={
+                  <ActionsButtons 
+                    canAdd={checkPermissionForAction("documents", "canAdd")} 
+                  />
+                }
+                actionsButtonsPosition="right"
+                onCheckItems={(show) => {
+                  setTableIcons(
+                    tableIcons.map((icon) => {
+                      icon.isDisabled = show;
+                      return icon;
+                    })
+                  );
+                }}
+                onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+                searchInputValue={searchParams.get("search") ?? ""}
+                hasMinHg={false}
+                border="none"
+                borderRadius="lg"
+              />
+              {pagination && (
+                <Box 
+                  p={4} 
+                  borderTop="1px solid" 
+                  borderColor="gray.100"
+                >
+                  <Pagination
+                    data={mockedData}
+                    onClickPagination={updateData}
+                    itemsPerPage={5}
+                    totalPages={pagination.totalPages}
+                    currentPage={pagination.currentPage}
+                    nextPage={pagination.next}
+                    lastPage={pagination.last}
+                  />
+                </Box>
+              )}
+            </Box>
+          )}
         </VStack>
       </Box>
       <DeleteModal

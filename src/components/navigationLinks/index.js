@@ -4,7 +4,7 @@ import React from "react";
 const NavigationLinks = ({ routeTree, padding, width }) => {
   return (
     <HStack
-      w={"220px"}
+      w={"500px"}
       pt={"5px"}
       pb={"10px"}
       pl={"50px"}

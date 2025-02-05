@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Box, Flex, VStack, useDisclosure } from "@chakra-ui/react";
+import { Box, VStack, useDisclosure } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
 import { columns } from "./companieArray";
 import { NotePencil } from "@phosphor-icons/react";
@@ -23,6 +23,8 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const CompaniesPage = () => {
   const { getUserInfo, dispatchAuditEvent } = useContext(AuthContext);
@@ -124,101 +126,124 @@ const CompaniesPage = () => {
       getCompanies(1, inputValue);
     }
   }, 500);
+
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            mb="24px"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            type="submit"
-            label={" + " + t("Adicionar")}
-            width="150px"
-            onClick={onAddUserModalOpen}
-          />
-        </Box>
-
-        <CustomTable
-          data={companies}
-          columns={columns}
-          title={t("Empresas")}
-          icons={tableIcons}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          searchInputValue={queryParams.get("search")}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Empresas")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddUserModalOpen}
+              width="150px"
+            />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
               data={companies}
-              onClickPagination={updateData}
-              itemsPerPage={itemsPerPage}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              searchInputValue={queryParams.get("search")}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
             />
-          )}
-        </Flex>
-        <ModalForm
-          isOpen={isEditModalOpen}
-          onClose={onEditModalClose}
-          id={editId}
-          form={
-            <CompanyForm
-              formRef={formRef}
-              onCloseModal={onEditModalClose}
-              formValues={editId}
-              event={"edit"}
-            />
-          }
-          formRef={formRef}
-          title={t("Editar Empresa")}
-          description={t("Tem certeza de que deseja Editar esta empresa?")}
-          leftButtonLabel={t("Cancelar")}
-          rightButtonLabel={t("Editar")}
-          modalSize={isDesktop ? "4xl" : "xl"}
-          isLoading={editCompanyIsLoading}
-        />
-        <ModalForm
-          isOpen={isAddUserModalOpen}
-          onClose={onAddUserModalClose}
-          id={editId}
-          form={
-            <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
-          }
-          formRef={formRef}
-          title={t("Adicionar Empresa")}
-          description={""}
-          leftButtonLabel={"Cancelar"}
-          rightButtonLabel={"Criar"}
-          modalSize={isDesktop ? "4xl" : "xl"}
-          isLoading={createCompanyIsLoading}
-        />
-      </VStack>
-    </>
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={companies}
+                  onClickPagination={updateData}
+                  itemsPerPage={itemsPerPage}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
+      <ModalForm
+        isOpen={isEditModalOpen}
+        onClose={onEditModalClose}
+        id={editId}
+        form={
+          <CompanyForm
+            formRef={formRef}
+            onCloseModal={onEditModalClose}
+            formValues={editId}
+            event={"edit"}
+          />
+        }
+        formRef={formRef}
+        title={t("Editar Empresa")}
+        description={t("Tem certeza de que deseja Editar esta empresa?")}
+        leftButtonLabel={t("Cancelar")}
+        rightButtonLabel={t("Editar")}
+        modalSize={isDesktop ? "4xl" : "xl"}
+        isLoading={editCompanyIsLoading}
+      />
+      <ModalForm
+        isOpen={isAddUserModalOpen}
+        onClose={onAddUserModalClose}
+        id={editId}
+        form={
+          <CompanyForm formRef={formRef} onCloseModal={onAddUserModalClose} />
+        }
+        formRef={formRef}
+        title={t("Adicionar Empresa")}
+        description={""}
+        leftButtonLabel={"Cancelar"}
+        rightButtonLabel={"Criar"}
+        modalSize={isDesktop ? "4xl" : "xl"}
+        isLoading={createCompanyIsLoading}
+      />
+    </Wrapper>
   );
 };
 

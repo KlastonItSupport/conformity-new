@@ -5,13 +5,7 @@ import { useTranslation } from "react-i18next";
 import { columns } from "./table-helper";
 import { Gear, NotePencil, Trash } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
-import {
-  Flex,
-  HStack,
-  VStack,
-  useBreakpoint,
-  useDisclosure,
-} from "@chakra-ui/react";
+import { Box, VStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import { DeleteModal } from "components/components";
@@ -28,6 +22,7 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
 
 const EquipmmentsPage = () => {
   const { t } = useTranslation();
@@ -180,60 +175,85 @@ const EquipmmentsPage = () => {
   return (
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <HStack justify={"start"} w={"100%"} pb={"10px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="40px"
-            bgColor={"header.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            width="150px"
-            disabled={!checkPermissionForAction("equipments", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={equipments}
-          columns={columns}
-          title={t("Equipamentos")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation pageTitle={t("Equipamentos")} />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={equipments}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor={"header.100"}
+              _hover={{ bgColor: "primary.200" }}
+              textColor={"white"}
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label={"Adicionar"}
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("equipments", "canAdd")}
             />
-          )}
-        </Flex>
-      </VStack>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={equipments}
+              columns={columns}
+              title={t("Equipamentos")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={equipments}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
+      {/* Modals */}
       <DeleteModal
         title={t("Excluir Classificação")}
         subtitle={t("Tem certeza de que deseja excluir esta Classificação?")}
@@ -241,14 +261,13 @@ const EquipmmentsPage = () => {
         onClose={onDeleteModalClose}
         onConfirm={async () => {
           setIsLoading(true);
-
           await deleteEquipment(deleteId);
-
           setIsLoading(false);
           onDeleteModalClose();
         }}
         isLoading={isLoading}
       />
+      
       <DeleteModal
         title={t("Excluir Equipamentos")}
         subtitle={t("Tem certeza de que deseja excluir estas Equipamentos?")}
@@ -262,6 +281,7 @@ const EquipmmentsPage = () => {
         }}
         isLoading={isLoading}
       />
+
       <ModalForm
         isOpen={isEditModalOpen}
         onClose={onEditModalClose}

@@ -20,6 +20,8 @@ import { useTranslation } from "react-i18next";
 import withWarningCheck from "hoc/with-warning-check";
 import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const GroupsPage = () => {
   const formRef = useRef(null);
@@ -182,63 +184,87 @@ const GroupsPage = () => {
   }, []);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Box w={isMobile ? "100vw" : "95vw"} paddingX={isMobile ? "20px" : 0}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            mb="24px"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            type="submit"
-            label={` + ${t("Adicionar")}`}
-            width="150px"
-            onClick={onAddGroupModalOpen}
-          />
-        </Box>
-        <CustomTable
-          data={groups}
-          columns={columns}
-          title={t("Grupos")}
-          icons={tableIcons}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          searchInputValue={queryParams.get("search")}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-          formatOnDownLoad={formatOnDownLoad}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation 
+        pageTitle={t("Grupos")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={groups}
-              onClickPagination={updateData}
-              itemsPerPage={itemsPerPage}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label={` + ${t("Adicionar")}`}
+              width="150px"
+              onClick={onAddGroupModalOpen}
             />
-          )}
-        </Flex>
-      </VStack>
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={groups}
+              columns={columns}
+              title=""
+              icons={tableIcons}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              searchInputValue={queryParams.get("search")}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+              formatOnDownLoad={formatOnDownLoad}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={groups}
+                  onClickPagination={updateData}
+                  itemsPerPage={itemsPerPage}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
       <ModalForm
         isOpen={isAddGroupModalOpen}
         onClose={onAddGroupModalClose}
@@ -288,8 +314,7 @@ const GroupsPage = () => {
         onClose={onDeleteSelectedGroupsClose}
         onConfirm={onConfirmDeleteSelecteds}
       />
-      ;
-    </>
+    </Wrapper>
   );
 };
 

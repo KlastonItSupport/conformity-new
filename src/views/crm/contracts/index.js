@@ -30,6 +30,8 @@ import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
 import withAuthenticated from "hoc/with-authenticated";
 import { AUDIT_EVENTS } from "constants/audit-events";
+import { TopNavigation } from "components/top-navigation";
+import Wrapper from "components/wrapper";
 
 const ContractsPage = () => {
   const { t } = useTranslation();
@@ -199,83 +201,109 @@ const ContractsPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%" paddingX="24px">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <Box
-          display={"flex"}
-          flexDir={{ base: "column", md: "row" }} // "base" é para mobile, "md" para telas maiores
-          justifyContent={"space-between"}
-          w={"95vw"}
+      <TopNavigation 
+        pageTitle={t("Contratos")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
+        px={6}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          <SquareInfos
-            label={"Contratos Ativos"}
-            value={contractsByStatus.active}
-          />
-          <SquareInfos
-            label={"Contratos Inativos"}
-            value={contractsByStatus.unactive}
-          />
-          <SquareInfos
-            label={"Contratos Cancelados"}
-            value={contractsByStatus.cancelled}
-          />
-        </Box>
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
 
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            width="150px"
-            onClick={onAddModalOpen}
-            disabled={!checkPermissionForAction("crm", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={contracts}
-          columns={columns}
-          title={t("Contratos")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
-        >
-          {pagination && (
-            <Pagination
-              data={contracts}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box
+            display={"flex"}
+            flexDir={{ base: "column", md: "row" }}
+            justifyContent={"space-between"}
+            w="100%"
+          >
+            <SquareInfos
+              label={"Contratos Ativos"}
+              value={contractsByStatus.active}
             />
-          )}
-        </Flex>
-      </VStack>
+            <SquareInfos
+              label={"Contratos Inativos"}
+              value={contractsByStatus.unactive}
+            />
+            <SquareInfos
+              label={"Contratos Cancelados"}
+              value={contractsByStatus.cancelled}
+            />
+          </Box>
+
+          <Box>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor="header.100"
+              _hover={{ bgColor: "primary.200" }}
+              textColor="white"
+              boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label="Adicionar"
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("crm", "canAdd")}
+            />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={contracts}
+              columns={columns}
+              title={t("")}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+            />
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={contracts}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
+
+      {/* Modals */}
       <DeleteModal
         title={t("Excluir Contrato")}
         subtitle={t("Tem certeza de que deseja excluir este Contrato?")}
@@ -360,7 +388,7 @@ const ContractsPage = () => {
         modalSize="2xl"
         isLoading={isLoading}
       />
-    </>
+    </Wrapper>
   );
 };
 
