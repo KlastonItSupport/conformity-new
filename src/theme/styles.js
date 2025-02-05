@@ -67,12 +67,12 @@ export const globalStyles = {
     global: (props) => ({
       'html, body': {
         overflowX: "hidden",
-        bg: mode("#2B3C49", "navy.900")(props),
+        bg: mode("#FAFAFA", "navy.900")(props),
         fontFamily: "DM Sans",
         letterSpacing: "-0.5px",
       },
       '#root': {
-        bg: mode("#2b3c49", "navy.900")(props),
+        bg: mode("#FAFAFA", "navy.900")(props),
         minHeight: '100vh',
       },
       '.chakra-stack': {

@@ -9,7 +9,7 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import { NavBar } from "components/navbar";
-import { Flex, VStack, useBreakpoint, useDisclosure } from "@chakra-ui/react";
+import { Flex, VStack, useBreakpoint, useDisclosure, Box } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
 import Filters from "./components/filters";
@@ -28,6 +28,8 @@ import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import { AUDIT_EVENTS } from "constants/audit-events";
 import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
+import { useSidebar } from 'contexts/SidebarContext';
 
 const ListDocumentsPage = () => {
   const { t } = useTranslation();
@@ -82,6 +84,8 @@ const ListDocumentsPage = () => {
     onOpen: onEditModalOpen,
     onClose: onEditModalClose,
   } = useDisclosure();
+
+  const { isCollapsed } = useSidebar();
 
   useEffect(() => {
     dispatchAuditEvent(AUDIT_EVENTS.DOCUMENTS_GET);
@@ -207,58 +211,84 @@ const ListDocumentsPage = () => {
   return (
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack 
-        marginTop={"100px"} 
-        spacing={0} 
-        w="100%" 
-        h="100%"
-        bg="#FAFAFA"
-        p={6}
-        borderRadius={{ base: "0 0.375rem 0.375rem 0.375rem", md: "0 0.375rem 0.375rem 0.375rem" }}
+      <TopNavigation 
+        pageTitle={t("Documentos cadastrados")}
+      />
+      <Box
+        marginTop="64px"
+        w="100%"
       >
-        {/* 
-        <ActionsButtons
-          canAdd={checkPermissionForAction("documents", "canAdd")}
-        /> 
-        */}
-
-        <Filters />
-        <CustomTable
-          data={documents}
-          columns={columns}
-          title={t("Documentos Cadastrados")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-          actionsButtons={<ActionsButtons canAdd={checkPermissionForAction("documents", "canAdd")} />}
-          actionsButtonsPosition="center"
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+        <VStack 
+          spacing={6}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={mockedData}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <Box>
+            <NavigationLinks routeTree={routeTreePaths} />
+          </Box>
+
+          <Box
+            bg="white"
+            borderRadius="lg"
+            p={4}
+            boxShadow="sm"
+            w="100%"
+          >
+            <Filters />
+          </Box>
+          
+          <Box 
+            w="100%" 
+            bg="white"
+            borderRadius="lg"
+            boxShadow="sm"
+            overflow="hidden"
+          >
+            <CustomTable
+              data={documents}
+              columns={columns}
+              title={t("Documentos Cadastrados")}
+              icons={tableIcons}
+              actionsButtons={
+                <ActionsButtons 
+                  canAdd={checkPermissionForAction("documents", "canAdd")} 
+                />
+              }
+              actionsButtonsPosition="right"
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              searchInputValue={searchParams.get("search") ?? ""}
+              hasMinHg={false}
+              border="none"
+              borderRadius="lg"
             />
-          )}
-        </Flex>
-      </VStack>
+            {pagination && (
+              <Box 
+                p={4} 
+                borderTop="1px solid" 
+                borderColor="gray.100"
+              >
+                <Pagination
+                  data={mockedData}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              </Box>
+            )}
+          </Box>
+        </VStack>
+      </Box>
       <DeleteModal
         title={t("Excluir Documento")}
         subtitle={t("Tem certeza de que deseja excluir este Documento?")}

@@ -295,40 +295,41 @@ const TableCustom = ({
 
   const searchInput = () => {
     return (
-<HStack
-  spacing={4}
-  align="center"
-  p={2}
->
-  <MagnifyingGlass 
-    size={24} 
-    weight="bold"
-    color="var(--chakra-colors-gray-600)"
-  />
-  <FormInput
-    variant="auth"
-    fontSize="sm"
-    ms={0}
-    type="text"
-    placeholder={t("Pesquisar")}
-    fontWeight="500"
-    size="lg"
-    borderRadius="8px"
-    bgColor="primary.50"
-    width="240px"
-    _hover={{ 
-      bgColor: "gray.100",
-      borderColor: "primary.200"
-    }}
-    _focus={{
-      bgColor: "white",
-      borderColor: "primary.300",
-      boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
-    }}
-    onChange={onChangeSearchInput}
-    defaultValue={searchInputValue}
-  />
-</HStack>
+      <HStack
+        spacing={2}
+        align="center"
+        p={1}
+        height="40px"
+      >
+        <MagnifyingGlass 
+          size={24}
+          weight="bold"
+          color="var(--chakra-colors-gray-600)"
+        />
+        <FormInput
+          variant="auth"
+          fontSize="sm"
+          ms={0}
+          type="text"
+          placeholder={t("Pesquisar")}
+          fontWeight="500"
+          size="md"
+          borderRadius="6px"
+          bgColor="primary.50"
+          width={{ base: "160px", md: "240px" }}
+          _hover={{ 
+            bgColor: "gray.100",
+            borderColor: "primary.200"
+          }}
+          _focus={{
+            bgColor: "white",
+            borderColor: "primary.300",
+            boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+          }}
+          onChange={onChangeSearchInput}
+          defaultValue={searchInputValue}
+        />
+      </HStack>
     );
   };
 
@@ -343,132 +344,133 @@ const TableCustom = ({
   };
   return (
     <Box
-      w={isMobile ? "99%" : deskWidth ?? "100%"}
-      margin={"0 auto"}
-      bgColor={"#fafafa"} 
-      minH={hasMinHg ? { lg: "500px", md: "500px" } : null}
-      border={border}
-      borderRadius="10px"  
-      padding="5px"
+      w="100%"
+      bg="white"
+      borderRadius="lg"
       boxShadow="sm"
+      overflow="hidden"
     >
-      <VStack alignItems={"start"} padding={paddingOnTitle ? "20px" : "0px"}>
-        <Flex
-          flexDirection={isMobile ? "column" : "row"}
-          w={"100%"}
-          justifyContent={"space-between"}
-          alignItems={"center"}
-          padding={"20px"}
-          gap={"10px"}
-        >
+      <Box p={4}>
+        {title && (
           <Text
-            fontSize={{ lg: "24px", md: "22px", sm: "20px" }}
-            color={"navy.700"}
-            fontWeight={"bold"}
-            paddingBottom={isMobile ? "10px" : "0"}
-            flex="1"  // Allow title to take available space
+            fontSize="lg"
+            fontWeight="bold"
+            mb={4}
           >
             {title}
           </Text>
-          
-          {actionsButtons && (
-            <Flex
-              justifyContent={"center"}  // Always center
-              alignItems={"center"}
-              flex="1"  // Take equal space
-            >
-              {actionsButtons}
-            </Flex>
-          )}
-          
-          {showSearchInput && searchInput()}
-        </Flex>
-      </VStack>
-      {data.length > 0 && (
-        <Flex justifyContent="flex-start" my={4}>
-          <InteractiveButtons
-            columns={columns}
-            data={data}
-            setVisibleColumns={setVisibleColumns}
-            visibleColumns={visibleColumns}
-            downloadTitle={title}
-            formatOnDownLoad={formatOnDownLoad}
-          />
-        </Flex>
-      )}
-      <Box width={"100%"} overflow={"auto"}>
-        <Table 
-          overflow={"auto"}
-          backgroundColor="white"
-          padding="16px"
-          borderCollapse="separate"
-          borderSpacing="0"
-          sx={{
-            'td, th': {
-              backgroundColor: 'white',
-              padding: '5px 8px',
-            },
-          }}
-        >
-          <Thead>
-            <Tr>
-            <Th borderWidth="0.5px" borderColor="#000000">
-                <Checkbox
-                  marginRight={"10px"}
-                  size="lg"
-                  _checked={{
-                    "& .chakra-checkbox__control": {
-                      background: "primary.100",
-                    },
-                  }}
-                  isChecked={selecteds[0].checked}
-                  onChange={(e) => handleCheckBoxes(e.target.checked, {}, true)}
-                />
-              </Th>
-              {renderTableHeader()}
-              {icons && (
-                <Th border={"1px solid #ddd"}>
-                  <Box display={"flex"}>
-                    {icons &&
-                      icons.map(
-                        (icon, index) =>
-                          icon &&
-                          icon.icon && (
-                            <Box
-                              key={index + "actionbuttons"}
-                              onClick={() =>
-                                shouldShowHeaderIcon(icon)
-                                  ? icon.onClickHeader(
-                                      selecteds.filter(
-                                        (selected) => selected.checked
-                                      )
-                                    )
-                                  : () => {}
-                              }
-                              cursor={
-                                shouldShowHeaderIcon(icon)
-                                  ? "pointer"
-                                  : "not-allowed"
-                              }
-                              color={
-                                shouldShowHeaderIcon(icon)
-                                  ? "black"
-                                  : "secondaryGray.500"
-                              }
-                            >
-                              {icon.icon}
-                            </Box>
-                          )
-                      )}
-                  </Box>
+        )}
+
+        {actionsButtons && (
+          <Flex 
+            justify={actionsButtonsPosition === 'center' ? 'center' : 'flex-start'}
+            mb={4}
+          >
+            {actionsButtons}
+          </Flex>
+        )}
+
+        {data.length > 0 && (
+          <Flex 
+            justifyContent="space-between" 
+            alignItems="center" 
+            mb={4}
+            flexDirection={{ base: "column", md: "row" }}
+            gap={2}
+          >
+            <InteractiveButtons
+              columns={columns}
+              data={data}
+              setVisibleColumns={setVisibleColumns}
+              visibleColumns={visibleColumns}
+              downloadTitle={title}
+              formatOnDownLoad={formatOnDownLoad}
+            />
+            {showSearchInput && (
+              <Box width={{ base: "100%", md: "auto" }}>
+                {searchInput()}
+              </Box>
+            )}
+          </Flex>
+        )}
+
+        <Box overflowX="auto">
+          <Table
+            w="100%"
+            bg="white"
+            sx={{
+              'td, th': {
+                padding: cellPadding,
+                whiteSpace: 'nowrap',
+                borderColor: 'gray.200',
+              },
+              'thead tr': {
+                position: 'sticky',
+                top: 0,
+                bg: 'white',
+                zIndex: 1,
+              }
+            }}
+          >
+            <Thead>
+              <Tr>
+              <Th borderWidth="0.5px" borderColor="#000000">
+                  <Checkbox
+                    marginRight={"10px"}
+                    size="lg"
+                    _checked={{
+                      "& .chakra-checkbox__control": {
+                        background: "primary.100",
+                      },
+                    }}
+                    isChecked={selecteds[0].checked}
+                    onChange={(e) => handleCheckBoxes(e.target.checked, {}, true)}
+                  />
                 </Th>
-              )}
-            </Tr>
-          </Thead>
-          <Tbody>{renderTableRows()}</Tbody>
-        </Table>
+                {renderTableHeader()}
+                {icons && (
+                  <Th border={"1px solid #ddd"}>
+                    <Box display={"flex"}>
+                      {icons &&
+                        icons.map(
+                          (icon, index) =>
+                            icon &&
+                            icon.icon && (
+                              <Box
+                                key={index + "actionbuttons"}
+                                onClick={() =>
+                                  shouldShowHeaderIcon(icon)
+                                    ? icon.onClickHeader(
+                                        selecteds.filter(
+                                          (selected) => selected.checked
+                                        )
+                                      )
+                                    : () => {}
+                                }
+                                cursor={
+                                  shouldShowHeaderIcon(icon)
+                                    ? "pointer"
+                                    : "not-allowed"
+                                }
+                                color={
+                                  shouldShowHeaderIcon(icon)
+                                    ? "black"
+                                    : "secondaryGray.500"
+                                }
+                              >
+                                {icon.icon}
+                              </Box>
+                            )
+                        )}
+                    </Box>
+                  </Th>
+                )}
+              </Tr>
+            </Thead>
+            <Tbody>{renderTableRows()}</Tbody>
+          </Table>
+        </Box>
       </Box>
-      {paginationComponent && paginationComponent}
     </Box>
   );
 };

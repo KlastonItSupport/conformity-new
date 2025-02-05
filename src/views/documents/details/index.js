@@ -25,6 +25,9 @@ import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
 import withDetailsPermission from "hoc/use-task-details-permission";
+import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
+import { useSidebar } from 'contexts/SidebarContext';
 
 const DocumentsDetailsPage = () => {
   const { t } = useTranslation();
@@ -37,6 +40,7 @@ const DocumentsDetailsPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const showFeed = useRef(null);
   const documentId = queryParams.get("id");
+  const { isCollapsed } = useSidebar();
 
   const routeTreePaths = [
     {
@@ -100,41 +104,41 @@ const DocumentsDetailsPage = () => {
   }, [documentId]);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <VStack w={isMobile ? "100%" : "95vw"}>
-          <NavigationLinks
-            routeTree={routeTreePaths}
-            padding={isMobile ? "0px 15px" : null}
-          />
-        </VStack>
-        {isMobile ? (
-          <VStack w={"100%"} h={"100%"} paddingX={"10px"}>
-            {leftContainer}
-            <Container h={"100%"} p={0} m={"0"} maxW={"none"}>
-              {documentsDetails && documentsDetails.document && <Description />}
-              <Revisions />
-              <Evaluators documentId={documentId} />
-              <RelatedDocuments documentId={documentId} />
-              <DepartamentPermissions documentId={documentId} />
-            </Container>
-          </VStack>
-        ) : (
-          <HStack w={"95vw"} h={"100%"} alignItems={"start"}>
-            {leftContainer}
-            <Box h={"100%"} overflow={"auto"}>
-              {documentsDetails && documentsDetails.document && <Description />}
-              <Revisions />
-              <Evaluators documentId={documentId} />
-              <RelatedDocuments documentId={documentId} />
-              <DepartamentPermissions documentId={documentId} />
-              <Container padding={"0 0 30px 0"}></Container>
-            </Box>
-          </HStack>
-        )}
-      </VStack>
-    </>
+      <TopNavigation 
+        pageTitle={t("Detalhes do Documento")}
+      />
+      <Box
+        marginTop="64px"
+        marginLeft={isCollapsed ? "60px" : "240px"}
+        transition="all 0.3s ease"
+        minH="calc(100vh - 64px)"
+        bg="#FAFAFA"
+        p={6}
+      >
+        <HStack
+          align="flex-start"
+          spacing={6}
+          w="100%"
+        >
+          {leftContainer}
+          <Box
+            flex={1}
+            bg="white"
+            borderRadius="lg"
+            p={6}
+            boxShadow="sm"
+          >
+            {documentsDetails && documentsDetails.document && <Description />}
+            <Revisions />
+            <Evaluators documentId={documentId} />
+            <RelatedDocuments documentId={documentId} />
+            <DepartamentPermissions documentId={documentId} />
+          </Box>
+        </HStack>
+      </Box>
+    </Wrapper>
   );
 };
 

@@ -10,106 +10,70 @@ import {
   Box,
   Image,
   VStack,
+  Avatar,
 } from "@chakra-ui/react";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import React from "react";
+import { CaretDown } from "@phosphor-icons/react";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-export const UserInfo = ({ itemsList, name, companyName, profilePhoto }) => {
+export const UserInfo = ({ 
+  name, 
+  profilePhoto, 
+  companyName, 
+  itemsList,
+  isCollapsed 
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const color = isOpen ? "white" : "#87A3BC";
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
-    <Menu isOpen={isOpen}>
-      <MenuButton
-        variant="ghost"
-        mx={1}
-        py={[1, 2, 2]}
-        px={4}
-        borderRadius="md"
-        fontWeight="normal"
-        onMouseEnter={onOpen}
-        onMouseLeave={onClose}
-        minWidth="200px"
-        _hover={{
-          bg: 'rgba(255, 255, 255, 0.1)',
-        }}
-      >
-        <HStack spacing={3}>
-          <Box
-            border={`2px solid ${color}`}
-            padding="1px"
-            borderRadius="md"
-            overflow="hidden"
-          >
-            <Image 
-              w="32px" 
-              h="32px" 
-              src={profilePhoto}
-              objectFit="cover"
-              borderRadius="sm"
-            />
-          </Box>
-          <VStack spacing={0} alignItems="start">
-            <Text fontSize="sm" color={color} fontWeight="medium">
+    <VStack spacing={3} align={isCollapsed ? "center" : "start"}>
+      <Avatar
+        size="md"
+        name={name}
+        src={profilePhoto}
+        cursor="pointer"
+      />
+      
+      {!isCollapsed && (
+        <>
+          <VStack spacing={1} align="start">
+            <Text fontSize="sm" fontWeight="bold">
               {name}
             </Text>
-            <Text 
-              fontSize="xs" 
-              color={color} 
-              maxW="120px" 
-              isTruncated
-            >
+            <Text fontSize="xs" color="gray.300">
               {companyName}
             </Text>
           </VStack>
-          <Box ml="auto">
-            {isOpen ? (
-              <ChevronUpIcon color="white" />
-            ) : (
-              <ChevronDownIcon color="#87A3BC" />
-            )}
-          </Box>
-        </HStack>
-      </MenuButton>
-      <MenuList
-        onMouseEnter={onOpen}
-        onMouseLeave={onClose}
-        bg="#1E2A35"
-        borderColor="rgba(134, 162, 187, 0.1)"
-        borderRadius="xl"
-        p={1}
-        minW="220px"
-        boxShadow="lg"
-      >
-        {itemsList.map((item, index) => (
-          <MenuItem
-            key={index}
-            onClick={item.onClick}
-            _hover={{
-              bg: '#2B3D4C',
-              color: 'white',
-            }}
-            _focus={{
-              bg: '#2B3D4C',
-              color: 'white',
-            }}
-            color="#87A3BC"
-            borderRadius="md"
-            fontSize="sm"
-            px={4}
-            py={2}
-            transition="all 0.2s"
-          >
-            <Link 
-              href={item.src} 
-              _hover={{ textDecoration: 'none' }}
-              w="100%"
-            >
-              {item.label}
-            </Link>
-          </MenuItem>
-        ))}
-      </MenuList>
-    </Menu>
+
+          <Menu>
+            <MenuButton w="100%">
+              <HStack w="100%" justify="space-between">
+                <Text fontSize="sm">{t("Menu")}</Text>
+                <CaretDown size={16} />
+              </HStack>
+            </MenuButton>
+            <MenuList bg="#3b5366" border="none">
+              {itemsList.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  onClick={item.onClick || (() => navigate(item.src))}
+                  bg="transparent"
+                  _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+                >
+                  <Text fontSize="sm" color="white">
+                    {item.label}
+                  </Text>
+                </MenuItem>
+              ))}
+            </MenuList>
+          </Menu>
+        </>
+      )}
+    </VStack>
   );
 };
