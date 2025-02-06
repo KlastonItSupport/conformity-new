@@ -1,6 +1,7 @@
 import { api } from "api/api";
 import { createContext, useState } from "react";
 import moment from "moment";
+import axios from "axios";
 
 import { toast } from "react-toastify";
 import i18n from "../i18n/index";
@@ -135,6 +136,15 @@ const AuthProvider = ({ children }) => {
       setUserAccessRule(null);
       setUserPermissions(null);
       
+      // Clear axios headers
+      delete api.defaults.headers.common['Authorization'];
+      
+      // Create a new axios instance to cancel pending requests
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      api.defaults.cancelToken = source.token;
+      source.cancel('User logged out');
+      
       // Redirect to login page
       history("/signin");
       
@@ -142,6 +152,8 @@ const AuthProvider = ({ children }) => {
       window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
+      // If logout fails, force a hard redirect
+      window.location.href = '/signin';
     }
   };
 

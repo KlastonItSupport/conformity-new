@@ -14,6 +14,15 @@
         "licenses": "licenças",
         "Disk Space": "Espaço em Disco",
         "Used Space": "Espaço Utilizado",
-        "Available Space": "Espaço Disponível"
+        "Available Space": "Espaço Disponível",
+        "Quick Access": "Acesso Rápido",
+        "Documents": "Documentos",
+        "Tasks": "Tarefas",
+        "Trainings": "Treinamentos",
+        "Indicators": "Indicadores",
+        "Equipment": "Manutenção / Calibração",
+        "Used": "Usado",
+        "Available": "Disponível",
+        "Dashboard": "Dashboard"
     }
 }

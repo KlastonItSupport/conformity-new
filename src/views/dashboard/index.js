@@ -24,27 +24,27 @@ const DashboardPage = () => {
   const quickAccessItems = [
     {
       icon: <FaFolder size={32} />,
-      label: "Documents",
+      label: t("Documents"),
       path: "/documents",
     },
     {
       icon: <FaCheck size={32} />,
-      label: "Tasks",
+      label: t("Tasks"),
       path: "/tasks",
     },
     {
       icon: <FaGraduationCap size={32} />,
-      label: "Trainings",
+      label: t("Trainings"),
       path: "/trainings",
     },
     {
       icon: <FaChartLine size={32} />,
-      label: "Indicators",
+      label: t("Indicators"),
       path: "/indicators",
     },
     {
       icon: <FaCog size={32} />,
-      label: "Equipment",
+      label: t("Equipment"),
       path: "/equipments",
     },
   ];
@@ -63,10 +63,7 @@ const DashboardPage = () => {
           w="100%"
           align="stretch"
         >
-          <Box>
-            <NavigationLinks routeTree={routeTreePaths} />
-          </Box>
-          
+     
           {/* Bento Grid Layout */}
           <Box 
             display="grid" 
@@ -74,6 +71,7 @@ const DashboardPage = () => {
             gap={4}
             bg="white"
             p={6}
+            mt={6}
             borderRadius="lg"
             boxShadow="sm"
           >
@@ -86,14 +84,19 @@ const DashboardPage = () => {
                 {quickAccessItems.map((item, index) => (
                   <Button
                     key={index}
-                    leftIcon={item.icon}
                     onClick={() => navigate(item.path)}
-                    variant="solid"
-                    colorScheme="blue"
-                    justifyContent="flex-start"
+                    variant="outline"
+                    borderColor="#3B5366"
+                    borderRadius="7px"
+                    color="#3B5366"
+                    bg="transparent"
+                    justifyContent="center"
                     h="48px"
                     w="100%"
-                    _hover={{ bg: "blue.600", color: "white" }}
+                    _hover={{ 
+                      bg: "#3B5366",
+                      color: "white"
+                    }}
                   >
                     {item.label}
                   </Button>
@@ -108,23 +111,23 @@ const DashboardPage = () => {
               </Text>
               <VStack align="stretch" spacing={3}>
                 <HStack>
-                  <Text fontWeight="medium">Company:</Text>
+                  <Text fontWeight="medium">{t("Company")}:</Text>
                   <Text>Company Name</Text>
                 </HStack>
                 <HStack>
-                  <Text fontWeight="medium">Group:</Text>
+                  <Text fontWeight="medium">{t("Group")}:</Text>
                   <Text>Group Name</Text>
                 </HStack>
                 <HStack>
-                  <Text fontWeight="medium">Department:</Text>
+                  <Text fontWeight="medium">{t("Department")}:</Text>
                   <Text>Department Name</Text>
                 </HStack>
                 <HStack>
-                  <Text fontWeight="medium">Role:</Text>
+                  <Text fontWeight="medium">{t("Role")}:</Text>
                   <Text>User Role</Text>
                 </HStack>
                 <HStack>
-                  <Text fontWeight="medium">User:</Text>
+                  <Text fontWeight="medium">{t("User")}:</Text>
                   <Text>Username</Text>
                 </HStack>
               </VStack>
@@ -141,26 +144,42 @@ const DashboardPage = () => {
                     <Text>{t("Contracted Licenses")}</Text>
                     <Text fontWeight="medium">10</Text>
                   </HStack>
-                  <Progress 
-                    value={100} 
-                    size="lg" 
-                    borderRadius="md"
-                    w="100%"
-                    colorScheme="blue"
-                  />
+                  <Box position="relative" overflow="hidden" borderRadius="md">
+                    <Progress 
+                      value={100} 
+                      size="lg" 
+                      w="100%"
+                      colorScheme="blue"
+                      sx={{
+                        '& > div': {
+                          animation: 'wave 2s ease-in-out infinite',
+                          backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                          backgroundSize: '200% 100%',
+                        }
+                      }}
+                    />
+                  </Box>
                 </Box>
                 <Box>
                   <HStack justify="space-between" mb={2}>
                     <Text>{t("Used Licenses")}</Text>
                     <Text fontWeight="medium">5</Text>
                   </HStack>
-                  <Progress 
-                    value={50} 
-                    size="lg" 
-                    borderRadius="md"
-                    w="100%"
-                    colorScheme="red"
-                  />
+                  <Box position="relative" overflow="hidden" borderRadius="md">
+                    <Progress 
+                      value={50} 
+                      size="lg" 
+                      w="100%"
+                      colorScheme="red"
+                      sx={{
+                        '& > div': {
+                          animation: 'wave 2s ease-in-out infinite',
+                          backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
+                          backgroundSize: '200% 100%',
+                        }
+                      }}
+                    />
+                  </Box>
                 </Box>
               </VStack>
             </Box>

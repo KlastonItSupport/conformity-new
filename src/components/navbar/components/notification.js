@@ -13,8 +13,7 @@ import {
   useDisclosure,
   Stack,
 } from "@chakra-ui/react";
-import { Bell } from "@phosphor-icons/react";
-import { BlogContext } from "providers/blog";
+import { IoIosNotifications } from "react-icons/io";import { BlogContext } from "providers/blog";
 import { useNavigate } from "react-router-dom";
 
 const Notification = () => {
@@ -44,7 +43,7 @@ const Notification = () => {
           zIndex={11}
           touchAction="manipulation"
         >
-          <Bell size={24} color="#3b5366" />
+          <IoIosNotifications size={30} color="#3b5366" />
 
           {notificationsTotal > 0 && (
             <>
@@ -52,11 +51,14 @@ const Notification = () => {
                 position="absolute"
                 top="-4"
                 right="-1"
-                fontSize="0.8em"
+                fontSize="1em"
                 colorScheme="whiteAlpha"
                 bg="red"
                 color="white"
                 rounded="full"
+                px={0.5}
+                py={0.5}  
+                mt={1}
               >
                 {notificationsTotal}
               </Badge>
