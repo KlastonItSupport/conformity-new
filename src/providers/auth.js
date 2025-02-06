@@ -123,11 +123,26 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = (history) => {
-    localStorage.removeItem(accessTokenKey);
-    localStorage.removeItem(userKey);
-    localStorage.removeItem(languageKey);
-
-    history("/");
+    try {
+      // Clear local storage
+      localStorage.removeItem(accessTokenKey);
+      localStorage.removeItem(userKey);
+      localStorage.removeItem(languageKey);
+      
+      // Clear any in-memory state
+      setUser(null);
+      setPermissions(null);
+      setUserAccessRule(null);
+      setUserPermissions(null);
+      
+      // Redirect to login page
+      history("/signin");
+      
+      // Force a full page reload to clear any cached data
+      window.location.reload();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const checkPermissionForAction = (module, action) => {

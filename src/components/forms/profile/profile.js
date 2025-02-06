@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, VStack, HStack, Text, Avatar } from "@chakra-ui/react";
 import { CalendarCustom } from "../../calendar/index";
 import { FormInput } from "components/components";
 import React, { useContext, useState } from "react";
@@ -13,6 +13,7 @@ import { handlingFileToBase64 } from "helpers/buffer-to-base-64";
 export const ProfileForm = () => {
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
   const { editProfile, user } = useContext(AuthContext);
   const { t } = useTranslation();
 
@@ -49,76 +50,112 @@ export const ProfileForm = () => {
     setIsLoading(false);
   };
 
-  return (
-    <form
-      style={{ width: "100%", padding: "0 20px" }}
-      onSubmit={handleSubmit(onSubmit)}
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const profilePicInput = (
+    <Box 
+      w="100%"
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      gap={4}
+      mb={4}
     >
-      <FormInput
-        variant="auth"
-        fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
-        type="file"
-        margin="0 0 10px 0 "
-        fontWeight="500"
-        size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
-        label={t("Insira sua foto")}
-        {...register("profilePic")}
-        className="center-file-input"
-        error={errors.profilePic?.message}
+      <Avatar 
+        size="2xl"
+        src={previewImage || user.profilePic}
+        name={user.name}
+        bg="primary.100"
       />
+      <Box flex={1} h="85px" maxW="320px">
+        <FormInput
+          variant="auth"
+          fontSize="sm"
+          type="file"
+          accept="image/*"
+          fontWeight="500"
+          size="lg"
+          h="45px"
+          borderRadius="7px"
+          bgColor="primary.50"
+          label={t("Insira sua foto")}
+          {...register("profilePic")}
+          className="center-file-input"
+          error={errors.profilePic?.message}
+          onChange={(e) => {
+            handleImageChange(e);
+            register("profilePic").onChange(e);
+          }}
+        />
+      </Box>
+    </Box>
+  );
+
+  const nameInput = (
+    <Box flex={1} h="85px">
       <FormInput
         variant="auth"
         fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
         type="text"
-        placeholder="Bruno Santos"
-        margin="0 0 10px 0 "
+        placeholder={t("Ex: Bruno Santos")}
         fontWeight="500"
         size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
+        h="45px"
+        borderRadius="7px"
+        bgColor="primary.50"
         label={t("Nome *")}
-        width="100%"
         {...register("name")}
         error={errors.name?.message}
         defaultValue={user.name}
       />
+    </Box>
+  );
+
+  const phoneInput = (
+    <Box flex={1} h="85px">
       <FormInput
         variant="auth"
         fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
         type="text"
-        placeholder="(xx) xxxx-xxxx"
-        margin="0 0 10px 0 "
+        placeholder={t("(xx) xxxx-xxxx")}
         fontWeight="500"
         size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
+        h="45px"
+        borderRadius="7px"
+        bgColor="primary.50"
         label={t("Telefone *")}
-        width="100%"
         defaultValue={user.celphone ?? ""}
         {...register("celphone")}
         error={errors.celphone?.message}
       />
+    </Box>
+  );
+
+  const birthdayInput = (
+    <Box flex={1} h="85px" position="relative">
       <FormInput
         variant="auth"
         fontSize="sm"
-        ms={{ base: "0px", md: "0px" }}
         type="text"
-        placeholder="dd/mm/yyyy"
-        margin="0 0 10px 0 "
+        placeholder={t("dd/mm/yyyy")}
         fontWeight="500"
         size="lg"
-        borderRadius="6px"
-        bgColor={"primary.50"}
+        h="45px"
+        borderRadius="7px"
+        bgColor="primary.50"
         label={t("Data de aniversário")}
         onClick={() => setIsShowingCalendar(!isShowingCalendar)}
-        width="100%"
         defaultValue={user.birthday ?? ""}
-        autocomplete="off"
+        autoComplete="off"
         {...register("birthday")}
         error={errors.birthday?.message}
         onChange={(e) => {
@@ -127,10 +164,17 @@ export const ProfileForm = () => {
       />
       {isShowingCalendar && (
         <Box
-          position={"absolute"}
-          top={{ lg: "410px", md: "410px", sm: "420px" }}
+          position="absolute"
+          top="100%"
+          left="0"
           zIndex={2}
-          w={{ sm: "80%" }}
+          w="100%"
+          maxW="320px"
+          bg="white"
+          boxShadow="lg"
+          borderRadius="md"
+          border="1px solid"
+          borderColor="gray.200"
         >
           <CalendarCustom
             onChangeDate={(date) => {
@@ -146,22 +190,55 @@ export const ProfileForm = () => {
           />
         </Box>
       )}
-      <ButtonPrimary
-        fontSize="sm"
-        fontWeight="bold"
-        h="50"
-        bgColor={"primary.100"}
-        _hover={{ bgColor: "primary.200" }}
-        textColor={"white"}
-        boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-        borderRadius="7px"
-        _active={{ bgColor: "primary.200" }}
-        label={t("Salvar")}
-        onClick={() => {}}
-        width="150px"
-        isLoading={isLoading}
-        type="submit"
-      />
-    </form>
+    </Box>
+  );
+
+  return (
+    <VStack
+      as="form"
+      onSubmit={handleSubmit(onSubmit)}
+      w="100%"
+      spacing={6}
+      align="stretch"
+      bg="white"
+      borderRadius="lg"
+      boxShadow="sm"
+      p={6}
+    >
+      <Text fontSize="xl" fontWeight="bold" color="gray.700">
+        {t("Informações do Perfil")}
+      </Text>
+
+      {profilePicInput}
+      
+      <VStack spacing={4} align="stretch">
+        <HStack spacing={4} align="flex-start">
+          {nameInput}
+          {phoneInput}
+        </HStack>
+        
+        <Box maxW="50%">
+          {birthdayInput}
+        </Box>
+      </VStack>
+
+      <Box pt={4}>
+        <ButtonPrimary
+          fontSize="sm"
+          fontWeight="bold"
+          h="40px"
+          bgColor="header.100"
+          _hover={{ bgColor: "primary.200" }}
+          textColor="white"
+          boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+          borderRadius="7px"
+          _active={{ bgColor: "primary.200" }}
+          label={t("Salvar")}
+          type="submit"
+          width="150px"
+          isLoading={isLoading}
+        />
+      </Box>
+    </VStack>
   );
 };
