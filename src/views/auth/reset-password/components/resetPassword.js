@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Flex, Heading, Text, VStack, useColorModeValue } from "@chakra-ui/react";
 import { AuthContext } from "providers/auth";
@@ -22,8 +22,15 @@ export const ResetPasswordForm = () => {
   const { resetPassword } = useContext(AuthContext);
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams()[0];
   const [isLoading, setIsLoading] = React.useState(false);
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (!token) {
+      navigate('/error', { state: { message: 'Token no proporcionado' } });
+    }
+  }, [searchParams, navigate]);
 
   const {
     handleSubmit,
@@ -33,18 +40,24 @@ export const ResetPasswordForm = () => {
     resolver: yupResolver(resetPasswordSchema),
   });
 
-  const handleResetPassword = async (data) => {
-    try {
-      setIsLoading(true);
-      const token = searchParams.get('token');
-      const success = await resetPassword(token, data.password);
-      if (success) {
-        navigate("/signin");
-      }
-    } finally {
-      setIsLoading(false);
+// Lógica clave del formulario de resetear contraseña
+const handleResetPassword = async (data) => {
+  try {
+    setIsLoading(true);
+    // 1. Obtener token de la URL
+    const token = searchParams.get('token'); 
+    
+    // 2. Enviar token + nueva contraseña al backend
+    const success = await resetPassword(token, data.password);
+    
+    if (success) {
+      // 3. Redireccionar a login
+      navigate("/signin");
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <Flex

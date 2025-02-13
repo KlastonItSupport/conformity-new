@@ -37,17 +37,16 @@ export const ForgotPasswordForm = () => {
   const handleForgotPassword = async (data) => {
     try {
       setIsLoading(true);
-      const success = await forgotPassword(data.email);
+      // 1. Enviar email al backend
+      const success = await forgotPassword(data.email); 
       
       if (success) {
+        // 2. Mostrar feedback y redireccionar
         setEmailSent(true);
-        // Redirect after 3 seconds
-        setTimeout(() => {
-          navigate("/signin");
-        }, 3000);
+        setTimeout(() => navigate("/signin"), 3000);
       }
     } catch (error) {
-      // Error handled by AuthContext
+      // 3. Manejo de errores (implementado en AuthContext)
     } finally {
       setIsLoading(false);
     }

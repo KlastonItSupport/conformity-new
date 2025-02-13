@@ -6,6 +6,7 @@ import SelectInput from "components/select";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "providers/users";
 import { CompanyContext } from "providers/company";
+import { AuthContext } from "providers/auth";
 import { useTranslation } from "react-i18next";
 import { Center, Spinner } from "@chakra-ui/react";
 
@@ -13,11 +14,15 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
   const { t } = useTranslation();
   const { editUser } = useContext(UserContext);
   const { getCompanies } = useContext(CompanyContext);
+  const { user: currentUser } = useContext(AuthContext);
   const [companyOptions, setCompanyOptions] = useState([]);
   const [companiesIsLoading, setCompaniesIsLoading] = useState(false);
+
   const {
     handleSubmit,
     register,
+    control,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(editUsersFormSchema),
@@ -25,7 +30,7 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
       name: formValues.name,
       email: formValues.email,
       celphone: formValues.celphone,
-      companyId: formValues.companyId, // Ensure companyId is included
+      companyId: formValues.companyId,
       role: formValues.role,
       departament: formValues.departament,
       accessRule: formValues.accessRule,
@@ -33,26 +38,27 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
     },
   });
 
+  useEffect(() => {
+    // Lock companyId field for non-super-admins
+    if (currentUser.accessRule !== 'super-admin') {
+      setValue('companyId', formValues.companyId);
+    }
+  }, [currentUser.accessRule, formValues.companyId, setValue]);
+
   const onSubmit = async (data) => {
     const userData = {
       ...data,
       id: formValues.id,
       companyId: data.companyId,
     };
-  
-    console.log('Original Company ID:', formValues.companyId);
-    console.log('New Company ID:', data.companyId);
-    console.log('Full User Data:', userData);
-  
+
     try {
       const response = await editUser(userData);
-      console.log('Full API Response:', response);
-      
       if (response) {
         onCloseModal();
       }
     } catch (error) {
-      console.error('Error Details:', {
+      console.error('Error updating user:', {
         message: error.message,
         status: error.response?.status,
         data: error.response?.data
@@ -60,22 +66,15 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
     }
   };
 
-  const getAccessDefaultValue = () => {
-    if (formValues.accessRule === "root") {
-      return { label: "root", value: "root" };
-    }
-    if (formValues.accessRule === "super-user") {
-      return { label: "Super Usuário", value: "super-user" };
-    }
-    return { label: "Usuário", value: "user" };
-  };
-
   const fetchCompaniesData = async () => {
     try {
       setCompaniesIsLoading(true);
       const companies = await getCompanies();
       setCompanyOptions(
-        companies.map((company) => ({ label: company.name, value: company.id }))
+        companies.map(company => ({
+          label: company.name,
+          value: company.id
+        }))
       );
     } catch (error) {
       console.error('Error fetching companies:', error);
@@ -85,9 +84,10 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
   };
 
   useEffect(() => {
-    fetchCompaniesData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (currentUser.accessRule === 'super-admin') {
+      fetchCompaniesData();
+    }
+  }, [currentUser.accessRule]);
 
   return (
     <form
@@ -100,124 +100,133 @@ export const EditUsersForm = ({ formRef, onCloseModal, formValues }) => {
         fontSize="sm"
         ms={{ base: "0px", md: "0px" }}
         type="text"
-        placeholder="Nome"
-        margin="0 0 10px 0 "
+        placeholder={t("Nome completo")}
+        margin="0 0 10px 0"
         fontWeight="500"
         size="lg"
         borderRadius="6px"
         bgColor={"primary.50"}
         label={t("Nome *")}
         width="100%"
-        defaultValue={formValues.name}
         {...register("name")}
         error={errors.name?.message}
+        defaultValue={formValues.name}
       />
+
       <FormInput
         variant="auth"
         fontSize="sm"
         ms={{ base: "0px", md: "0px" }}
         type="email"
         placeholder="emailexample@hotmail.com"
-        margin="0 0 10px 0 "
+        margin="0 0 10px 0"
         fontWeight="500"
         size="lg"
         borderRadius="6px"
         bgColor={"primary.50"}
         label="Email *"
-        defaultValue={formValues.email}
         {...register("email")}
         error={errors.email?.message}
+        defaultValue={formValues.email}
       />
+
       <FormInput
         variant="auth"
         fontSize="sm"
         ms={{ base: "0px", md: "0px" }}
         type="text"
         placeholder="(xx) xxxx-xxxx"
-        margin="0 0 10px 0 "
+        margin="0 0 10px 0"
         fontWeight="500"
         size="lg"
         borderRadius="6px"
         bgColor={"primary.50"}
         label={t("Telefone *")}
         width="100%"
-        defaultValue={formValues.celphone}
         {...register("celphone")}
         error={errors.celphone?.message}
+        defaultValue={formValues.celphone}
       />
 
-{companiesIsLoading ? (
-        <Center>
-          <Spinner />
-        </Center>
-      ) : (
-        <SelectInput
-        label={t("Empresa *")}
-        {...register("companyId")}
-        errors={errors.companyId}
-        options={companyOptions}
-        placeholder={t("Selecione uma empresa")}
-        defaultValue={{
-          label: formValues.company?.name,
-          value: formValues.companyId
-        }}
-      />
+      {currentUser.accessRule === "super-admin" && (
+        companiesIsLoading ? (
+          <Center height="100px">
+            <Spinner size="xl" />
+          </Center>
+        ) : (
+          <SelectInput
+            label={t("Empresa")}
+            {...register("companyId")}
+            control={control}
+            options={companyOptions}
+            placeholder={t("Selecione uma empresa")}
+            defaultValue={{
+              label: formValues.company?.name,
+              value: formValues.companyId
+            }}
+            error={errors.companyId?.message}
+            isOptional={true}
+          />
+        )
       )}
 
-
       <SelectInput
-        error={errors.role}
+        label={t("Cargo")}
+        {...register("role")}
+        control={control}
         options={[
           { label: "TI", value: "1" },
           { label: "DP", value: "a" },
           { label: "RH", value: "3" },
         ]}
-        {...register("role")}
-      />
-      <SelectInput
-        errors={errors.departament}
-        label={t("Departamento")}
-        options={[
-          { label: "Qualidade", value: "1" },
-          { label: "Compras", value: "2" },
-          { label: "Admin", value: "3" },
-        ]}
-        {...register("departament")}
+        error={errors.role?.message}
+        defaultValue={formValues.role}
       />
 
       <SelectInput
-        errors={errors.accessRule}
+        label={t("Departamento")}
+        {...register("departament")}
+        control={control}
+        options={[
+          { label: t("Qualidade"), value: "1" },
+          { label: t("Compras"), value: "2" },
+          { label: t("Administrativo"), value: "3" },
+        ]}
+        error={errors.departament?.message}
+        defaultValue={formValues.departament}
+      />
+
+      <SelectInput
         label={t("Regra de acesso")}
         {...register("accessRule")}
-        defaultValue={getAccessDefaultValue()}
+        control={control}
         options={[
-          { label: "root", value: "root" },
-          { label: "Super Usuário", value: "super-user" },
-          { label: "Usuário", value: "user" },
+          { label: "Root", value: "root" },
+          { label: t("Super Usuário"), value: "super-user" },
+          { label: t("Usuário"), value: "user" },
         ]}
+        error={errors.accessRule?.message}
+        defaultValue={{
+          label: formValues.accessRule === "root" ? "Root" : 
+                 formValues.accessRule === "super-user" ? t("Super Usuário") : t("Usuário"),
+          value: formValues.accessRule
+        }}
       />
 
       <SelectInput
+        label={t("Status")}
         {...register("status")}
-        label="Status"
-        errors={errors.status}
+        control={control}
+        options={[
+          { label: t("Ativo"), value: "active" },
+          { label: t("Inativo"), value: "inactive" },
+        ]}
+        error={errors.status?.message}
         defaultValue={{
           label: formValues.status === "active" ? t("Ativo") : t("Inativo"),
-          value: formValues.status,
+          value: formValues.status
         }}
-        options={[
-          {
-            label: t("Ativo"),
-            value: "active",
-          },
-          {
-            label: t("Inativo"),
-            value: "inactive",
-          },
-        ]}
       />
-
-      
     </form>
   );
 };

@@ -1,30 +1,32 @@
 import {
-  Heading,
   Image,
-  Text,
   VStack,
   useBreakpointValue,
+  Box,
 } from "@chakra-ui/react";
-import illustration from "assets/img/auth/notebook-design.png";
-import { useTranslation } from "react-i18next";
+import illustration from "../../../assets/img/auth/conformity-signin.png";
 
 export const RightSideMessage = () => {
-  const { t } = useTranslation();
-  const isDesktop = useBreakpointValue({ base: false, md: false, lg: true });
-
   return (
-    <VStack w={{ lg: "50%", md: "90%", sm: "90%" }} alignItems={"start"}>
-      <Heading
-        mt={{ lg: "15vh", md: "10vh", sm: "10vh" }}
-        color="navy.700"
-        fontSize={{ lg: "36px", md: "32px", sm: "24px" }}
-      >
-        {t("Seja bem-vindo ao Conformity!")}
-      </Heading>
-      <Text mt="10px" color="gray.600" fontWeight="400">
-        {t("A solução mais completa e segura em gestão administrativa.")}
-      </Text>
-      {isDesktop && <Image src={illustration} />}
-    </VStack>
+    <Box
+      w="100%"
+      h="100%"
+      position="relative"
+    >
+      <Image
+        src={illustration}
+        position="absolute"
+        top="50%"
+        left="50%"
+        w="170%"
+        h="170%"
+        transform="translate(-50%, -50%)"
+        padding={6}
+        objectFit="contain"
+        objectPosition="center"
+        alt="Conformity Sign In"
+        fallback={<Box bg="gray.100" w="100%" h="100%" />}
+      />
+    </Box>
   );
 };

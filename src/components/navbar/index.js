@@ -257,7 +257,13 @@ export const NavBar = () => {
     const location = useLocation();
     const isActive = item.path ? location.pathname === item.path : 
                     item.submenu?.some(subitem => location.pathname === subitem.src);
-    const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+    const [isSubmenuOpen, setIsSubmenuOpen] = useState(isActive);
+
+    useEffect(() => {
+      if (item.submenu) {
+        setIsSubmenuOpen(item.submenu.some(subitem => location.pathname === subitem.src));
+      }
+    }, [location.pathname, item.submenu]);
 
     if (item.submenu) {
       return (
@@ -303,21 +309,24 @@ export const NavBar = () => {
               overflow="hidden"
               transition="all 0.2s ease-in-out"
             >
-              {item.submenu.map((subitem) => (
-                <HStack
-                  key={subitem.src}
-                  py={2}
-                  px={6}
-                  cursor="pointer"
-                  bg="transparent"
-                  _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
-                  onClick={() => navigate(subitem.src)}
-                >
-                  <Text fontSize="sm" color="white">
-                    {t(subitem.label)}
-                  </Text>
-                </HStack>
-              ))}
+              {item.submenu.map((subitem) => {
+                const isSubitemActive = location.pathname === subitem.src;
+                return (
+                  <HStack
+                    key={subitem.src}
+                    py={2}
+                    px={6}
+                    cursor="pointer"
+                    bg={isSubitemActive ? "rgba(255, 255, 255, 0.1)" : "transparent"}
+                    _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
+                    onClick={() => navigate(subitem.src)}
+                  >
+                    <Text fontSize="sm" color="white">
+                      {t(subitem.label)}
+                    </Text>
+                  </HStack>
+                );
+              })}
             </VStack>
           )}
         </VStack>

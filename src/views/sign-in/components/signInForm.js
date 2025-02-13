@@ -8,6 +8,7 @@ import {
   Text,
   VStack,
   useColorModeValue,
+  Box,
 } from "@chakra-ui/react";
 import { HSeparator } from "components/separator/Separator";
 import { AuthContext } from "providers/auth";
@@ -35,7 +36,7 @@ export const SignInForm = () => {
   });
 
   const textColor = useColorModeValue("navy.700", "white");
-  const textColorSecondary = "gray.600";
+  const textColorSecondary = "gray.500";
 
   const [show, setShow] = React.useState(false);
   const handleClick = () => setShow(!show);
@@ -51,128 +52,136 @@ export const SignInForm = () => {
   return (
     <Flex
       flexDirection="column"
-      mt={"15vh"}
-      w={{ lg: "50%", md: "90%", sm: "90%" }}
+      w="100%"
+      h="100%"
+      justifyContent="center"
+      p={{ base: "2rem", lg: "3rem" }}
+      position="relative"
+      bg="#fafafa"
     >
-      <VStack alignItems={{ lg: "normal", sm: "start", md: "start" }}>
-        <Heading
-          fontSize={{ lg: "36px", md: "32px", sm: "24px" }}
-          color={textColor}
-        >
-          {t("Logar")}
-        </Heading>
-        <Text
-          mb="36px"
-          ms="4px"
-          color={textColorSecondary}
-          fontWeight="400"
-          fontSize="md"
-        >
-          {t("Insira seu email e senha para entrar na nossa plataforma")}
-        </Text>
-      </VStack>
-      <Flex
-        direction="column"
-        w={{ base: "100%", md: "420px" }}
-        maxW="100%"
-        background="transparent"
-        borderRadius="15px"
-        mx={{ base: "auto", lg: "unset" }}
-        me="auto"
+      <VStack 
+        alignItems="start" 
+        w="100%" 
+        spacing={{ base: "1.5rem", md: "2rem", lg: "2.5rem" }}
       >
-        <Flex align="center" mb="25px">
-          <HSeparator />
-        </Flex>
-        <form onSubmit={handleSubmit((data) => handleSignIn(data))}>
-          <FormInput
-            variant="auth"
-            fontSize="sm"
-            ms={{ base: "0px", md: "0px" }}
-            type="email"
-            placeholder="emailexample@hotmail.com"
-            margin="0 0 10px 0 "
-            fontWeight="500"
-            size="lg"
-            borderRadius="6px"
-            bgColor={"primary.50"}
-            {...register("email")}
-            error={errors.email?.message}
-            label="Email *"
-          />
-
-          <FormInput
-            fontSize="sm"
-            placeholder={t("Min. 8 caracteres")}
-            margin="0 0 10px 0 "
-            size="lg"
-            type={show ? "text" : "password"}
-            variant="auth"
-            borderRadius="6px"
-            icon={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
-            bgColor={"primary.50"}
-            {...register("password")}
-            error={errors.password?.message}
-            label={t("Senha *")}
-            onClickIcon={handleClick}
-          />
-
-          <FormLabel
-            ms="4px"
-            fontSize="sm"
-            fontWeight="500"
+        <Box>
+          <Heading
+            fontSize={{ base: "21px", md: "21px", lg: "21px" }}
             color={textColor}
-            display="flex"
+            lineHeight="shorter"
+            mb={2}
           >
-            {t("Idioma")}
-          </FormLabel>
-          <Select
-            variant="auth"
-            fontSize="sm"
-            ms={{ base: "0px", md: "0px" }}
-            type="email"
-            placeholder={t("Selecione o idioma")}
-            mb="24px"
-            fontWeight="500"
-            size="lg"
-            borderRadius="6px"
-            bgColor={"primary.50"}
-            {...register("language")}
-            error={errors.language?.message}
-          >
-            <option value="pt">{t("Português")}</option>
-            <option value="en-US">{t("Inglês")}</option>
-            <option value="es">{t("Espanhol")}</option>
-          </Select>
-          <Flex mb="24px">
-            <NavLink to="/forgot-password">
-              <Text
-                color={"primary.100"}
-                fontSize="sm"
-                fontWeight="500"
-                w={"100%"}
-              >
-                {t("Esqueceu a senha?")}
-              </Text>
-            </NavLink>
-          </Flex>
-          <ButtonPrimary
-            fontSize="sm"
+            {t("Seja bem-vindo ao Conformity!")}
+          </Heading>
+          
+          <Text
+            color={textColorSecondary}
             fontWeight="bold"
-            w="100%"
-            h="50"
-            mb="24px"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            type="submit"
-            label={t("Entrar")}
-            isLoading={isSignInLoading}
-          />
-        </form>
-      </Flex>
+            fontSize={{ base: "sm", md: "lg" }}
+            letterSpacing="0.2px"
+            maxW="100%"
+          >
+            {t("A solução mais completa e segura em gestão administrativa.")}
+          </Text>
+        </Box>
+
+        <Flex
+          direction="column"
+          w="100%"
+          maxW={{ base: "100%", md: "420px" }}
+          background="transparent"
+          borderRadius="15px"
+          mx={{ base: "auto", lg: "unset" }}
+          me="auto"
+          gap="1.5rem"
+        >
+          <HSeparator />
+          
+          <form onSubmit={handleSubmit((data) => handleSignIn(data))}>
+            <VStack spacing="1.5rem" align="stretch">
+              <FormInput
+                variant="auth"
+                fontSize="sm"
+                type="email"
+                placeholder="emailexample@hotmail.com"
+                fontWeight="500"
+                size="lg"
+                borderRadius="6px"
+                bgColor="primary.50"
+                {...register("email")}
+                error={errors.email?.message}
+                label="Email *"
+              />
+
+              <FormInput
+                fontSize="sm"
+                placeholder={t("Min. 8 caracteres")}
+                size="lg"
+                type={show ? "text" : "password"}
+                variant="auth"
+                borderRadius="6px"
+                icon={show ? RiEyeCloseLine : MdOutlineRemoveRedEye}
+                bgColor="primary.50"
+                {...register("password")}
+                error={errors.password?.message}
+                label={t("Senha *")}
+                onClickIcon={handleClick}
+              />
+
+              <Box>
+                <FormLabel
+                  fontSize="sm"
+                  fontWeight="500"
+                  color={textColor}
+                >
+                  {t("Idioma")}
+                </FormLabel>
+                <Select
+                  variant="auth"
+                  fontSize="sm"
+                  placeholder={t("Selecione o idioma")}
+                  fontWeight="500"
+                  size="lg"
+                  borderRadius="6px"
+                  bgColor="primary.50"
+                  {...register("language")}
+                  error={errors.language?.message}
+                >
+                  <option value="pt">{t("Português")}</option>
+                  <option value="en-US">{t("Inglês")}</option>
+                  <option value="es">{t("Espanhol")}</option>
+                </Select>
+              </Box>
+
+              <NavLink to="/forgot-password">
+                <Text
+                  color="primary.100"
+                  fontSize="md"
+                  fontWeight="500"
+                >
+                  {t("Esqueceu a senha?")}
+                </Text>
+              </NavLink>
+
+              <ButtonPrimary
+                fontSize="sm"
+                fontWeight="bold"
+                w="100%"
+                h="50"
+                bgColor="primary.100"
+                _hover={{ bgColor: "primary.200" }}
+                textColor="white"
+                boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+                borderRadius="7px"
+                _active={{ bgColor: "primary.200" }}
+                type="submit"
+                label={t("Entrar")}
+                isLoading={isSignInLoading}
+              />
+            </VStack>
+          </form>
+        </Flex>
+      </VStack>
     </Flex>
   );
 };

@@ -3,7 +3,7 @@ import * as Yup from "yup";
 const editUsersFormSchema = Yup.object().shape({
   name: Yup.string().required("O nome é obrigatório"),
   celphone: Yup.string().required("O telefone é obrigatório"),
-  companyId: Yup.string().required("A empresa é obrigatória"),
+  companyId: Yup.string().optional(),
   role: Yup.string().required("O cargo é obrigatório"),
   email: Yup.string()
     .email("Digite um e-mail válido")

@@ -6,6 +6,7 @@ import SelectInput from "components/select";
 import { UserContext } from "providers/users";
 import { useContext, useEffect, useRef, useState } from "react";
 import { GroupContext } from "providers/group";
+import { CompanyContext } from "providers/company";
 import {
   Center,
   Flex,
@@ -23,8 +24,11 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
   const { createUser } = useContext(UserContext);
   const { getUserInfo } = useContext(AuthContext);
   const { getGroups, createGroupIsLoading } = useContext(GroupContext);
+  const { getCompanies } = useContext(CompanyContext);
   const [groupOptions, setGroupOptions] = useState([]);
+  const [companyOptions, setCompanyOptions] = useState([]);
   const [groupIsLoading, setGroupIsLoading] = useState(false);
+  const [companyIsLoading, setCompanyIsLoading] = useState(false);
   const groupFormRef = useRef(null);
   const {
     handleSubmit,
@@ -42,12 +46,34 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
 
   const onSubmit = async (data) => {
     if (setLoading) setLoading(true);
-    const cretedSuccessfully = await createUser(data);
-
-    if (cretedSuccessfully) {
-      onCloseModal(cretedSuccessfully);
+    
+    if (!data.companyId) {
+      console.log("Por favor seleccione uma empresa");
+      return;
     }
-    if (setLoading) setLoading(false);
+
+    try {
+      const userData = {
+        ...data,
+        companyId: data.companyId,
+      };
+
+      const createdSuccessfully = await createUser(userData);
+      
+      if (createdSuccessfully) {
+        onCloseModal(createdSuccessfully);
+      }
+    } catch (error) {
+      if (error.response?.status === 400) {
+        console.log("Invalid company selection");
+      } else if (error.response?.status === 404) {
+        console.log("Company not found");
+      } else {
+        console.log("Error creating user");
+      }
+    } finally {
+      if (setLoading) setLoading(false);
+    }
   };
 
   const fetchGroupData = async () => {
@@ -62,9 +88,25 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
     }
   };
 
+  const fetchCompaniesData = async () => {
+    try {
+      setCompanyIsLoading(true);
+      const companies = await getCompanies();
+      setCompanyOptions(
+        companies.map((company) => ({ label: company.name, value: company.id }))
+      );
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+    } finally {
+      setCompanyIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     setGroupIsLoading(true);
+    setCompanyIsLoading(true);
     fetchGroupData();
+    fetchCompaniesData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -91,6 +133,21 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           {...register("name")}
           error={errors.name?.message}
         />
+        
+        {companyIsLoading ? (
+          <Center>
+            <Spinner />
+          </Center>
+        ) : (
+          <SelectInput
+            label="Empresa *"
+            {...register("companyId")}
+            errors={errors.companyId}
+            options={companyOptions}
+            placeholder="Selecione uma empresa"
+          />
+        )}
+
         <FormInput
           variant="auth"
           fontSize="sm"
@@ -207,12 +264,14 @@ export const AddUserForm = ({ formRef, onCloseModal, setLoading }) => {
           errors={errors.accessRule}
           {...register("accessRule")}
           options={[
-            getUserInfo().accessRule
-              ? { label: "Super Admin", value: "super-admin" }
-              : null,
-            { label: "Super Usuário", value: "super-user" },
-            { label: "Usuário", value: "user" },
-          ]}
+            ...(getUserInfo().accessRule === 'super-admin'
+              ? [{ label: "Super Admin", value: "super-admin" }]
+              : []),
+            ...(getUserInfo().accessRule === 'super-admin' || getUserInfo().accessRule === 'super-user'
+              ? [{ label: "Super Usuário", value: "super-user" }]
+              : []),
+            { label: "Usuário", value: "user" }
+          ].filter(Boolean)}
         />
         <SelectInput
           label="Status"

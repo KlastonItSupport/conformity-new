@@ -2,10 +2,10 @@ import { api } from "api/api";
 import { createContext, useState } from "react";
 import moment from "moment";
 import axios from "axios";
-
 import { toast } from "react-toastify";
 import i18n from "../i18n/index";
 import { AUDIT_EVENTS } from "constants/audit-events";
+
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
@@ -47,8 +47,9 @@ const AuthProvider = ({ children }) => {
       i18n.changeLanguage(language);
       toast.success(i18n.t("Login feito com sucesso"));
       history("/users");
-    } catch (_) {
+    } catch (error) {
       toast.error(i18n.t("Ocorreu um erro"));
+      throw error;
     }
   };
 
@@ -72,10 +73,7 @@ const AuthProvider = ({ children }) => {
   };
 
   const getToken = () => {
-    const token = localStorage.getItem(accessTokenKey);
-    if (token) {
-      return token;
-    }
+    return localStorage.getItem(accessTokenKey);
   };
 
   function getUserInfo() {
@@ -97,12 +95,12 @@ const AuthProvider = ({ children }) => {
       setUser({ ...response.data, birthDate: data.birthday });
       moment(response.data.profilePic).format("DD/MM/YYYY");
 
-      toast.success("Usuário editado com sucesso");
+      toast.success(i18n.t("Usuário editado com sucesso"));
       localStorage.setItem(userKey, JSON.stringify(response.data));
 
       return true;
-    } catch (e) {
-      toast.error("Ocorreu um erro.");
+    } catch (error) {
+      toast.error(i18n.t("Ocorreu um erro"));
       return false;
     }
   };
@@ -119,40 +117,38 @@ const AuthProvider = ({ children }) => {
   const getUserAccessRule = async () => {
     const response = await api.get(`/users/access-rule/${user.id}`);
     setUserAccessRule(response.data);
-
     return response.data;
   };
 
-  const logout = (history) => {
+  const logout = async (history) => {
     try {
-      // Clear local storage
+      // Limpiar localStorage
       localStorage.removeItem(accessTokenKey);
       localStorage.removeItem(userKey);
       localStorage.removeItem(languageKey);
       
-      // Clear any in-memory state
+      // Limpiar estados
       setUser(null);
       setPermissions(null);
       setUserAccessRule(null);
       setUserPermissions(null);
       
-      // Clear axios headers
+      // Limpiar headers de axios
       delete api.defaults.headers.common['Authorization'];
       
-      // Create a new axios instance to cancel pending requests
+      // Cancelar peticiones pendientes
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       api.defaults.cancelToken = source.token;
       source.cancel('User logged out');
       
-      // Redirect to login page
+      // Redireccionar
       history("/signin");
       
-      // Force a full page reload to clear any cached data
+      // Forzar recarga para limpiar cache
       window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
-      // If logout fails, force a hard redirect
       window.location.href = '/signin';
     }
   };
@@ -177,12 +173,10 @@ const AuthProvider = ({ children }) => {
       if (!userAccessRule) return false;
     }
     if (userAccessRule?.isAdmin || userAccessRule?.isSuperUser) {
-      console.log("entrei 1");
       return true;
     }
 
     if (userPermissions) {
-      console.log("entrei");
       const isAllowed = userPermissions[moduleName]["canRead"];
       return isAllowed;
     }
@@ -200,52 +194,66 @@ const AuthProvider = ({ children }) => {
 
   const forgotPassword = async (email) => {
     try {
-      await api.post('/auth/forgot-password', { email }, {
-        headers: {
-          'x-audit-event': AUDIT_EVENTS.USER_FORGOT_PASSWORD
-        }
-      });
+      const response = await api.post('/auth/forgot-password', { email });
+      console.log(response.data);
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Error al enviar email');
+      }
       
-      toast.success(i18n.t('Email de recuperação enviado com sucesso'));
+      toast.success(i18n.t("Email de recuperación enviado"));
       return true;
     } catch (error) {
-      const errorMessage = error.response?.status === 404
-        ? i18n.t('Email não encontrado')
-        : error.response?.status === 429
-        ? i18n.t('Muitas tentativas. Tente novamente mais tarde')
-        : i18n.t('Erro ao enviar email de recuperação');
-      
-      toast.error(errorMessage);
-      return false;
+      toast.error(i18n.t("Error al enviar email de recuperación"));
+      throw new Error(
+        error.response?.data?.message || 
+        'Error de conexión. Intente nuevamente.'
+      );
     }
   };
 
   const resetPassword = async (token, newPassword) => {
     try {
-      await api.post('/users/reset-password', { token, newPassword }, {
+      const response = await api.post('/auth/reset-password', {
+        token,
+        newPassword
+      }, {
         headers: {
-          'x-audit-event': AUDIT_EVENTS.USER_RESET_PASSWORD
+          'x-audit-event': AUDIT_EVENTS.PASSWORD_RESET_SUCCESS
         }
       });
-      toast.success(i18n.t('Senha alterada com sucesso'));
+
+      if (!response.data.success) {
+        throw new Error('Error al actualizar contraseña');
+      }
+
+      toast.success(i18n.t("Contraseña actualizada exitosamente"));
       return true;
     } catch (error) {
-      toast.error(i18n.t('Token inválido ou expirado'));
-      return false;
+      toast.error(i18n.t("Error al actualizar contraseña"));
+      throw new Error(
+        error.response?.data?.message || 
+        'Error al actualizar contraseña. Token inválido o expirado.'
+      );
     }
   };
 
   const changePassword = async (data) => {
     try {
-      const response = await api.post('users/change-password', {
+      const response = await api.post('/users/change-password', {
         token: data.token,
         id: data.id,
         newPassword: data.newPassword
+      }, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'x-audit-event': AUDIT_EVENTS.PASSWORD_CHANGED
+        }
       });
-      toast.success('Senha alterada com sucesso!');
+
+      toast.success(i18n.t('Senha alterada com sucesso!'));
       return response.data;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erro ao alterar senha');
+      toast.error(i18n.t(error.response?.data?.message || 'Erro ao alterar senha'));
       throw error;
     }
   };
@@ -283,4 +291,3 @@ const AuthProvider = ({ children }) => {
 };
 
 export { AuthContext, AuthProvider };
-
