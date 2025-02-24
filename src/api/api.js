@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "https://api-new-klaston.vercel.app",
-  // baseURL: "http://localhost:3000/",
+  baseURL: "https://api.klaston.com",
+  // baseURL: "http://localhost:3002",
   // baseURL: "https://conformity-new-api-production.up.railway.app/",
 });
 api.interceptors.request.use(request => {

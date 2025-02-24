@@ -58,15 +58,20 @@ const CompanyProvider = ({ children }) => {
   };
 
   const getCompanies = async (page = 1, search = "", limit = 10) => {
-    const response = await api.get(
-      `/companies?page=${page}&search=${search}&pageSize=${limit}`,
-      {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      }
-    );
-    setCompanies(response.data.items);
-    setPagination(response.data.pages);
-    return response.data.items;
+    try {
+      const response = await api.get(
+        `companies?page=${page}&search=${search}&pageSize=${limit}`,
+        {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        }
+      );
+
+      setCompanies(response.data.items);
+      setPagination(response.data.pages);
+      return response.data.items;
+    } catch (error) {
+      console.error("Error fetching companies:", error);
+    }
   };
 
   const editCompany = async (id, data) => {
