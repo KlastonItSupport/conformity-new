@@ -199,18 +199,17 @@ const LeadsTaskDetailsPage = () => {
         minH="calc(100vh - 64px)"
         bg="#FAFAFA"
         p={6}
-        width={`calc(100% - ${isCollapsed ? "60px" : "240px"})`}
+        width={`calc(100% - ${isCollapsed ? "0px" : "0px"})`}
         overflow="auto"
       >
         <Flex
           direction={isMobile ? "column" : "row"}
           gap={6}
           w="100%"
-          flexWrap="wrap"
         >
           <Box
             flex={1}
-            minW={isMobile ? "100%" : "600px"}
+            w="100%"
             bg="white"
             borderRadius="lg"
             p={6}
@@ -265,18 +264,6 @@ const LeadsTaskDetailsPage = () => {
                 />
               )}
             </Flex>
-          </Box>
-
-          <Box
-            w={isMobile ? "100%" : "350px"}
-            bg="white"
-            borderRadius="lg"
-            p={6}
-            boxShadow="sm"
-            flexShrink={0}
-            h="fit-content"
-          >
-            {/* Additional task details */}
           </Box>
         </Flex>
 

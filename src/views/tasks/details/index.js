@@ -133,6 +133,7 @@ const TaskDetailsPage = () => {
   const rightContainer = task && (
     <Box
       flex={1}
+      width="100%"
       bg="white"
       borderRadius="lg"
       p={6}
@@ -145,18 +146,23 @@ const TaskDetailsPage = () => {
         margin={"0 0px 40px 0px"}
         padding={"23px"}
         border={"1px solid #ddd"}
+        bg="white"
+        maxW="100%"
       >
         <Text fontSize={"20px"} color={"header.100"}>
           Título: {task.title}
         </Text>
-        <Text
+        <Box
           fontSize={"16px"}
           color={"header.100"}
           mb={isMobile ? "20px" : "0"}
-          bgColor={"white"}
+          bg="gray.50"
+          p={3}
+          borderRadius="md"
+          width="100%"
         >
           {HtmlParser(task.description)}
-        </Text>
+        </Box>
       </Container>
       <Box mb={isMobile ? "20px" : "0"}>
         <Feed
