@@ -1,0 +1,41 @@
+  <Box
+    marginTop="64px"
+    marginLeft={isCollapsed ? "60px" : "240px"}
+    transition="all 0.3s ease"
+    minH="calc(100vh - 64px)"
+    bg="#FAFAFA"
+    p={6}
+    width={`calc(100% - ${isCollapsed ? "60px" : "240px"})`}
+    overflow="auto"
+  >
+    <Flex
+      direction={isMobile ? "column" : "row"}
+      gap={6}
+      w="100%"
+      flexWrap="wrap"
+    >
+      <Box
+        flex={1}
+        minW={isMobile ? "100%" : "600px"}
+        bg="white"s
+        borderRadius="lg"
+        p={6}
+        boxShadow="sm"
+      >
+        {/* Table content */}
+      </Box>
+
+      <Box
+        w={isMobile ? "100%" : "350px"}
+        bg="white"
+        borderRadius="lg"
+        p={6}
+        boxShadow="sm"
+        flexShrink={0}
+      >
+        {/* Additional task details */}
+      </Box>
+    </Flex>
+
+    {/* Modals remain unchanged */}
+  </Box> 

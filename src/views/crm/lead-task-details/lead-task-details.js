@@ -11,6 +11,9 @@ import {
   VStack,
   useBreakpoint,
   useDisclosure,
+  useBreakpointValue,
+  Box,
+  Container,
 } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
@@ -27,10 +30,12 @@ import LeadTaskForm from "./components/lead-task-form";
 import { compose } from "recompose";
 import withAuthenticated from "hoc/with-authenticated";
 import withWarningCheck from "hoc/with-warning-check";
+import { useSidebar } from 'contexts/SidebarContext';
+import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
 
 const LeadsTaskDetailsPage = () => {
   const { t } = useTranslation();
-  const { isMobile } = useBreakpoint();
   const [searchParams, setSearchParams] = useSearchParams();
   const { id } = useParams();
   const queryParams = useQuery();
@@ -97,6 +102,9 @@ const LeadsTaskDetailsPage = () => {
     onOpen: onAddModalOpen,
     onClose: onAddModalClose,
   } = useDisclosure();
+
+  const { isCollapsed } = useSidebar();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     getLeadsTasks(
@@ -179,149 +187,186 @@ const LeadsTaskDetailsPage = () => {
   }, 500);
 
   return (
-    <>
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <HStack justify={"start"} w={"95vw"} py={"20px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="50"
-            bgColor={"primary.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            minW="150px"
-            disabled={!checkPermissionForAction("tasks", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={services}
-          columns={columns}
-          title={t(`Tarefas do lead: ${name}`)}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
+      <TopNavigation 
+        pageTitle={t(`Tarefas do lead: ${name}`)}
+      />
+      <Box
+        marginTop="64px"
+        marginLeft={isCollapsed ? "0px" : "0px"}
+        transition="all 0.3s ease"
+        minH="calc(100vh - 64px)"
+        bg="#FAFAFA"
+        p={6}
+        width={`calc(100% - ${isCollapsed ? "60px" : "240px"})`}
+        overflow="auto"
+      >
         <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+          direction={isMobile ? "column" : "row"}
+          gap={6}
+          w="100%"
+          flexWrap="wrap"
         >
-          {pagination && (
-            <Pagination
+          <Box
+            flex={1}
+            minW={isMobile ? "100%" : "600px"}
+            bg="white"
+            borderRadius="lg"
+            p={6}
+            boxShadow="sm"
+          >
+            <HStack justify="start" w="100%" py={4}>
+              <ButtonPrimary
+                fontSize="sm"
+                fontWeight="bold"
+                h="50"
+                bgColor={"primary.100"}
+                _hover={{ bgColor: "primary.200" }}
+                textColor={"white"}
+                boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+                borderRadius="7px"
+                _active={{ bgColor: "primary.200" }}
+                label={"Adicionar"}
+                onClick={onAddModalOpen}
+                minW="150px"
+                disabled={!checkPermissionForAction("tasks", "canAdd")}
+              />
+            </HStack>
+
+            <CustomTable
               data={services}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+              columns={columns}
+              title={t(`Tarefas do lead: ${name}`)}
+              icons={tableIcons}
+              searchInputValue={searchParams.get("search") ?? ""}
+              onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+              iconsHasMaxW={true}
+              onCheckItems={(show) => {
+                setTableIcons(
+                  tableIcons.map((icon) => {
+                    icon.isDisabled = show;
+                    return icon;
+                  })
+                );
+              }}
             />
-          )}
+            
+            <Flex justifyContent="end" w="100%" pt={4}>
+              {pagination && (
+                <Pagination
+                  data={services}
+                  onClickPagination={updateData}
+                  itemsPerPage={5}
+                  totalPages={pagination.totalPages}
+                  currentPage={pagination.currentPage}
+                  nextPage={pagination.next}
+                  lastPage={pagination.last}
+                />
+              )}
+            </Flex>
+          </Box>
+
+          <Box
+            w={isMobile ? "100%" : "350px"}
+            bg="white"
+            borderRadius="lg"
+            p={6}
+            boxShadow="sm"
+            flexShrink={0}
+            h="fit-content"
+          >
+            {/* Additional task details */}
+          </Box>
         </Flex>
-      </VStack>
-      <DeleteModal
-        title={t("Excluir Tarefa")}
-        subtitle={t("Tem certeza de que deseja excluir esta Tarefa?")}
-        isOpen={isDeleteModalOpen}
-        onClose={onDeleteModalClose}
-        onConfirm={async () => {
-          setIsLoading(true);
 
-          const response = await deleteTaskLead(deleteId);
-          if (response) {
-            setServices(
-              services.filter((category) => category.id !== deleteId)
-            );
-          }
+        <DeleteModal
+          title={t("Excluir Tarefa")}
+          subtitle={t("Tem certeza de que deseja excluir esta Tarefa?")}
+          isOpen={isDeleteModalOpen}
+          onClose={onDeleteModalClose}
+          onConfirm={async () => {
+            setIsLoading(true);
 
-          setIsLoading(false);
-          onDeleteModalClose();
-        }}
-        isLoading={isLoading}
-      />
-      <DeleteModal
-        title={t("Excluir Tarefa")}
-        subtitle={t("Tem certeza de que deseja excluir estas Tarefas?")}
-        isOpen={isDeleteMultipleModalOpen}
-        onClose={onDeleteMultipleModalClose}
-        onConfirm={async () => {
-          setIsDeleteLoading(true);
-          await deleteMultipleTaskLead(selected, setServices, services);
-          setIsDeleteLoading(false);
-          onDeleteMultipleModalClose();
-        }}
-        isLoading={isDeleteLoading}
-      />
-      <ModalForm
-        isOpen={isEditModalOpen}
-        onClose={onEditModalClose}
-        form={
-          <LeadTaskForm
-            formRef={categoryRef}
-            onClose={(origin) => {
-              onEditModalClose();
-              const servicesCopy = [...services];
-              const index = servicesCopy.findIndex(
-                (item) => item.id === origin.id
+            const response = await deleteTaskLead(deleteId);
+            if (response) {
+              setServices(
+                services.filter((category) => category.id !== deleteId)
               );
-              servicesCopy[index] = origin;
-              setServices(servicesCopy);
-            }}
-            event="edit"
-            onEdit={editTaskLead}
-            leadTaskId={editSelected.id}
-            formValues={editSelected}
-            setLoading={setIsLoading}
-          />
-        }
-        formRef={categoryRef}
-        title={t("Editar Tarefa")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Editar")}
-        modalSize="xl"
-        isLoading={isLoading}
-      />
+            }
 
-      <ModalForm
-        isOpen={isAddModalOpen}
-        onClose={onAddModalClose}
-        form={
-          <LeadTaskForm
-            formRef={categoryRef}
-            onClose={(origin) => {
-              onAddModalClose();
-              setServices([origin, ...services]);
-            }}
-            event="add"
-            onAdd={createTaskLead}
-            setLoading={setIsLoading}
-          />
-        }
-        formRef={categoryRef}
-        title={t("Adicionar Tarefa")}
-        leftButtonLabel={t("Cancelar")}
-        rightButtonLabel={t("Adicionar")}
-        modalSize="xl"
-        isLoading={isLoading}
-      />
-    </>
+            setIsLoading(false);
+            onDeleteModalClose();
+          }}
+          isLoading={isLoading}
+        />
+        <DeleteModal
+          title={t("Excluir Tarefa")}
+          subtitle={t("Tem certeza de que deseja excluir estas Tarefas?")}
+          isOpen={isDeleteMultipleModalOpen}
+          onClose={onDeleteMultipleModalClose}
+          onConfirm={async () => {
+            setIsDeleteLoading(true);
+            await deleteMultipleTaskLead(selected, setServices, services);
+            setIsDeleteLoading(false);
+            onDeleteMultipleModalClose();
+          }}
+          isLoading={isDeleteLoading}
+        />
+        <ModalForm
+          isOpen={isEditModalOpen}
+          onClose={onEditModalClose}
+          form={
+            <LeadTaskForm
+              formRef={categoryRef}
+              onClose={(origin) => {
+                onEditModalClose();
+                const servicesCopy = [...services];
+                const index = servicesCopy.findIndex(
+                  (item) => item.id === origin.id
+                );
+                servicesCopy[index] = origin;
+                setServices(servicesCopy);
+              }}
+              event="edit"
+              onEdit={editTaskLead}
+              leadTaskId={editSelected.id}
+              formValues={editSelected}
+              setLoading={setIsLoading}
+            />
+          }
+          formRef={categoryRef}
+          title={t("Editar Tarefa")}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Editar")}
+          modalSize="xl"
+          isLoading={isLoading}
+        />
+
+        <ModalForm
+          isOpen={isAddModalOpen}
+          onClose={onAddModalClose}
+          form={
+            <LeadTaskForm
+              formRef={categoryRef}
+              onClose={(origin) => {
+                onAddModalClose();
+                setServices([origin, ...services]);
+              }}
+              event="add"
+              onAdd={createTaskLead}
+              setLoading={setIsLoading}
+            />
+          }
+          formRef={categoryRef}
+          title={t("Adicionar Tarefa")}
+          leftButtonLabel={t("Cancelar")}
+          rightButtonLabel={t("Adicionar")}
+          modalSize="xl"
+          isLoading={isLoading}
+        />
+      </Box>
+    </Wrapper>
   );
 };
 

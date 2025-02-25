@@ -111,7 +111,7 @@ const DocumentsDetailsPage = () => {
       />
       <Box
         marginTop="64px"
-        marginLeft={isCollapsed ? "60px" : "240px"}
+        marginLeft={isCollapsed ? "0px" : "0px"}
         transition="all 0.3s ease"
         minH="calc(100vh - 64px)"
         bg="#FAFAFA"

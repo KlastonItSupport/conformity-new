@@ -27,6 +27,9 @@ import withAuthenticated from "hoc/with-authenticated";
 import { compose } from "recompose";
 import withWarningCheck from "hoc/with-warning-check";
 import withDetailsPermission from "hoc/use-task-details-permission";
+import { useSidebar } from 'contexts/SidebarContext';
+import Wrapper from "components/wrapper";
+import { TopNavigation } from "components/top-navigation";
 
 const TaskDetailsPage = () => {
   const { t } = useTranslation();
@@ -49,6 +52,7 @@ const TaskDetailsPage = () => {
   const [task, setTask] = useState(null);
   const [previsionsList, setPrevisionsList] = useState([]);
   const [percentage, setPercentage] = useState(0);
+  const { isCollapsed } = useSidebar();
 
   const routeTreePaths = [
     {
@@ -69,13 +73,12 @@ const TaskDetailsPage = () => {
 
   const leftContainer = (
     <Container
-      w={isMobile ? "95%" : "65%"}
+      w={isMobile ? "100%" : "32%"}
       h={"100%"}
       m={"0"}
-      minH={"200px"}
-      maxW={"none"}
-      p={"0px"}
-      mr={"15px"}
+      mr={isMobile ? null : "20px"}
+      p={isMobile ? "0px" : 0}
+      maxW={"95%"}
     >
       {task && (
         <Header
@@ -128,13 +131,12 @@ const TaskDetailsPage = () => {
   );
 
   const rightContainer = task && (
-    <Container
-      w={isMobile ? "95%" : "35%"}
-      h={"100%"}
-      m={"0"}
-      mr={isMobile ? null : "20px"}
-      p={isMobile ? "0px" : 0}
-      maxW={"none"}
+    <Box
+      flex={1}
+      bg="white"
+      borderRadius="lg"
+      p={6}
+      boxShadow="sm"
     >
       <Container
         m={"0px"}
@@ -143,7 +145,6 @@ const TaskDetailsPage = () => {
         margin={"0 0px 40px 0px"}
         padding={"23px"}
         border={"1px solid #ddd"}
-        bgColor={"white"}
       >
         <Text fontSize={"20px"} color={"header.100"}>
           Título: {task.title}
@@ -166,7 +167,7 @@ const TaskDetailsPage = () => {
           canEdit={canEdit}
         />
       </Box>
-    </Container>
+    </Box>
   );
 
   const onLoad = async () => {
@@ -186,24 +187,30 @@ const TaskDetailsPage = () => {
     setCanAdd(checkPermissionForAction("tasks", "canAdd"));
   }, [checkPermissionForAction, userAccessRule]);
 
-  return isMobile ? (
-    <VStack w={"100%"} h={"100%"} marginTop={"100px"} spacing={0}>
+  return (
+    <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <NavigationLinks routeTree={routeTreePaths} />
-      {rightContainer}
-      {leftContainer}
-    </VStack>
-  ) : (
-    <>
-      <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <NavigationLinks routeTree={routeTreePaths} />
-        <HStack w={"95vw"} h={"100%"} alignItems={"start"}>
+      <TopNavigation 
+        pageTitle={t("Detalhes da Tarefa")}
+      />
+      <Box
+        marginTop="64px"
+        marginLeft={isCollapsed ? "0px" : "0px"}
+        transition="all 0.3s ease"
+        minH="calc(100vh - 64px)"
+        bg="#FAFAFA"
+        p={6}
+      >
+        <HStack
+          align="flex-start"
+          spacing={6}
+          w="100%"
+        >
           {leftContainer}
           {rightContainer}
         </HStack>
-      </VStack>
-    </>
+      </Box>
+    </Wrapper>
   );
 };
 

@@ -127,7 +127,7 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem(userKey);
     localStorage.removeItem(languageKey);
 
-    history("/");
+    history("/signin");
   };
 
   const checkPermissionForAction = (module, action) => {
