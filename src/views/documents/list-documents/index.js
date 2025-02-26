@@ -233,7 +233,7 @@ const ListDocumentsPage = () => {
       <Box
         marginTop="64px"
         w="100%"
-        px={6}
+        pr={4}
       >
         <VStack 
           spacing={3}

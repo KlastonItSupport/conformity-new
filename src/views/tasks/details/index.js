@@ -73,7 +73,7 @@ const TaskDetailsPage = () => {
 
   const leftContainer = (
     <Container
-      w={isMobile ? "100%" : "32%"}
+      w={isMobile ? "100%" : "65%"}
       h={"100%"}
       m={"0"}
       mr={isMobile ? null : "20px"}
@@ -133,11 +133,12 @@ const TaskDetailsPage = () => {
   const rightContainer = task && (
     <Box
       flex={1}
-      width="100%"
       bg="white"
       borderRadius="lg"
       p={6}
       boxShadow="sm"
+      w={isMobile ? "100%" : "32%"}
+      ml={isMobile ? null : "20px"}
     >
       <Container
         m={"0px"}
@@ -146,23 +147,18 @@ const TaskDetailsPage = () => {
         margin={"0 0px 40px 0px"}
         padding={"23px"}
         border={"1px solid #ddd"}
-        bg="white"
-        maxW="100%"
       >
         <Text fontSize={"20px"} color={"header.100"}>
           Título: {task.title}
         </Text>
-        <Box
+        <Text
           fontSize={"16px"}
           color={"header.100"}
           mb={isMobile ? "20px" : "0"}
-          bg="gray.50"
-          p={3}
-          borderRadius="md"
-          width="100%"
+          bgColor={"white"}
         >
           {HtmlParser(task.description)}
-        </Box>
+        </Text>
       </Container>
       <Box mb={isMobile ? "20px" : "0"}>
         <Feed
@@ -209,7 +205,7 @@ const TaskDetailsPage = () => {
       >
         <HStack
           align="flex-start"
-          spacing={6}
+          
           w="100%"
         >
           {leftContainer}

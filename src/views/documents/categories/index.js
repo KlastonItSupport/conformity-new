@@ -1,4 +1,5 @@
 import { CustomTable } from "components/components";
+import { TopNavigation } from "components/top-navigation";
 
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +12,7 @@ import {
   VStack,
   useBreakpoint,
   useDisclosure,
+  Box,
 } from "@chakra-ui/react";
 import NavigationLinks from "components/navigationLinks";
 import { Pagination } from "components/components";
@@ -174,60 +176,71 @@ const CategoriesPage = () => {
   return (
     <Wrapper routeTreePaths={routeTreePaths}>
       <NavBar />
-      <VStack marginTop={"100px"} spacing={0} w="100%" h="100%">
-        <HStack justify={"start"} w={"100%"} pb={"10px"}>
-          <ButtonPrimary
-            fontSize="sm"
-            fontWeight="bold"
-            h="40px"
-            bgColor={"header.100"}
-            _hover={{ bgColor: "primary.200" }}
-            textColor={"white"}
-            boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-            borderRadius="7px"
-            _active={{ bgColor: "primary.200" }}
-            label={"Adicionar"}
-            onClick={onAddModalOpen}
-            width="150px"
-            disabled={!checkPermissionForAction("documents", "canAdd")}
-          />
-        </HStack>
-
-        <CustomTable
-          data={categoriesList}
-          columns={columns}
-          title={t("Categorias")}
-          icons={tableIcons}
-          searchInputValue={searchParams.get("search") ?? ""}
-          onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
-          iconsHasMaxW={true}
-          onCheckItems={(show) => {
-            setTableIcons(
-              tableIcons.map((icon) => {
-                icon.isDisabled = show;
-                return icon;
-              })
-            );
-          }}
-        />
-        <Flex
-          justifyContent={"end"}
-          w={isMobile ? "99vw" : "95vw"}
-          bgColor={"white"}
+      <TopNavigation pageTitle={t("Categorias")} />
+      <Box
+        marginTop="64px"
+        w="100%"
+        pr={4}
+      >
+        <VStack 
+          spacing={3}
+          w="100%"
+          align="stretch"
         >
-          {pagination && (
-            <Pagination
-              data={categoriesList}
-              onClickPagination={updateData}
-              itemsPerPage={5}
-              totalPages={pagination.totalPages}
-              currentPage={pagination.currentPage}
-              nextPage={pagination.next}
-              lastPage={pagination.last}
+          <HStack justify={"start"} w={"100%"} pb={"10px"}>
+            <ButtonPrimary
+              fontSize="sm"
+              fontWeight="bold"
+              h="40px"
+              bgColor={"header.100"}
+              _hover={{ bgColor: "primary.200" }}
+              textColor={"white"}
+              borderRadius="7px"
+              _active={{ bgColor: "primary.200" }}
+              label={"Adicionar"}
+              onClick={onAddModalOpen}
+              width="150px"
+              disabled={!checkPermissionForAction("documents", "canAdd")}
             />
-          )}
-        </Flex>
-      </VStack>
+          </HStack>
+
+          <CustomTable
+            data={categoriesList}
+            columns={columns}
+            title={t("Categorias")}
+            icons={tableIcons}
+            searchInputValue={searchParams.get("search") ?? ""}
+            onChangeSearchInput={(e) => debouncedSearch(e.target.value)}
+            iconsHasMaxW={true}
+            onCheckItems={(show) => {
+              setTableIcons(
+                tableIcons.map((icon) => {
+                  icon.isDisabled = show;
+                  return icon;
+                })
+              );
+            }}
+          />
+          
+          <Flex
+            justifyContent={"end"}
+            w={isMobile ? "99vw" : "95vw"}
+            bgColor={"white"}
+          >
+            {pagination && (
+              <Pagination
+                data={categoriesList}
+                onClickPagination={updateData}
+                itemsPerPage={5}
+                totalPages={pagination.totalPages}
+                currentPage={pagination.currentPage}
+                nextPage={pagination.next}
+                lastPage={pagination.last}
+              />
+            )}
+          </Flex>
+        </VStack>
+      </Box>
       <DeleteModal
         title={t("Excluir Categoria")}
         subtitle={t("Tem certeza de que deseja excluir esta Categoria?")}

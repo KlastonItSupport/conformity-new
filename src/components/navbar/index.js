@@ -273,7 +273,7 @@ export const NavBar = () => {
               w="100%"
               py={2}
               px={isCollapsed ? 2 : 4}
-              borderRadius="md"
+              borderRadius="sm"
               bg={isActive || isSubmenuOpen ? "rgba(255, 255, 255, 0.1)" : "transparent"}
               _hover={{ bg: "rgba(255, 255, 255, 0.1)" }}
               cursor="pointer"
@@ -447,7 +447,9 @@ export const NavBar = () => {
           {isLoading ? (
             <HStack justify="center" py={4}>
               <Spinner color="white" />
-              <Text color="white">Carregando permissões</Text>
+              {!isCollapsed && (
+                <Text color="white">Carregando permissões</Text>
+              )}
             </HStack>
           ) : (
             <VStack spacing={2} align="stretch">

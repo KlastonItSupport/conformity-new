@@ -135,6 +135,7 @@ const Filters = () => {
         variant="auth"
         fontSize="sm"
         type="text"
+        h="35px"
         margin="0"
         placeholder="dd/mm/yyyy"
         fontWeight="500"
@@ -143,6 +144,14 @@ const Filters = () => {
         bgColor="primary.50"
         label="Data Inicial"
         width="100%"
+        _hover={{ 
+          bgColor: "gray.100",
+          borderColor: "primary.200"
+        }}
+        _focus={{
+          borderColor: "primary.300",
+          boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+        }}
         {...register("initialDate")}
         onClick={() => setIsShowingCalendarInitial(!isShowingCalendarInitial)}
         autocomplete="off"
@@ -180,6 +189,7 @@ const Filters = () => {
         ref={endDateRef}
         variant="auth"
         fontSize="sm"
+        h="35px"
         type="text"
         margin="0"
         placeholder="dd/mm/yyyy"
@@ -189,6 +199,14 @@ const Filters = () => {
         bgColor="primary.50"
         label="Data Final"
         width="100%"
+        _hover={{ 
+          bgColor: "gray.100",
+          borderColor: "primary.200"
+        }}
+        _focus={{
+          borderColor: "primary.300",
+          boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+        }}
         {...register("endDate")}
         onClick={() => setIsShowingCalendarEnd(!isShowingCalendarEnd)}
         autocomplete="off"
@@ -238,7 +256,15 @@ const Filters = () => {
         bgColor="primary.50"
         margin="0"
         width="100%"
-        height="45px"
+        height="35px"
+        _hover={{ 
+          bgColor: "gray.100",
+          borderColor: "primary.200"
+        }}
+        _focus={{
+          borderColor: "primary.300",
+          boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+        }}
         containerStyles={{ height: "100%" }}
       />
     </Box>
@@ -262,8 +288,16 @@ const Filters = () => {
         bgColor="primary.50"
         margin="0"
         width="100%"
-        height="45px"
+        height="35px"
         containerStyles={{ height: "100%" }}
+        _hover={{ 
+          bgColor: "gray.100",
+          borderColor: "primary.200"
+        }}
+        _focus={{
+          borderColor: "primary.300",
+          boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+        }}
       />
     </Box>
   );
@@ -273,6 +307,7 @@ const Filters = () => {
       variant="auth"
       fontSize="sm"
       type="text"
+      h="35px"
       placeholder="Ex: Bruno Santos"
       margin="0"
       fontWeight="500"
@@ -281,6 +316,14 @@ const Filters = () => {
       bgColor="primary.50"
       label="Autor"
       width="100%"
+      _hover={{ 
+        bgColor: "gray.100",
+        borderColor: "primary.200"
+      }}
+      _focus={{
+        borderColor: "primary.300",
+        boxShadow: "0 0 0 1px var(--chakra-colors-primary-300)"
+      }}
       {...register("author")}
       defaultValue={formDefaultValues.author}
     />
@@ -328,23 +371,40 @@ const Filters = () => {
         {finalDateInput}
       </HStack>
 
-      {departamentInput}
-      {categoryInput}
-      {authorInput}
-      <ButtonPrimary
-        fontSize="sm"
-        fontWeight="bold"
-        h="45px"
-        bgColor="header.100"
-        _hover={{ bgColor: "primary.200" }}
-        textColor="white"
-        boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
-        borderRadius="7px"
-        _active={{ bgColor: "primary.200" }}
-        label="Filtrar"
-        width="100%"
-        type="submit"
-      />
+      <Box w="100%">{departamentInput}</Box>
+      <Box w="100%">{categoryInput}</Box>
+      <Box w="100%">{authorInput}</Box>
+      
+      <Box minHeight="65px" alignItems="center" display="flex" w="100%" justifyContent="center">
+        <ButtonPrimary
+          variant="outline"
+          borderColor="#3B5366"
+          color="#3B5366"
+          fontWeight="bold"
+          h="35px"
+          borderRadius="7px"
+          bg="transparent"
+          boxShadow="none"
+          _hover={{ 
+            bg: "#3B5366",
+            color: "white",
+            borderColor: "transparent"
+          }}
+          _active={{
+            bg: "#3B5366",
+            color: "white"
+          }}
+          label={
+            <HStack spacing={2} justify="center" w="100%">
+              <MagnifyingGlass size={18} weight="bold" />
+              <Text fontSize="sm">Filtrar</Text>
+            </HStack>
+          }
+          width="100%"
+          type="submit"
+          px={4}
+        />
+      </Box>
     </VStack>
   ) : (
     <HStack
@@ -352,40 +412,50 @@ const Filters = () => {
       onSubmit={handleSubmit(onSubmit)}
       w="100%"
       spacing={4}
-      alignItems="flex-start"
+      alignItems="flex-end"
     >
-      <Box flex={1} h="85px">
+      <Box flex={1} minHeight="85px" alignItems="center" display="flex">
         {initialDateInput}
       </Box>
-      <Box flex={1} h="85px">
+      <Box flex={1} minHeight="85px" alignItems="center" display="flex">
         {finalDateInput}
       </Box>
-      <Box flex={1} h="85px">
+      <Box flex={1} minHeight="85px" alignItems="center" display="flex">
         {departamentInput}
       </Box>
-      <Box flex={1} h="85px">
+      <Box flex={1} minHeight="85px" alignItems="center" display="flex">
         {categoryInput}
       </Box>
-      <Box flex={1} h="85px">
+      <Box flex={1} minHeight="85px" alignItems="center" display="flex">
         {authorInput}
       </Box>
-      <Box alignSelf="flex-end" pb="10px">
+      <Box minHeight="65px" alignItems="center" display="flex" flexShrink={0}>
         <ButtonPrimary
-          fontSize="sm"
-          h="45px"
-          bgColor="header.100"
-          _hover={{ bgColor: "primary.200" }}
-          textColor="white"
-          boxShadow="0 4px 16px rgba(0, 0, 0, 0.2)"
+          variant="outline"
+          borderColor="#3B5366"
+          color="#3B5366"
+          h="35px"
           borderRadius="7px"
-          _active={{ bgColor: "primary.200" }}
+          bg="transparent"
+          boxShadow="none"
+          _hover={{ 
+            bg: "#3B5366",
+            color: "white",
+            borderColor: "transparent"
+          }}
+          _active={{
+            bg: "#3B5366",
+            color: "white"
+          }}
           label={
-            <HStack spacing={2} justify="center">
-              <MagnifyingGlass size={20} weight="bold" />
+            <HStack spacing={2} justify="center" w="100%">
+              <MagnifyingGlass size={18} weight="bold" />
+              <Text fontSize="sm">Filtrar</Text>
             </HStack>
           }
           minW="120px"
           type="submit"
+          px={4}
         />
       </Box>
     </HStack>

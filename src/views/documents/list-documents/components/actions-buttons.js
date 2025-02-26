@@ -24,14 +24,19 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="40px"
-      bgColor={"header.100"}
-      _hover={{ bgColor: "primary.200" }}
-      textColor={"white"}
-      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
+      h="35px"
+      bgColor="#3B5366"
+      boxShadow="none"
+      _hover={{ 
+        bgColor: "#2A3A4A",
+      }}
+      _active={{
+        bgColor: "#1A2A3A",
+      }}
+      textColor="white"
       borderRadius="7px"
-      _active={{ bgColor: "primary.200" }}
-      label={"Adicionar"}
+      transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+      label="Adicionar"
       onClick={onAddModalOpen}
       width="150px"
     />
@@ -41,29 +46,40 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="40px"
-      bgColor={"header.100"}
-      _hover={{ bgColor: "primary.200" }}
-      textColor={"white"}
-      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
+      h="35px"
+      bgColor="#3B5366"
+      boxShadow="none"
+      _hover={{ 
+        bgColor: "#2A3A4A",
+      }}
+      _active={{
+        bgColor: "#1A2A3A",
+      }}
+      textColor="white"
       borderRadius="7px"
-      _active={{ bgColor: "primary.200" }}
-      label={"Lista mestre"}
+      transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+      label="Lista mestre"
       width="150px"
     />
   );
+
   const revisivionButton = (
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="40px"
-      bgColor={"header.100"}
-      _hover={{ bgColor: "primary.200" }}
-      textColor={"white"}
-      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
+      h="35px"
+      bgColor="#3B5366"
+      boxShadow="none"
+      _hover={{ 
+        bgColor: "#2A3A4A",
+      }}
+      _active={{
+        bgColor: "#1A2A3A",
+      }}
+      textColor="white"
       borderRadius="7px"
-      _active={{ bgColor: "primary.200" }}
-      label={"Revisões"}
+      transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+      label="Revisões"
       width="150px"
       onClick={() => navigate("/revisions")}
     />
@@ -73,18 +89,24 @@ const ActionsButtons = ({ canAdd }) => {
     <ButtonPrimary
       fontSize="sm"
       fontWeight="bold"
-      h="40px"
-      bgColor={"header.100"}
-      _hover={{ bgColor: "primary.200" }}
-      textColor={"white"}
-      boxShadow="0 2px 8px rgba(0, 0, 0, 0.1)"
+      h="35px"
+      bgColor="#3B5366"
+      boxShadow="none"
+      _hover={{ 
+        bgColor: "#2A3A4A",
+      }}
+      _active={{
+        bgColor: "#1A2A3A",
+      }}
+      textColor="white"
       borderRadius="7px"
-      _active={{ bgColor: "primary.200" }}
-      label={"Lembretes"}
+      transition="all 0.2s cubic-bezier(.08,.52,.52,1)"
+      label="Lembretes"
       width="150px"
       onClick={() => navigate("/reminders")}
     />
   );
+
   return (
     <>
       {isMobile ? (

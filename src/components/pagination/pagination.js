@@ -25,39 +25,45 @@ export const Pagination = ({
     onClickPagination(next);
   };
 
-  const dotsButton = () => {
-    return (
-      <Button
-        _hover={{ bgColor: "secondaryGray.400" }}
-        sx={{ borderRadius: "7px" }}
-        fontWeight={"bold"}
-        disabled={true}
-        _disabled={{ color: "black" }}
-        bgColor={"secondaryGray.400"}
-        cursor={"not-allowed"}
-        maxHeight={"30px"}
-      >
-        ...
-      </Button>
-    );
-  };
+  const dotsButton = () => (
+    <Button
+      size="sm"
+      variant="ghost"
+      disabled
+      _disabled={{ opacity: 0.6 }}
+      minW="7"
+      h="7"
+      p="1"
+      fontSize="sm"
+      color={colorMode === "light" ? "gray.500" : "gray.300"}
+    >
+      ...
+    </Button>
+  );
 
-  const mountButtonPage = (page) => {
-    return (
-      <Button
-        _hover={{ bgColor: "secondaryGray.400" }}
-        sx={{ borderRadius: "7px" }}
-        fontWeight={"normal"}
-        key={page}
-        onClick={() => onPageClick(page)}
-        isActive={Number(currentPage) === page}
-        bgColor={"secondaryGray.100"}
-        maxHeight={"30px"}
-      >
-        {page}
-      </Button>
-    );
-  };
+  const mountButtonPage = (page) => (
+    <Button
+      size="sm"
+      minW="7"
+      h="7"
+      p="1"
+      fontSize="sm"
+      variant="ghost"
+      color={colorMode === "light" ? "gray.600" : "gray.200"}
+      _hover={{ 
+        bg: colorMode === "light" ? "gray.100" : "whiteAlpha.200",
+        transform: "scale(1.05)"
+      }}
+      _active={{
+        bg: colorMode === "light" ? "gray.200" : "whiteAlpha.300",
+      }}
+      isActive={Number(currentPage) === page}
+      onClick={() => onPageClick(page)}
+    >
+      {page}
+    </Button>
+  );
+
   const handleMiddlePages = () => {
     let pageButtons = [];
     if (totalPages <= 5) {
@@ -93,36 +99,38 @@ export const Pagination = ({
 
   return (
     <HStack 
-      padding={hasPadding ? "20px" : "0"}
-      spacing="2"
+      padding={hasPadding ? "12px" : "0"}
+      spacing="1"
       justify="center"
       width="100%"
       bg={colorMode === "light" ? "white" : "navy.900"}
     >
       <Button
+        size="sm"
+        h="7"
+        px="2"
+        fontSize="sm"
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
         fontWeight="normal"
         onClick={() => onPageClick(Number(currentPage) - 1)}
         disabled={Number(currentPage) === 1}
         bgColor="secondaryGray.100"
-        height="30px"
-        minW="auto"
-        px="3"
       >
         {t("Anterior")}
       </Button>
       {handleMiddlePages()}
       <Button
+        size="sm"
+        h="7"
+        px="2"
+        fontSize="sm"
         _hover={{ bgColor: "secondaryGray.400" }}
         sx={{ borderRadius: "7px" }}
         fontWeight="normal"
         onClick={() => onPageClick(Number(currentPage) + 1)}
         disabled={Number(currentPage) === lastPage || lastPage === 0}
         bgColor="secondaryGray.100"
-        height="30px"
-        minW="auto"
-        px="3"
       >
         {t("Próximo")}
       </Button>

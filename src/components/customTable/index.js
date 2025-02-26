@@ -309,6 +309,7 @@ const TableCustom = ({
         <FormInput
           variant="auth"
           fontSize="sm"
+          h="35px"
           ms={0}
           type="text"
           placeholder={t("Pesquisar")}

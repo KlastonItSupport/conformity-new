@@ -116,7 +116,11 @@ export const mockedData = [
   },
 ];
 export const columns = [
-  { header: i18n.t("Código"), access: "id" },
+  // Remove or comment out the code column definition
+  // {
+  //   Header: "Código",
+  //   accessor: "code",
+  // },
   {
     header: i18n.t("Empresa"),
     access: "companyName",
@@ -150,4 +154,4 @@ export const columns = [
     access: "revisionDate",
     formatData: (data) => moment.utc(data).format("DD/MM/YYYY"),
   },
-];
+].filter(Boolean);
